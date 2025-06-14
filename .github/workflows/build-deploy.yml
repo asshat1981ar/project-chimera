@@ -71,5 +71,6 @@ jobs:
       with:
         name: app-release
         path: android/app/build/outputs/apk/release/app-release.apk
-
+    - name: Claude Code Action Official
+      .uses: anthropics/claude-code-action@beta
   # ... rest of your workflow remains the same
