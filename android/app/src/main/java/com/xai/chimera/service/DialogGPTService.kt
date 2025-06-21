@@ -30,7 +30,7 @@ class DialogGPTService(
             
             val response = apiService.generateDialogue(request)
             if (response.isSuccessful && response.body() != null) {
-                val dialogueResponse = response.body()!!
+                val dialogueResponse = response.body() ?: throw RuntimeException("Empty response body")
                 emotionEngine.updatePlayerEmotionalState(playerId, dialogueResponse)
                 return@withContext dialogueResponse
             } else {
@@ -46,7 +46,7 @@ class DialogGPTService(
         return withContext(Dispatchers.IO) {
             val response = apiService.getDialogue(dialogueId)
             if (response.isSuccessful && response.body() != null) {
-                return@withContext response.body()!!
+                return@withContext response.body() ?: throw RuntimeException("Empty response body")
             } else {
                 throw RuntimeException("Failed to retrieve dialogue: ${response.errorBody()?.string()}")
             }

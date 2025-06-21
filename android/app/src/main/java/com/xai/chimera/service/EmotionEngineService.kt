@@ -1,24 +1,23 @@
 package com.xai.chimera.service
 
 import com.xai.chimera.api.DialogueResponse
-import com.xai.chimera.api.Emotion
 
 /**
- * Service for handling emotion processing in the DialogGPT system
+ * Enhanced service for consciousness-inspired emotion processing
  */
 interface EmotionEngineService {
     /**
-     * Analyzes text and extracts emotions
+     * Analyzes text and extracts emotions as intensity map
      */
-    suspend fun analyzeEmotions(text: String): List<Emotion>
+    suspend fun analyzeEmotions(text: String): Map<String, Float>
     
     /**
      * Updates player emotional state based on dialogue response
      */
-    suspend fun updatePlayerEmotionalState(playerId: String, response: DialogueResponse)
+    suspend fun updatePlayerEmotionalState(playerId: String, dialogueResponse: DialogueResponse)
     
     /**
      * Gets recommended emotional responses based on context
      */
-    suspend fun getRecommendedEmotions(context: String): List<Emotion>
+    suspend fun getRecommendedEmotions(playerId: String, context: String): Map<String, Float>
 }
