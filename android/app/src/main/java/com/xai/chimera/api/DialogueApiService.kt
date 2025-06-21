@@ -24,7 +24,7 @@ data class DialogueRequest(
 )
 
 data class DialogueResponse(
-    val id: String,
+    val id: String = "",
     val text: String,
     val emotions: Map<String, Float> = emptyMap(),
     val nextPrompts: List<String>? = null,
