@@ -1,2 +1,3 @@
 # project-chimera
-# test
+
+This repository is used to explore code management examples.
