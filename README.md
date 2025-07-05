@@ -295,3 +295,12 @@ Every NPC interaction demonstrates genuine behavioral evolution. Every conscious
 *Built with ❤️ for the advancement of AI consciousness research and the future of interactive entertainment.*
 
 **⭐ Star this repository to support AI consciousness research!**
+## 🛠️ Autonomous SDLC Orchestrator
+
+A simple Python script is included to demonstrate Bayesian task planning. Run it with:
+
+```bash
+python automation/orchestrator.py
+```
+
+The script outputs a JSON plan containing beliefs and tasks sorted by expected gain. Extend it to fit your workflow.
