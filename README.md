@@ -304,5 +304,4 @@ python automation/orchestrator.py
 ```
 
 The script outputs a JSON plan containing beliefs and tasks sorted by expected gain. Extend it to fit your workflow.
-=======
 # project-chimera
