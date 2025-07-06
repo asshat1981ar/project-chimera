@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Project Chimera</string>
+    <string name="consciousness_level">Consciousness Level</string>
+    <string name="creativity_metrics">Creativity Metrics</string>
+    <string name="system_archetypes">System Archetypes</string>
+    <string name="npc_interactions">NPC Interactions</string>
+    <string name="emotional_archaeology">Emotional Archaeology</string>
+    <string name="emergent_narrative">Emergent Narrative</string>
+</resources>
