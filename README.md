@@ -1,6 +1,6 @@
 🧠 Project Chimera - Revolutionary AI-Driven NPC Consciousness
 
-[![Android CI/CD](https://github.com/asshat1981ar/project-chimera/actions/workflows/android.yml/badge.svg)](https://github.com/asshat1981ar/project-chimera/actions/workflows/android.yml)
+Android CI/CD](https://github.com/asshat1981ar/project-chimera/actions/workflows/android.yml/badge.svg)](https://github.com/asshat1981ar/project-chimera/actions/workflows/android.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
 
