@@ -6,20 +6,23 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import android.content.Context
 import com.xai.chimera.dao.PlayerDao
+import com.xai.chimera.dao.SelfOptMetricsDao
 import com.xai.chimera.domain.Player
+import com.xai.chimera.domain.SelfOptMetrics
 
 /**
  * Room database for Project Chimera consciousness-aware dialogue system
  */
 @Database(
-    entities = [Player::class],
-    version = 1,
+    entities = [Player::class, SelfOptMetrics::class],
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class ChimeraDatabase : RoomDatabase() {
     
     abstract fun playerDao(): PlayerDao
+    abstract fun selfOptMetricsDao(): SelfOptMetricsDao
     
     companion object {
         @Volatile
