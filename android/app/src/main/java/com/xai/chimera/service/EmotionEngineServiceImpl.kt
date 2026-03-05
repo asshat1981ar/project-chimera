@@ -7,6 +7,7 @@ import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.random.Random
 
 /**
  * Enhanced EmotionEngine with consciousness-inspired features
@@ -123,7 +124,7 @@ class EmotionEngineServiceImpl : EmotionEngineService {
         emotionKeywords.forEach { (emotion, keywords) ->
             val matches = keywords.count { keyword -> lowerText.contains(keyword) }
             if (matches > 0) {
-                emotions[emotion] = min(1.0f, matches * 0.3f + (Math.random() * 0.2f).toFloat())
+                emotions[emotion] = min(1.0f, matches * 0.3f + Random.nextFloat() * 0.2f)
             }
         }
         

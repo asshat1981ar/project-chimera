@@ -9,6 +9,8 @@ import javax.inject.Inject
 import com.chimera.core.archetypes.SystemArchetypeEngine
 import com.chimera.core.events.GameEventBus
 import com.chimera.core.worldstate.WorldStateManagerService
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 
 @HiltViewModel
 class ChimeraMainViewModel @Inject constructor(

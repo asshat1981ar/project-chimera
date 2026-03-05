@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.*
+import kotlin.random.Random
 
 /**
  * SystemArchetypeEngine - Core Innovation of Project Chimera
@@ -217,7 +218,7 @@ class SystemArchetypeEngine {
                 InteractionType.PLAYER_DEESCALATION -> {
                     playerAggression.setValue(0.0f)
                     // NPC may not immediately accept deescalation
-                    if (tensionLevel.value > 0.8f && Math.random() < 0.3) {
+                    if (tensionLevel.value > 0.8f && Random.nextDouble() < 0.3) {
                         npcAggression.addValue(0.2f) // Rejection
                     } else {
                         npcAggression.multiplyValue(0.8f) // Cooling down
