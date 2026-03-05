@@ -3,7 +3,6 @@ package com.xai.chimera.test
 import com.xai.chimera.api.DialogueApiService
 import com.xai.chimera.api.DialogueRequest
 import com.xai.chimera.api.DialogueResponse
-import com.xai.chimera.api.Emotion
 import com.xai.chimera.dao.PlayerDao
 import com.xai.chimera.domain.Player
 import com.xai.chimera.service.DialogGPTService
@@ -57,7 +56,7 @@ class DialogGPTServiceTest {
         val dialogueResponse = DialogueResponse(
             id = "dialogue123",
             text = "Hello! How can I help you today?",
-            emotions = listOf(Emotion("friendly", 0.9f), Emotion("helpful", 0.8f))
+            emotions = mapOf("friendly" to 0.9f, "helpful" to 0.8f)
         )
         
         `when`(playerDao.getPlayer(playerId)).thenReturn(player)
@@ -92,7 +91,7 @@ class DialogGPTServiceTest {
         val dialogueResponse = DialogueResponse(
             id = dialogueId,
             text = "Hello! How can I help you today?",
-            emotions = listOf(Emotion("friendly", 0.9f), Emotion("helpful", 0.8f))
+            emotions = mapOf("friendly" to 0.9f, "helpful" to 0.8f)
         )
         
         `when`(apiService.getDialogue(dialogueId)).thenReturn(Response.success(dialogueResponse))
