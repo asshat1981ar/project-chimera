@@ -4,71 +4,66 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Architecture
 
-**Project Chimera DialogGPT** is a conversational AI system with both Android and web components:
+**Chimera: Ashes of the Hollow King** is an Android-first narrative RPG with AI-assisted dialogue and stateful companion relationships.
 
-- **Android App**: Kotlin-based Android application (`android/`) using modern Android architecture
-- **Web Component**: Configured for deployment via Netlify/Vercel with build automation
-- **Core Services**: DialogGPT service with emotion processing capabilities
+### Module Structure
+
+```
+:core-model      Pure Kotlin domain data classes (no Android deps)
+:core-database   Android library: Room entities, DAOs, Hilt DI, RelationshipArchetypeEngine
+:app             Android application: Compose UI, navigation, screens, DI
+```
+
+The `android/` directory contains a legacy DialogGPT service module (excluded from build, reference only).
 
 ### Key Components
 
-1. **DialogGPTService** (`android/app/src/main/java/com/xai/chimera/service/DialogGPTService.kt`): Main service orchestrating dialogue generation, player state management, and emotion processing
-2. **DialogueApiService** (`android/app/src/main/java/com/xai/chimera/api/DialogueApiService.kt`): Retrofit-based API interface for dialogue requests/responses
-3. **EmotionEngineService** (`android/app/src/main/java/com/xai/chimera/service/EmotionEngineService.kt`): Interface for emotion analysis and player emotional state updates
-4. **PlayerDao** (`android/app/src/main/java/com/xai/chimera/dao/PlayerDao.kt`): Data access layer for player persistence
-5. **Player Domain** (`android/app/src/main/java/com/xai/chimera/domain/Player.kt`): Player entity with emotions and dialogue history
+1. **Room Database** (`core-database/.../ChimeraGameDatabase.kt`): Game persistence with entities for SaveSlots, Characters, CharacterStates, DialogueTurns
+2. **RelationshipArchetypeEngine** (`core-database/.../engine/RelationshipArchetypeEngine.kt`): Systems-thinking feedback loops driving NPC disposition changes
+3. **GameEventBus** (`app/.../core/events/GameEventBus.kt`): SharedFlow-based event system using `com.chimera.model.GameEvent` sealed hierarchy
+4. **GameSessionManager** (`app/.../data/GameSessionManager.kt`): Holds active save slot ID for the play session
+5. **Navigation** (`app/.../ui/navigation/`): Compose Navigation with bottom bar (Home, Map, Camp, Journal, Party) and fullscreen dialogue scenes
 
 ### Data Flow
-- Player interacts → DialogGPTService coordinates → API call via DialogueApiService → EmotionEngine updates player state → PlayerDao persists changes
+- Player selects save slot → GameSessionManager stores active slot
+- Player enters scene from Map/Home → ChimeraNavHost navigates to DialogueSceneScreen
+- Dialogue completes → RelationshipArchetypeEngine processes interaction → CharacterState updated via DAO
+- Journal/Camp/Party screens read state through DAOs scoped to active save slot
+
+### Domain Models (core-model)
+- `SaveSlot`: Save game slot with player name, chapter, playtime
+- `Character`: NPC/companion definition with role enum
+- `CharacterState`: Mutable state (disposition, emotions, archetype variables)
+- `GameEvent`: Sealed event hierarchy for cross-system communication
 
 ## Development Commands
 
-### Android Development
+### Build (from project root)
 ```bash
-# Navigate to android directory first
-cd android
-
-# Build the project
-./gradlew build
-
-# Run tests
-./gradlew test
-
-# Clean build
-./gradlew clean
-
-# Build debug APK
-./gradlew assembleDebug
+./gradlew build          # Build all modules
+./gradlew test           # Run tests
+./gradlew clean build    # Clean build
+./gradlew assembleDebug  # Build debug APK
 ```
 
-### Web Development (if working on web components)
+### Legacy Android module (reference only)
 ```bash
-# Install dependencies
-npm install
-
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+cd android && ./gradlew test  # Run legacy tests
 ```
 
 ## Testing
-- Unit tests located in `android/app/src/test/java/com/xai/chimera/test/`
-- Uses JUnit 4, Mockito, and Kotlin test framework
-- Mock-based testing pattern for service layer testing
-- Run tests with `./gradlew test` from android directory
+- New tests go in module-specific test directories
+- DAOs: use in-memory Room database
+- ViewModels: use Turbine for StateFlow testing
+- Uses JUnit 4, Coroutines Test, Turbine, Google Truth
 
 ## Dependencies
-- **Android**: Kotlin, Retrofit, Coroutines, Room, ViewModel/LiveData, Material Design
-- **Testing**: JUnit, Mockito, Coroutines Test
-- **Build**: Gradle with Kotlin DSL, Android Gradle Plugin 8.1.0
+- **Android**: Kotlin 1.9.10, Jetpack Compose (BOM 2023.10.01), Hilt 2.48, Room 2.6.1
+- **Navigation**: Compose Navigation 2.7.6, Hilt Navigation Compose 1.1.0
+- **Serialization**: kotlinx-serialization-json 1.6.0
+- **Build**: Gradle 8.4, AGP 8.1.2, Version Catalog (`gradle/libs.versions.toml`)
 
 ## Deployment
-- **CI/CD**: GitHub Actions workflow (`.github/workflows/build-deploy.yml`)
-- **Android**: Builds APK and uploads as artifact
-- **Web**: Auto-deploys to Netlify on main branch pushes
-- **Requirements**: Java 17, Node.js 18+
+- **CI/CD**: GitHub Actions (`.github/workflows/android.yml`)
+- **Android**: Builds debug/release/demo APKs
+- **Requirements**: Java 8+ (compile target), SDK 34
