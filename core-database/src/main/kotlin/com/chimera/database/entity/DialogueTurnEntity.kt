@@ -2,11 +2,20 @@ package com.chimera.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "dialogue_turns",
+    foreignKeys = [
+        ForeignKey(
+            entity = SaveSlotEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["save_slot_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
     indices = [
         Index("save_slot_id"),
         Index("scene_id")

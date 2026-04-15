@@ -21,7 +21,11 @@ interface CharacterStateDao {
 
     @Query(
         "UPDATE character_states SET disposition_to_player = " +
-        "MAX(-1.0, MIN(1.0, disposition_to_player + :delta)) " +
+        "CASE " +
+        "WHEN disposition_to_player + :delta < -1.0 THEN -1.0 " +
+        "WHEN disposition_to_player + :delta > 1.0 THEN 1.0 " +
+        "ELSE disposition_to_player + :delta " +
+        "END " +
         "WHERE character_id = :characterId"
     )
     suspend fun adjustDisposition(characterId: String, delta: Float)

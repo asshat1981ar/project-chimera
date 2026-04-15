@@ -41,7 +41,7 @@ fun ChimeraNavHost(
         composable(ChimeraRoutes.SAVE_SLOT_SELECT) {
             SaveSlotSelectScreen(
                 onSlotSelected = { slotId ->
-                    navController.navigate(ChimeraRoutes.HOME) {
+                    navController.navigate(ChimeraRoutes.GAME_GRAPH) {
                         popUpTo(ChimeraRoutes.SAVE_SLOT_SELECT) { inclusive = true }
                     }
                 }

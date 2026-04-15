@@ -56,8 +56,10 @@ fun Character.toEntity() = CharacterEntity(
 fun CharacterStateEntity.toModel() = CharacterState(
     characterId = characterId,
     saveSlotId = saveSlotId,
-    healthFraction = healthFraction,
-    dispositionToPlayer = dispositionToPlayer,
+    healthFraction = healthFraction.coerceIn(0f, 1f),
+    dispositionToPlayer = dispositionToPlayer.coerceIn(
+        CharacterState.DISPOSITION_MIN, CharacterState.DISPOSITION_MAX
+    ),
     emotionalState = converters.toFloatMap(emotionalStateJson),
     activeArchetype = activeArchetype,
     archetypeVariables = converters.toFloatMap(archetypeVariablesJson),

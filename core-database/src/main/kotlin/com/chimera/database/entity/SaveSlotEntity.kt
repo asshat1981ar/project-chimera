@@ -2,9 +2,13 @@ package com.chimera.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "save_slots")
+@Entity(
+    tableName = "save_slots",
+    indices = [Index(value = ["slot_index"], unique = true)]
+)
 data class SaveSlotEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
