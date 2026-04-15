@@ -1,8 +1,13 @@
 package com.chimera.ui.screens.dialogue
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -12,26 +17,38 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,6 +66,7 @@ fun DialogueSceneScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    var typedInput by remember { mutableStateOf("") }
 
     LaunchedEffect(uiState.transcript.size) {
         if (uiState.transcript.isNotEmpty()) {
@@ -73,23 +91,58 @@ fun DialogueSceneScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onSceneComplete) {
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = "Leave scene",
-                        tint = FadedBone
-                    )
+                    Icon(Icons.Default.ArrowBack, "Leave scene", tint = FadedBone)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(uiState.sceneTitle, style = MaterialTheme.typography.titleMedium)
                     Text(
-                        text = uiState.sceneTitle,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = "${uiState.npcName} - ${uiState.npcMood}",
+                        "${uiState.npcName} -- ${uiState.npcMood}",
                         style = MaterialTheme.typography.bodySmall,
                         color = FadedBone
                     )
+                }
+                if (uiState.isFallbackMode) {
+                    Text(
+                        "AUTHORED",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = EmberGold.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = EmberGold
+                    )
+                }
+            }
+        }
+
+        // Relationship banner
+        AnimatedVisibility(
+            visible = uiState.relationshipBanner != null,
+            enter = slideInVertically() + fadeIn(),
+            exit = fadeOut()
+        ) {
+            uiState.relationshipBanner?.let { banner ->
+                Surface(
+                    color = if (banner.delta > 0) VoidGreen.copy(alpha = 0.2f) else HollowCrimson.copy(alpha = 0.2f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "${banner.npcName}: ${if (banner.delta > 0) "+" else ""}${String.format("%.0f", banner.delta * 100)}%",
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                        color = if (banner.delta > 0) VoidGreen else HollowCrimson,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                LaunchedEffect(banner) {
+                    kotlinx.coroutines.delay(2500)
+                    viewModel.dismissRelationshipBanner()
                 }
             }
         }
@@ -108,11 +161,8 @@ fun DialogueSceneScreen(
         }
 
         // Quick intents
-        if (uiState.quickIntents.isNotEmpty()) {
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 4.dp
-            ) {
+        if (uiState.quickIntents.isNotEmpty() && !uiState.isLoading) {
+            Surface(color = MaterialTheme.colorScheme.surface) {
                 FlowRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -123,12 +173,7 @@ fun DialogueSceneScreen(
                     uiState.quickIntents.forEach { intent ->
                         AssistChip(
                             onClick = { viewModel.selectIntent(intent) },
-                            label = {
-                                Text(
-                                    text = intent,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            },
+                            label = { Text(intent, style = MaterialTheme.typography.bodySmall) },
                             colors = AssistChipDefaults.assistChipColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 labelColor = MaterialTheme.colorScheme.onSurface
@@ -137,6 +182,46 @@ fun DialogueSceneScreen(
                                 borderColor = EmberGold.copy(alpha = 0.3f)
                             )
                         )
+                    }
+                }
+            }
+        }
+
+        // Text input composer
+        if (!uiState.isSceneComplete) {
+            val sendMessage = {
+                if (typedInput.isNotBlank()) {
+                    viewModel.submitTypedInput(typedInput)
+                    typedInput = ""
+                }
+            }
+            Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 4.dp) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = typedInput,
+                        onValueChange = { typedInput = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("Speak your mind...") },
+                        singleLine = true,
+                        enabled = !uiState.isLoading,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                        keyboardActions = KeyboardActions(onSend = { sendMessage() }),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = EmberGold,
+                            cursorColor = EmberGold
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = { sendMessage() },
+                        enabled = typedInput.isNotBlank() && !uiState.isLoading
+                    ) {
+                        Icon(Icons.Default.Send, "Send", tint = EmberGold)
                     }
                 }
             }
@@ -154,12 +239,22 @@ private fun DialogueBubble(line: DialogueLine) {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = alignment
     ) {
-        Text(
-            text = line.speakerName,
-            style = MaterialTheme.typography.labelMedium,
-            color = nameColor,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = line.speakerName,
+                style = MaterialTheme.typography.labelMedium,
+                color = nameColor
+            )
+            if (!line.isPlayer && line.emotion != "neutral") {
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = line.emotion,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = FadedBone.copy(alpha = 0.6f)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant

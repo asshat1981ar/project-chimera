@@ -3,10 +3,12 @@ package com.chimera.database.mapper
 import com.chimera.database.converter.Converters
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.CharacterStateEntity
+import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.database.entity.SaveSlotEntity
 import com.chimera.model.Character
 import com.chimera.model.CharacterRole
 import com.chimera.model.CharacterState
+import com.chimera.model.MemoryShard
 import com.chimera.model.SaveSlot
 
 private val converters = Converters()
@@ -75,4 +77,25 @@ fun CharacterState.toEntity() = CharacterStateEntity(
     activeArchetype = activeArchetype,
     archetypeVariablesJson = converters.fromFloatMap(archetypeVariables),
     lastInteractionEpoch = lastInteractionEpoch
+)
+
+fun MemoryShardEntity.toModel() = MemoryShard(
+    id = id,
+    saveSlotId = saveSlotId,
+    sceneId = sceneId,
+    characterId = characterId,
+    summary = summary,
+    tags = emptyList(), // TODO: add string list converter when needed
+    importanceScore = importanceScore,
+    createdAt = createdAt
+)
+
+fun MemoryShard.toEntity() = MemoryShardEntity(
+    id = id,
+    saveSlotId = saveSlotId,
+    sceneId = sceneId,
+    characterId = characterId,
+    summary = summary,
+    importanceScore = importanceScore,
+    createdAt = createdAt
 )
