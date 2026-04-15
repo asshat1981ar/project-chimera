@@ -43,5 +43,23 @@
     "initialDisposition": -0.5,
     "archetype": null,
     "portraitResName": null
+  },
+  {
+    "id": "thorne",
+    "name": "Thorne",
+    "title": "The Deserter",
+    "role": "COMPANION",
+    "initialDisposition": -0.1,
+    "archetype": "ESCALATION",
+    "portraitResName": null
+  },
+  {
+    "id": "vessa",
+    "name": "Vessa",
+    "title": "The Hollow Priestess",
+    "role": "NPC_NEUTRAL",
+    "initialDisposition": 0.0,
+    "archetype": "SHIFTING_THE_BURDEN",
+    "portraitResName": null
   }
 ]

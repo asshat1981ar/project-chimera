@@ -6,7 +6,9 @@
     "npcName": "The Warden",
     "setting": "the crumbling gates of the Hollow",
     "stakes": "First contact with a gatekeeper who controls access to the ruins",
-    "maxTurns": 12
+    "maxTurns": 12,
+    "allowedReveals": ["hollow_history"],
+    "forbiddenTopics": ["king_identity"]
   },
   {
     "sceneId": "outer_ruins_1",
@@ -24,7 +26,9 @@
     "npcName": "Marcus the Guard",
     "setting": "atop a watchtower overlooking the Hollow",
     "stakes": "A suspicious guard questions your intentions and loyalty",
-    "maxTurns": 10
+    "maxTurns": 10,
+    "allowedReveals": ["garrison_movements"],
+    "forbiddenTopics": ["corruption_source"]
   },
   {
     "sceneId": "merchants_1",
@@ -33,7 +37,9 @@
     "npcName": "Aria the Scholar",
     "setting": "a sheltered alcove where travelers barter",
     "stakes": "A scholar seeks a research partner but hides a dangerous agenda",
-    "maxTurns": 12
+    "maxTurns": 12,
+    "allowedReveals": ["scholar_research"],
+    "forbiddenTopics": ["king_history"]
   },
   {
     "sceneId": "deep_hollow_1",
@@ -44,6 +50,59 @@
     "stakes": "A spectral echo offers power at a terrible cost",
     "maxTurns": 8,
     "allowedReveals": ["king_history", "corruption_source"],
+    "forbiddenTopics": ["escape_route"]
+  },
+  {
+    "sceneId": "elena_recruitment",
+    "sceneTitle": "The Merchant's Gambit",
+    "npcId": "elena",
+    "npcName": "Elena the Merchant",
+    "setting": "Elena's hidden cache behind the outer ruins",
+    "stakes": "Elena offers to join your cause if you prove your worth -- but her terms are steep",
+    "maxTurns": 10,
+    "allowedReveals": ["trade_routes", "supply_cache"]
+  },
+  {
+    "sceneId": "thorne_encounter",
+    "sceneTitle": "The Deserter's Camp",
+    "npcId": "thorne",
+    "npcName": "Thorne the Deserter",
+    "setting": "a makeshift camp hidden behind the watchtower's shadow",
+    "stakes": "A deserter from the Hollow garrison offers combat expertise but carries dangerous secrets",
+    "maxTurns": 12,
+    "allowedReveals": ["garrison_betrayal", "hollow_defenses"],
+    "forbiddenTopics": ["king_identity"]
+  },
+  {
+    "sceneId": "vessa_shrine",
+    "sceneTitle": "The Broken Shrine",
+    "npcId": "vessa",
+    "npcName": "Vessa the Hollow Priestess",
+    "setting": "a corrupted shrine where incense burns black",
+    "stakes": "A priestess tends a corrupted altar and speaks in riddles about the King's fall",
+    "maxTurns": 10,
+    "allowedReveals": ["corruption_source", "hollow_faith"],
+    "forbiddenTopics": ["garrison_movements"]
+  },
+  {
+    "sceneId": "warden_betrayal",
+    "sceneTitle": "The Warden's Secret",
+    "npcId": "warden",
+    "npcName": "The Warden",
+    "setting": "a hidden chamber beneath the gate mechanism",
+    "stakes": "The Warden reveals a terrible truth about why the Hollow was sealed",
+    "maxTurns": 10,
+    "allowedReveals": ["warden_secret", "king_identity"]
+  },
+  {
+    "sceneId": "hollow_approach",
+    "sceneTitle": "March to the Throne",
+    "npcId": "hollow_king",
+    "npcName": "The Hollow King's Echo",
+    "setting": "the crumbling processional hall leading to the throne room",
+    "stakes": "The King's echo tests your resolve one final time before granting passage",
+    "maxTurns": 8,
+    "allowedReveals": ["king_history", "corruption_source", "king_identity"],
     "forbiddenTopics": ["escape_route"]
   }
 ]

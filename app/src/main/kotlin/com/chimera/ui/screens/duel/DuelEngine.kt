@@ -100,7 +100,8 @@ class DuelEngine(
     }
 
     private fun buildNarrative(player: Stance, opponent: Stance, outcome: RoundOutcome, round: Int): String {
-        return when (outcome) {
+        val escalation = getEscalationPrefix(round)
+        val core = when (outcome) {
             RoundOutcome.WIN -> when (player) {
                 Stance.STRIKE -> "Your strike cuts through ${opponentName}'s feint. Their resolve wavers."
                 Stance.WARD -> "You hold firm against ${opponentName}'s blow. The impact rebounds."
@@ -112,6 +113,20 @@ class DuelEngine(
                 Stance.FEINT -> "${opponentName}'s feint draws you out of position."
             }
             RoundOutcome.DRAW -> "You mirror each other's stance. The ritual holds its breath."
+        }
+        return if (escalation.isNotEmpty()) "$escalation $core" else core
+    }
+
+    private fun getEscalationPrefix(round: Int): String {
+        return when (round) {
+            1 -> ""
+            2 -> "You test each other's measure."
+            3 -> "The ritual crackles with building energy."
+            4 -> "Sweat beads on both brows. The air grows heavy."
+            5 -> "The stones beneath your feet hum with power."
+            6 -> "One of you will break. The ritual demands it."
+            7 -> "This is the final exchange. Everything rides on this moment."
+            else -> ""
         }
     }
 }

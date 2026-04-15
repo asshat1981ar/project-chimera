@@ -78,11 +78,15 @@ class FakeDialogueProvider @Inject constructor() : DialogueProvider {
                 flags = listOf("scene_ending"),
                 directorNotes = "Scene reaching max turns, wrap up"
             )
-            else -> DialogueTurnResult(
-                npcLine = getGenericResponse(disposition, turnCount),
-                emotion = if (disposition > 0.2f) "warm" else if (disposition < -0.2f) "cold" else "neutral",
-                relationshipDelta = 0.01f
-            )
+            else -> {
+                val line = getNpcVoicedResponse(contract.npcId, disposition, turnCount)
+                    ?: getGenericResponse(disposition, turnCount)
+                DialogueTurnResult(
+                    npcLine = line,
+                    emotion = if (disposition > 0.2f) "warm" else if (disposition < -0.2f) "cold" else "neutral",
+                    relationshipDelta = 0.01f
+                )
+            }
         }
     }
 
@@ -138,6 +142,149 @@ class FakeDialogueProvider @Inject constructor() : DialogueProvider {
         )
         return responses[turnCount % responses.size]
     }
+
+    private fun getNpcVoicedResponse(npcId: String, disposition: Float, turnCount: Int): String? {
+        val voices = npcVoices[npcId] ?: return null
+        val tier = when {
+            disposition > 0.3f -> voices.warm
+            disposition < -0.2f -> voices.cold
+            else -> voices.neutral
+        }
+        return tier[turnCount % tier.size]
+    }
+
+    private data class NpcVoice(
+        val warm: List<String>,
+        val cold: List<String>,
+        val neutral: List<String>
+    )
+
+    private val npcVoices = mapOf(
+        "warden" to NpcVoice(
+            warm = listOf(
+                "Duty brought me to this gate, but you give me reason to hope it wasn't in vain.",
+                "You carry yourself well. The Hollow respects strength -- and so do I.",
+                "I've watched the gate for years. Few earn my trust. You have."
+            ),
+            cold = listOf(
+                "The gate stays shut to those who cannot prove their worth. That includes you.",
+                "Duty demands I stand here. It does not demand I tolerate fools.",
+                "The gate remembers every soul that passed. It will remember you too -- briefly."
+            ),
+            neutral = listOf(
+                "The gate has stood longer than any of us. It will outlast us all.",
+                "I neither welcome nor refuse you. The Hollow decides who enters.",
+                "Duty is its own reward. Or so they told me when they posted me here."
+            )
+        ),
+        "elena" to NpcVoice(
+            warm = listOf(
+                "For you? A fair price. You've earned that much from me.",
+                "You strike a fair deal, and that's rare in the Hollow. I like working with you.",
+                "Business is business, but friendship? That's something I don't offer lightly. Consider it offered.",
+                "I've saved something special. Not for sale -- a gift. Don't make me regret it."
+            ),
+            cold = listOf(
+                "Everything has a price, and yours just went up.",
+                "I trade with anyone who pays. That doesn't mean I have to enjoy the company.",
+                "Coin talks. You don't. Pay or leave."
+            ),
+            neutral = listOf(
+                "The Hollow runs on barter. What do you bring to the table?",
+                "I've survived here longer than most soldiers. Commerce is its own kind of armor.",
+                "Supply and demand, stranger. Right now, I'm the supply, and you're the demand."
+            )
+        ),
+        "marcus" to NpcVoice(
+            warm = listOf(
+                "At ease. You've proven you're not the enemy. That's enough for now.",
+                "I don't say this often, but you fight clean. The garrison could use someone like you.",
+                "Stand with me on the wall sometime. I'll show you what we're really guarding against."
+            ),
+            cold = listOf(
+                "State your business or move along. I don't have time for games.",
+                "I've seen your kind before. All talk, no backbone when the shadows come.",
+                "One wrong move and I'll have you in irons. Don't test me.",
+                "The garrison doesn't tolerate threats. Neither do I."
+            ),
+            neutral = listOf(
+                "The watchtower sees everything. Including you.",
+                "I keep watch. That's my purpose. What's yours?",
+                "Another traveler. The Hollow collects them like stones in a river."
+            )
+        ),
+        "aria" to NpcVoice(
+            warm = listOf(
+                "Fascinating -- you understood that immediately. Most people stare blankly when I explain it.",
+                "The texts suggest a connection between the corruption and the King's crown. I need your help to prove it.",
+                "I rarely share my research, but you've earned access. Come, let me show you what I've found.",
+                "You ask the questions I've been afraid to ask myself. That takes courage."
+            ),
+            cold = listOf(
+                "Your ignorance is showing. Perhaps come back when you've read something. Anything.",
+                "I don't share my work with the unworthy. And you are decidedly unworthy.",
+                "The texts are clear on one point: knowledge belongs to those who seek it. You merely stumble."
+            ),
+            neutral = listOf(
+                "The archives hold more answers than any living person. I merely interpret.",
+                "Interesting. Not the answer I expected, but interesting nonetheless.",
+                "Every ruin tells a story. I'm still reading this one."
+            )
+        ),
+        "thorne" to NpcVoice(
+            warm = listOf(
+                "You don't know what it was like in the garrison. But you listen, and that counts for something.",
+                "I deserted because staying meant dying for a lie. You're the first person who didn't judge me for it.",
+                "Trust gets people killed. But I'm starting to think not trusting you might be worse."
+            ),
+            cold = listOf(
+                "Another righteous outsider. Save the lectures -- I've heard them all.",
+                "You want to know why I deserted? None of your damn business.",
+                "Keep your distance. I didn't survive this long by making friends."
+            ),
+            neutral = listOf(
+                "The garrison fell apart from the inside. Nobody talks about that.",
+                "I sleep with one eye open. The Hollow teaches you that, or it kills you.",
+                "Don't mistake my camp for hospitality. This is survival, not friendship."
+            )
+        ),
+        "vessa" to NpcVoice(
+            warm = listOf(
+                "The hollow speaks through stone, and today it speaks of you with warmth.",
+                "Faith is not comfort -- it is the courage to face what the darkness reveals. You have that courage.",
+                "The shrine remembers your kindness. So do I.",
+                "Come. Pray with me. Not to the old gods -- to whatever remains that is still good."
+            ),
+            cold = listOf(
+                "The corruption sees your heart, outsider. It does not like what it finds.",
+                "I tend this altar alone. Your presence profanes it.",
+                "Faith demands sacrifice. You bring only demands."
+            ),
+            neutral = listOf(
+                "The incense burns black because the hollow is sick. Not evil -- sick. There is a difference.",
+                "I was a priestess before the fall. Now I am... something else.",
+                "The old prayers don't work anymore. But I say them anyway."
+            )
+        ),
+        "hollow_king" to NpcVoice(
+            warm = listOf(
+                "You remind me of who I was before the crown consumed me. That is... dangerous.",
+                "Power is not given -- it is taken. But you... you might deserve what I offer.",
+                "Kneel not in submission, but in recognition of what you could become."
+            ),
+            cold = listOf(
+                "You dare stand before a king and offer nothing? Kneel or be forgotten.",
+                "I have waited centuries. Your defiance is a heartbeat compared to my patience.",
+                "The crown sees all who enter the Hollow. It found you... wanting.",
+                "Insignificant. The echoes of my reign will outlast your brief flame."
+            ),
+            neutral = listOf(
+                "I was a king once. Now I am an echo. But echoes still carry power.",
+                "The throne remembers every soul that sought it. Will you seek, or will you flee?",
+                "Time means nothing here. Your choices, however, mean everything."
+            )
+        )
+    )
 
     private fun getGenericResponse(disposition: Float, turnCount: Int): String {
         return when {

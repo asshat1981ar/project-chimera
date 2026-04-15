@@ -23,7 +23,7 @@
     "name": "The Watchtower",
     "description": "A cracked spire overlooking the Hollow. Guards keep watch from its heights.",
     "sceneId": "watchtower_1",
-    "connectedTo": ["hollow_gate", "merchants_rest"],
+    "connectedTo": ["hollow_gate", "merchants_rest", "deserters_camp"],
     "xFraction": 0.7,
     "yFraction": 0.65
   },
@@ -32,7 +32,7 @@
     "name": "Merchant's Rest",
     "description": "A sheltered alcove where travelers barter goods and share rumors.",
     "sceneId": "merchants_1",
-    "connectedTo": ["outer_ruins", "watchtower", "deep_hollow"],
+    "connectedTo": ["outer_ruins", "watchtower", "deep_hollow", "broken_shrine"],
     "xFraction": 0.5,
     "yFraction": 0.4
   },
@@ -41,12 +41,42 @@
     "name": "The Deep Hollow",
     "description": "Darkness gathers where the King once held court. Few return unchanged.",
     "sceneId": "deep_hollow_1",
-    "connectedTo": ["outer_ruins", "merchants_rest"],
+    "connectedTo": ["outer_ruins", "merchants_rest", "hollow_approach"],
     "xFraction": 0.4,
     "yFraction": 0.15,
     "unlockRequirements": {
       "minDisposition": { "warden": 0.1 },
       "completedScenes": ["prologue_scene_1"]
+    }
+  },
+  {
+    "id": "deserters_camp",
+    "name": "Deserter's Camp",
+    "description": "A hidden camp behind the watchtower's shadow. Someone lives here in secret.",
+    "sceneId": "thorne_encounter",
+    "connectedTo": ["watchtower"],
+    "xFraction": 0.85,
+    "yFraction": 0.5
+  },
+  {
+    "id": "broken_shrine",
+    "name": "The Broken Shrine",
+    "description": "A corrupted altar where black incense burns. The air tastes of ash and prayer.",
+    "sceneId": "vessa_shrine",
+    "connectedTo": ["merchants_rest"],
+    "xFraction": 0.15,
+    "yFraction": 0.3
+  },
+  {
+    "id": "hollow_approach",
+    "name": "The Processional",
+    "description": "A crumbling hall of carved pillars leading to the throne room. The echoes grow louder.",
+    "sceneId": "hollow_approach",
+    "connectedTo": ["deep_hollow"],
+    "xFraction": 0.35,
+    "yFraction": 0.05,
+    "unlockRequirements": {
+      "completedScenes": ["deep_hollow_1"]
     }
   }
 ]

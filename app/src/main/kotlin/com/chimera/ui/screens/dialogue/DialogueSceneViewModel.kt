@@ -10,6 +10,8 @@ import com.chimera.data.SceneLoader
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.SaveSlotDao
+import com.chimera.database.dao.VowDao
+import com.chimera.database.entity.VowEntity
 import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
@@ -75,7 +77,8 @@ class DialogueSceneViewModel @Inject constructor(
     private val characterDao: CharacterDao,
     private val characterStateDao: CharacterStateDao,
     private val journalEntryDao: JournalEntryDao,
-    private val saveSlotDao: SaveSlotDao
+    private val saveSlotDao: SaveSlotDao,
+    private val vowDao: VowDao
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
@@ -263,6 +266,7 @@ class DialogueSceneViewModel @Inject constructor(
                         usedFallback = orchestrator.isFallbackActive
                     )
                     generateJournalEntry(slotId)
+                    generateVows(slotId)
                     // Persist accumulated playtime
                     val sessionSeconds = gameSessionManager.getSessionPlaytimeSeconds()
                     val slot = saveSlotDao.getById(slotId)
@@ -350,6 +354,41 @@ class DialogueSceneViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private suspend fun generateVows(slotId: Long) {
+        val allFlags = turnResults.flatMap { it.flags }.toSet()
+        val disposition = cachedCharState?.dispositionToPlayer ?: 0f
+
+        // Authored vow triggers based on scene + flags + disposition
+        val vows = mutableListOf<VowEntity>()
+
+        if (contract.npcId == "warden" && disposition > 0.3f && allFlags.contains("scene_ending")) {
+            vows.add(VowEntity(
+                saveSlotId = slotId,
+                description = "Protect the Hollow from those who would exploit it",
+                swornTo = "warden",
+                sceneIdOrigin = sceneId
+            ))
+        }
+        if (contract.npcId == "aria" && allFlags.contains("scene_ending")) {
+            vows.add(VowEntity(
+                saveSlotId = slotId,
+                description = "Find the source of the corruption in the deep ruins",
+                swornTo = "aria",
+                sceneIdOrigin = sceneId
+            ))
+        }
+        if (contract.sceneId == "elena_recruitment" && allFlags.contains("recruit_companion")) {
+            vows.add(VowEntity(
+                saveSlotId = slotId,
+                description = "Return what was taken from Elena's hidden cache",
+                swornTo = "elena",
+                sceneIdOrigin = sceneId
+            ))
+        }
+
+        vows.forEach { vowDao.insert(it) }
     }
 
     private suspend fun persistTurn(speakerId: String, text: String, emotion: String) {
