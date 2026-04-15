@@ -1,0 +1,52 @@
+[
+  {
+    "id": "hollow_gate",
+    "name": "The Hollow Gate",
+    "description": "A crumbling entrance to the ancient ruins. The stones hum with fading wards.",
+    "isUnlocked": true,
+    "sceneId": "prologue_scene_1",
+    "connectedTo": ["outer_ruins", "watchtower"],
+    "xFraction": 0.5,
+    "yFraction": 0.85
+  },
+  {
+    "id": "outer_ruins",
+    "name": "Outer Ruins",
+    "description": "Weathered stone corridors open to the sky. Merchants and scavengers pass through.",
+    "sceneId": "outer_ruins_1",
+    "connectedTo": ["hollow_gate", "merchants_rest", "deep_hollow"],
+    "xFraction": 0.3,
+    "yFraction": 0.6
+  },
+  {
+    "id": "watchtower",
+    "name": "The Watchtower",
+    "description": "A cracked spire overlooking the Hollow. Guards keep watch from its heights.",
+    "sceneId": "watchtower_1",
+    "connectedTo": ["hollow_gate", "merchants_rest"],
+    "xFraction": 0.7,
+    "yFraction": 0.65
+  },
+  {
+    "id": "merchants_rest",
+    "name": "Merchant's Rest",
+    "description": "A sheltered alcove where travelers barter goods and share rumors.",
+    "sceneId": "merchants_1",
+    "connectedTo": ["outer_ruins", "watchtower", "deep_hollow"],
+    "xFraction": 0.5,
+    "yFraction": 0.4
+  },
+  {
+    "id": "deep_hollow",
+    "name": "The Deep Hollow",
+    "description": "Darkness gathers where the King once held court. Few return unchanged.",
+    "sceneId": "deep_hollow_1",
+    "connectedTo": ["outer_ruins", "merchants_rest"],
+    "xFraction": 0.4,
+    "yFraction": 0.15,
+    "unlockRequirements": {
+      "minDisposition": { "warden": 0.1 },
+      "completedScenes": ["prologue_scene_1"]
+    }
+  }
+]

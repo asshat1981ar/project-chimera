@@ -1,0 +1,47 @@
+[
+  {
+    "id": "warden",
+    "name": "The Warden",
+    "title": "Keeper of the Gate",
+    "role": "NPC_NEUTRAL",
+    "initialDisposition": 0.0,
+    "archetype": "SHIFTING_THE_BURDEN",
+    "portraitResName": null
+  },
+  {
+    "id": "elena",
+    "name": "Elena",
+    "title": "The Merchant",
+    "role": "NPC_ALLY",
+    "initialDisposition": 0.1,
+    "archetype": "GROWTH_AND_UNDERINVESTMENT",
+    "portraitResName": null
+  },
+  {
+    "id": "marcus",
+    "name": "Marcus",
+    "title": "The Guard",
+    "role": "NPC_HOSTILE",
+    "initialDisposition": -0.2,
+    "archetype": "ESCALATION",
+    "portraitResName": null
+  },
+  {
+    "id": "aria",
+    "name": "Aria",
+    "title": "The Scholar",
+    "role": "COMPANION",
+    "initialDisposition": 0.2,
+    "archetype": "FIXES_THAT_FAIL",
+    "portraitResName": null
+  },
+  {
+    "id": "hollow_king",
+    "name": "The Hollow King's Echo",
+    "title": "Shade of the Fallen",
+    "role": "FACTION_LEADER",
+    "initialDisposition": -0.5,
+    "archetype": null,
+    "portraitResName": null
+  }
+]
