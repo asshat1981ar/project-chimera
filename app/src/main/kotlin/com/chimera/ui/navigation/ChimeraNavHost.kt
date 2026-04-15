@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.chimera.ui.screens.camp.CampScreen
 import com.chimera.ui.screens.dialogue.DialogueSceneScreen
+import com.chimera.ui.screens.duel.DuelScreen
 import com.chimera.ui.screens.home.HomeScreen
 import com.chimera.ui.screens.journal.JournalScreen
 import com.chimera.ui.screens.map.MapScreen
@@ -100,6 +101,17 @@ fun ChimeraNavHost(
                 DialogueSceneScreen(
                     sceneId = sceneId,
                     onSceneComplete = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = ChimeraRoutes.DUEL,
+                arguments = listOf(
+                    navArgument("opponentId") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                DuelScreen(
+                    onDuelComplete = { navController.popBackStack() }
                 )
             }
         }
