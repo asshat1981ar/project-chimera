@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.ai.DialogueOrchestrator
 import com.chimera.data.GameSessionManager
+import com.chimera.data.SceneLoader
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.JournalEntryDao
@@ -64,6 +65,7 @@ class DialogueSceneViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val orchestrator: DialogueOrchestrator,
     private val gameSessionManager: GameSessionManager,
+    private val sceneLoader: SceneLoader,
     private val dialogueTurnDao: DialogueTurnDao,
     private val sceneInstanceDao: SceneInstanceDao,
     private val memoryShardDao: MemoryShardDao,
@@ -84,13 +86,12 @@ class DialogueSceneViewModel @Inject constructor(
         private const val MAX_TURN_HISTORY = 20
     }
 
-    private val contract = SceneContract(
+    private val contract: SceneContract = sceneLoader.getScene(sceneId) ?: SceneContract(
         sceneId = sceneId,
-        sceneTitle = "The Hollow Threshold",
-        npcId = "warden",
-        npcName = "The Warden",
-        setting = "the crumbling gates of the Hollow",
-        stakes = "First contact with a gatekeeper who controls access to the ruins"
+        sceneTitle = "Unknown Scene",
+        npcId = "unknown",
+        npcName = "Stranger",
+        setting = "an unfamiliar place"
     )
 
     init {

@@ -3,6 +3,7 @@ package com.chimera.ui.screens.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
+import com.chimera.data.MapNodeLoader
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SceneInstanceDao
@@ -43,19 +44,12 @@ class MapViewModel @Inject constructor(
     private val sceneInstanceDao: SceneInstanceDao,
     private val rumorPacketDao: RumorPacketDao,
     private val factionStateDao: FactionStateDao,
+    private val mapNodeLoader: MapNodeLoader,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
     private val _selectedNode = MutableStateFlow<MapNode?>(null)
-
-    // Hardcoded map nodes for Act 1 -- will be data-driven later
-    private val baseNodes = listOf(
-        MapNode("hollow_gate", "The Hollow Gate", "A crumbling entrance to the ancient ruins.", isUnlocked = true, sceneId = "prologue_scene_1", connectedTo = listOf("outer_ruins", "watchtower"), xFraction = 0.5f, yFraction = 0.85f),
-        MapNode("outer_ruins", "Outer Ruins", "Weathered stone corridors open to the sky.", sceneId = "outer_ruins_1", connectedTo = listOf("hollow_gate", "merchants_rest", "deep_hollow"), xFraction = 0.3f, yFraction = 0.6f),
-        MapNode("watchtower", "The Watchtower", "A cracked spire overlooking the Hollow.", sceneId = "watchtower_1", connectedTo = listOf("hollow_gate", "merchants_rest"), xFraction = 0.7f, yFraction = 0.65f),
-        MapNode("merchants_rest", "Merchant's Rest", "A sheltered alcove where travelers barter.", sceneId = "merchants_1", connectedTo = listOf("outer_ruins", "watchtower", "deep_hollow"), xFraction = 0.5f, yFraction = 0.4f),
-        MapNode("deep_hollow", "The Deep Hollow", "Darkness gathers where the King once held court.", sceneId = "deep_hollow_1", connectedTo = listOf("outer_ruins", "merchants_rest"), xFraction = 0.4f, yFraction = 0.15f)
-    )
+    private val baseNodes: List<MapNode> by lazy { mapNodeLoader.loadNodes() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<MapUiState> = gameSessionManager.activeSlotId

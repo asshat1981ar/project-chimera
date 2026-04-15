@@ -1,0 +1,49 @@
+[
+  {
+    "sceneId": "prologue_scene_1",
+    "sceneTitle": "The Hollow Threshold",
+    "npcId": "warden",
+    "npcName": "The Warden",
+    "setting": "the crumbling gates of the Hollow",
+    "stakes": "First contact with a gatekeeper who controls access to the ruins",
+    "maxTurns": 12
+  },
+  {
+    "sceneId": "outer_ruins_1",
+    "sceneTitle": "Whispers in Stone",
+    "npcId": "elena",
+    "npcName": "Elena the Merchant",
+    "setting": "weathered corridors open to the sky",
+    "stakes": "A traveling merchant offers supplies but demands a steep price",
+    "maxTurns": 10
+  },
+  {
+    "sceneId": "watchtower_1",
+    "sceneTitle": "The Cracked Spire",
+    "npcId": "marcus",
+    "npcName": "Marcus the Guard",
+    "setting": "atop a watchtower overlooking the Hollow",
+    "stakes": "A suspicious guard questions your intentions and loyalty",
+    "maxTurns": 10
+  },
+  {
+    "sceneId": "merchants_1",
+    "sceneTitle": "Barter and Bone",
+    "npcId": "aria",
+    "npcName": "Aria the Scholar",
+    "setting": "a sheltered alcove where travelers barter",
+    "stakes": "A scholar seeks a research partner but hides a dangerous agenda",
+    "maxTurns": 12
+  },
+  {
+    "sceneId": "deep_hollow_1",
+    "sceneTitle": "The Throne of Ashes",
+    "npcId": "hollow_king",
+    "npcName": "The Hollow King's Echo",
+    "setting": "the dark heart where the King once held court",
+    "stakes": "A spectral echo offers power at a terrible cost",
+    "maxTurns": 8,
+    "allowedReveals": ["king_history", "corruption_source"],
+    "forbiddenTopics": ["escape_route"]
+  }
+]
