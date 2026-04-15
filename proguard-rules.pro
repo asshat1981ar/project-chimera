@@ -28,5 +28,18 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
+# Keep Room DAOs (interface methods called via reflection)
+-keep class com.chimera.database.dao.** { *; }
+
+# Keep Room converters
+-keep class com.chimera.database.converter.** { *; }
+
+# Keep Navigation Compose arguments
+-keep class * extends androidx.navigation.NavArgs { *; }
+
 # Keep enums
 -keepclassmembers enum com.chimera.** { *; }
+
+# Keep Lifecycle ViewModel factories
+-keep class * extends androidx.lifecycle.ViewModel { *; }
+-keep class * extends androidx.lifecycle.ViewModelProvider$Factory { *; }
