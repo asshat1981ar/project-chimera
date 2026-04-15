@@ -5,9 +5,11 @@ import com.chimera.database.ChimeraGameDatabase
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
+import com.chimera.database.dao.VowDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,21 +27,12 @@ object DatabaseModule {
         return ChimeraGameDatabase.buildDatabase(context)
     }
 
-    @Provides
-    fun provideSaveSlotDao(db: ChimeraGameDatabase): SaveSlotDao = db.saveSlotDao()
-
-    @Provides
-    fun provideCharacterDao(db: ChimeraGameDatabase): CharacterDao = db.characterDao()
-
-    @Provides
-    fun provideCharacterStateDao(db: ChimeraGameDatabase): CharacterStateDao = db.characterStateDao()
-
-    @Provides
-    fun provideDialogueTurnDao(db: ChimeraGameDatabase): DialogueTurnDao = db.dialogueTurnDao()
-
-    @Provides
-    fun provideMemoryShardDao(db: ChimeraGameDatabase): MemoryShardDao = db.memoryShardDao()
-
-    @Provides
-    fun provideSceneInstanceDao(db: ChimeraGameDatabase): SceneInstanceDao = db.sceneInstanceDao()
+    @Provides fun provideSaveSlotDao(db: ChimeraGameDatabase): SaveSlotDao = db.saveSlotDao()
+    @Provides fun provideCharacterDao(db: ChimeraGameDatabase): CharacterDao = db.characterDao()
+    @Provides fun provideCharacterStateDao(db: ChimeraGameDatabase): CharacterStateDao = db.characterStateDao()
+    @Provides fun provideDialogueTurnDao(db: ChimeraGameDatabase): DialogueTurnDao = db.dialogueTurnDao()
+    @Provides fun provideMemoryShardDao(db: ChimeraGameDatabase): MemoryShardDao = db.memoryShardDao()
+    @Provides fun provideSceneInstanceDao(db: ChimeraGameDatabase): SceneInstanceDao = db.sceneInstanceDao()
+    @Provides fun provideJournalEntryDao(db: ChimeraGameDatabase): JournalEntryDao = db.journalEntryDao()
+    @Provides fun provideVowDao(db: ChimeraGameDatabase): VowDao = db.vowDao()
 }

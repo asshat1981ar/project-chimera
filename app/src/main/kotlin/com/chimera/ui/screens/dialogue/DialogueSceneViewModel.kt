@@ -8,9 +8,11 @@ import com.chimera.ai.DialogueOrchestrator
 import com.chimera.data.GameSessionManager
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.entity.DialogueTurnEntity
+import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.database.entity.SceneInstanceEntity
 import com.chimera.database.mapper.toModel
@@ -65,7 +67,8 @@ class DialogueSceneViewModel @Inject constructor(
     private val dialogueTurnDao: DialogueTurnDao,
     private val sceneInstanceDao: SceneInstanceDao,
     private val memoryShardDao: MemoryShardDao,
-    private val characterStateDao: CharacterStateDao
+    private val characterStateDao: CharacterStateDao,
+    private val journalEntryDao: JournalEntryDao
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
@@ -243,6 +246,7 @@ class DialogueSceneViewModel @Inject constructor(
                         turnCount = turnResults.size,
                         usedFallback = orchestrator.isFallbackActive
                     )
+                    generateJournalEntry(slotId)
                 }
             } catch (e: Exception) {
                 Log.e("DialogueVM", "Failed to process turn", e)
@@ -269,6 +273,26 @@ class DialogueSceneViewModel @Inject constructor(
         if (turnResults.size > MAX_TURN_HISTORY) {
             turnResults.removeAt(0)
         }
+    }
+
+    private suspend fun generateJournalEntry(slotId: Long) {
+        val npcLines = _uiState.value.transcript.filter { !it.isPlayer }
+        val summary = if (npcLines.size > 1) {
+            "Spoke with ${contract.npcName} at ${contract.setting}. " +
+            "The conversation spanned ${turnResults.size} exchanges."
+        } else {
+            "A brief encounter with ${contract.npcName}."
+        }
+        journalEntryDao.insert(
+            JournalEntryEntity(
+                saveSlotId = slotId,
+                title = contract.sceneTitle,
+                body = summary,
+                category = "story",
+                sceneId = sceneId,
+                characterId = contract.npcId
+            )
+        )
     }
 
     private suspend fun persistTurn(speakerId: String, text: String, emotion: String) {
