@@ -20,6 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalAccessibilityManager
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.chimera.ui.theme.EmberGold
@@ -30,23 +33,27 @@ import kotlinx.coroutines.delay
 fun SplashScreen(
     onFinished: () -> Unit
 ) {
-    var visible by remember { mutableStateOf(false) }
+    val accessibilityManager = LocalAccessibilityManager.current
+    val reduceMotion = accessibilityManager?.isEnabled == true
+
+    var visible by remember { mutableStateOf(reduceMotion) }
     val alpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
-        animationSpec = tween(durationMillis = 1200),
+        animationSpec = tween(durationMillis = if (reduceMotion) 0 else 1200),
         label = "splash_fade"
     )
 
     LaunchedEffect(Unit) {
         visible = true
-        delay(2500)
+        delay(if (reduceMotion) 500 else 2500)
         onFinished()
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            .semantics { contentDescription = "Chimera: Ashes of the Hollow King. Loading." },
         contentAlignment = Alignment.Center
     ) {
         Column(
