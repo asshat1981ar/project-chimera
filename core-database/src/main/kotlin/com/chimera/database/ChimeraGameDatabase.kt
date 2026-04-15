@@ -10,15 +10,19 @@ import com.chimera.database.converter.Converters
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
+import com.chimera.database.dao.VowDao
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.CharacterStateEntity
 import com.chimera.database.entity.DialogueTurnEntity
+import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.database.entity.SaveSlotEntity
 import com.chimera.database.entity.SceneInstanceEntity
+import com.chimera.database.entity.VowEntity
 
 @Database(
     entities = [
@@ -27,9 +31,11 @@ import com.chimera.database.entity.SceneInstanceEntity
         CharacterStateEntity::class,
         DialogueTurnEntity::class,
         MemoryShardEntity::class,
-        SceneInstanceEntity::class
+        SceneInstanceEntity::class,
+        JournalEntryEntity::class,
+        VowEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -41,6 +47,8 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
     abstract fun dialogueTurnDao(): DialogueTurnDao
     abstract fun memoryShardDao(): MemoryShardDao
     abstract fun sceneInstanceDao(): SceneInstanceDao
+    abstract fun journalEntryDao(): JournalEntryDao
+    abstract fun vowDao(): VowDao
 
     companion object {
         const val DATABASE_NAME = "chimera_game.db"
