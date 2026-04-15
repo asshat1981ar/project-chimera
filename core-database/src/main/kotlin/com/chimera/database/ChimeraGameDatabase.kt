@@ -10,23 +10,26 @@ import com.chimera.database.converter.Converters
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.SaveSlotDao
+import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.CharacterStateEntity
 import com.chimera.database.entity.DialogueTurnEntity
+import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.database.entity.SaveSlotEntity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.chimera.database.entity.SceneInstanceEntity
 
 @Database(
     entities = [
         SaveSlotEntity::class,
         CharacterEntity::class,
         CharacterStateEntity::class,
-        DialogueTurnEntity::class
+        DialogueTurnEntity::class,
+        MemoryShardEntity::class,
+        SceneInstanceEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -36,6 +39,8 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
     abstract fun characterDao(): CharacterDao
     abstract fun characterStateDao(): CharacterStateDao
     abstract fun dialogueTurnDao(): DialogueTurnDao
+    abstract fun memoryShardDao(): MemoryShardDao
+    abstract fun sceneInstanceDao(): SceneInstanceDao
 
     companion object {
         const val DATABASE_NAME = "chimera_game.db"
@@ -55,13 +60,13 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
     private class PrepopulateCallback : Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            // Insert 3 empty save slots on first database creation
+            val now = System.currentTimeMillis()
             for (index in 0..2) {
                 db.execSQL(
                     "INSERT INTO save_slots (slot_index, player_name, chapter_tag, " +
                     "playtime_seconds, last_played_at, created_at, is_empty) " +
-                    "VALUES ($index, '', 'prologue', 0, ${System.currentTimeMillis()}, " +
-                    "${System.currentTimeMillis()}, 1)"
+                    "VALUES (?, '', 'prologue', 0, ?, ?, 1)",
+                    arrayOf(index, now, now)
                 )
             }
         }

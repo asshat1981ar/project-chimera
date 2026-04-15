@@ -5,7 +5,9 @@ import com.chimera.database.ChimeraGameDatabase
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.SaveSlotDao
+import com.chimera.database.dao.SceneInstanceDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,4 +36,10 @@ object DatabaseModule {
 
     @Provides
     fun provideDialogueTurnDao(db: ChimeraGameDatabase): DialogueTurnDao = db.dialogueTurnDao()
+
+    @Provides
+    fun provideMemoryShardDao(db: ChimeraGameDatabase): MemoryShardDao = db.memoryShardDao()
+
+    @Provides
+    fun provideSceneInstanceDao(db: ChimeraGameDatabase): SceneInstanceDao = db.sceneInstanceDao()
 }

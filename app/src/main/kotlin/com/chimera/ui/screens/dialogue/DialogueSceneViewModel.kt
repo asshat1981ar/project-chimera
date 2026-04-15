@@ -1,76 +1,286 @@
 package com.chimera.ui.screens.dialogue
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.chimera.ai.DialogueOrchestrator
+import com.chimera.data.GameSessionManager
+import com.chimera.database.dao.CharacterStateDao
+import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.MemoryShardDao
+import com.chimera.database.dao.SceneInstanceDao
+import com.chimera.database.entity.DialogueTurnEntity
+import com.chimera.database.entity.MemoryShardEntity
+import com.chimera.database.entity.SceneInstanceEntity
+import com.chimera.database.mapper.toModel
+import com.chimera.model.CharacterState
+import com.chimera.model.DialogueTurnResult
+import com.chimera.model.MemoryShard
+import com.chimera.model.PlayerInput
+import com.chimera.model.SceneContract
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class DialogueUiState(
-    val sceneId: String = "",
-    val sceneTitle: String = "The Hollow Threshold",
-    val npcName: String = "The Warden",
-    val npcMood: String = "guarded",
-    val transcript: List<DialogueLine> = emptyList(),
-    val quickIntents: List<String> = emptyList(),
-    val isLoading: Boolean = false,
-    val isFallbackMode: Boolean = false
-)
 
 data class DialogueLine(
     val speakerId: String,
     val speakerName: String,
     val text: String,
+    val emotion: String = "neutral",
     val isPlayer: Boolean = false
 )
 
+data class DialogueUiState(
+    val sceneId: String = "",
+    val sceneTitle: String = "",
+    val npcName: String = "",
+    val npcMood: String = "neutral",
+    val transcript: List<DialogueLine> = emptyList(),
+    val quickIntents: List<String> = emptyList(),
+    val isLoading: Boolean = false,
+    val isFallbackMode: Boolean = false,
+    val isSceneComplete: Boolean = false,
+    val relationshipBanner: RelationshipBanner? = null
+)
+
+data class RelationshipBanner(
+    val npcName: String,
+    val delta: Float,
+    val newDisposition: Float
+) {
+    companion object {
+        const val SIGNIFICANCE_THRESHOLD = 0.05f
+    }
+}
+
 @HiltViewModel
 class DialogueSceneViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val orchestrator: DialogueOrchestrator,
+    private val gameSessionManager: GameSessionManager,
+    private val dialogueTurnDao: DialogueTurnDao,
+    private val sceneInstanceDao: SceneInstanceDao,
+    private val memoryShardDao: MemoryShardDao,
+    private val characterStateDao: CharacterStateDao
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
-
-    private val _uiState = MutableStateFlow(
-        DialogueUiState(
-            sceneId = sceneId,
-            transcript = listOf(
-                DialogueLine(
-                    speakerId = "warden",
-                    speakerName = "The Warden",
-                    text = "You stand at the threshold of the Hollow. " +
-                        "Few who enter return unchanged. What drives you forward?"
-                ),
-            ),
-            quickIntents = listOf(
-                "I seek the truth.",
-                "I have a debt to repay.",
-                "Curiosity, nothing more.",
-                "None of your concern."
-            )
-        )
-    )
+    private val _uiState = MutableStateFlow(DialogueUiState(sceneId = sceneId))
     val uiState: StateFlow<DialogueUiState> = _uiState.asStateFlow()
 
+    private val turnResults = mutableListOf<DialogueTurnResult>()
+    private var recentMemories = mutableListOf<MemoryShard>()
+    private var sceneInstanceId: Long = 0
+    private var cachedCharState: CharacterState? = null
+
+    companion object {
+        private const val MAX_TURN_HISTORY = 20
+    }
+
+    private val contract = SceneContract(
+        sceneId = sceneId,
+        sceneTitle = "The Hollow Threshold",
+        npcId = "warden",
+        npcName = "The Warden",
+        setting = "the crumbling gates of the Hollow",
+        stakes = "First contact with a gatekeeper who controls access to the ruins"
+    )
+
+    init {
+        initializeScene()
+    }
+
+    private fun initializeScene() {
+        viewModelScope.launch {
+            try {
+                val slotId = gameSessionManager.activeSlotId.value ?: return@launch
+                _uiState.value = _uiState.value.copy(
+                    sceneTitle = contract.sceneTitle,
+                    npcName = contract.npcName,
+                    isLoading = true
+                )
+
+                sceneInstanceId = sceneInstanceDao.insert(
+                    SceneInstanceEntity(
+                        saveSlotId = slotId,
+                        sceneId = sceneId,
+                        npcId = contract.npcId
+                    )
+                )
+
+                val charState = loadCharacterState(slotId)
+                recentMemories = memoryShardDao.getTopMemories(slotId, contract.npcId, 5)
+                    .map { it.toModel() }
+                    .toMutableList()
+
+                val openingInput = PlayerInput(text = "[Scene begins]", isQuickIntent = true)
+                val result = orchestrator.generateTurn(
+                    contract, openingInput, charState, recentMemories, turnResults
+                )
+                turnResults.add(result)
+
+                persistTurn(contract.npcId, result.npcLine, result.emotion)
+
+                val intents = orchestrator.generateIntents(contract, charState, turnResults)
+
+                _uiState.value = _uiState.value.copy(
+                    transcript = listOf(
+                        DialogueLine(
+                            speakerId = contract.npcId,
+                            speakerName = contract.npcName,
+                            text = result.npcLine,
+                            emotion = result.emotion
+                        )
+                    ),
+                    npcMood = result.emotion,
+                    quickIntents = intents,
+                    isFallbackMode = orchestrator.isFallbackActive,
+                    isLoading = false
+                )
+            } catch (e: Exception) {
+                Log.e("DialogueVM", "Failed to initialize scene", e)
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }
+        }
+    }
+
     fun selectIntent(intent: String) {
-        val current = _uiState.value
-        val playerLine = DialogueLine(
-            speakerId = "player",
-            speakerName = "You",
-            text = intent,
-            isPlayer = true
-        )
-        val npcResponse = DialogueLine(
-            speakerId = "warden",
-            speakerName = "The Warden",
-            text = "Interesting. The Hollow will test that resolve. " +
-                "Step carefully -- the shadows remember every word spoken here."
-        )
-        _uiState.value = current.copy(
-            transcript = current.transcript + playerLine + npcResponse,
-            quickIntents = emptyList()
+        submitPlayerInput(PlayerInput(text = intent, isQuickIntent = true))
+    }
+
+    fun submitTypedInput(text: String) {
+        if (text.isBlank()) return
+        submitPlayerInput(PlayerInput(text = text.trim()))
+    }
+
+    private fun submitPlayerInput(input: PlayerInput) {
+        if (_uiState.value.isLoading || _uiState.value.isSceneComplete) return
+
+        viewModelScope.launch {
+            try {
+                val slotId = gameSessionManager.activeSlotId.value ?: return@launch
+                _uiState.value = _uiState.value.copy(isLoading = true, quickIntents = emptyList())
+
+                val playerLine = DialogueLine(
+                    speakerId = "player",
+                    speakerName = "You",
+                    text = input.text,
+                    isPlayer = true
+                )
+                persistTurn("player", input.text, "")
+
+                val charState = loadCharacterState(slotId)
+
+                val result = orchestrator.generateTurn(
+                    contract, input, charState, recentMemories, turnResults
+                )
+                addTurnResult(result)
+
+                persistTurn(contract.npcId, result.npcLine, result.emotion)
+
+                // Batch insert memory candidates
+                if (result.memoryCandidates.isNotEmpty()) {
+                    val shards = result.memoryCandidates.map { summary ->
+                        MemoryShardEntity(
+                            saveSlotId = slotId,
+                            sceneId = sceneId,
+                            characterId = contract.npcId,
+                            summary = summary,
+                            importanceScore = 0.6f
+                        )
+                    }
+                    memoryShardDao.insertAll(shards)
+                    recentMemories.addAll(shards.map { it.toModel() })
+                }
+
+                if (result.relationshipDelta != 0f) {
+                    characterStateDao.adjustDisposition(contract.npcId, result.relationshipDelta)
+                    cachedCharState = null // invalidate cache after mutation
+                }
+
+                val npcLine = DialogueLine(
+                    speakerId = contract.npcId,
+                    speakerName = contract.npcName,
+                    text = result.npcLine,
+                    emotion = result.emotion
+                )
+
+                val isEnding = result.flags.contains("scene_ending") ||
+                    turnResults.size >= contract.maxTurns
+
+                val intents = if (isEnding) {
+                    listOf("Farewell.", "[Leave]")
+                } else {
+                    orchestrator.generateIntents(contract, charState, turnResults)
+                }
+
+                val banner = if (kotlin.math.abs(result.relationshipDelta) >= RelationshipBanner.SIGNIFICANCE_THRESHOLD) {
+                    val updated = loadCharacterState(slotId)
+                    RelationshipBanner(
+                        npcName = contract.npcName,
+                        delta = result.relationshipDelta,
+                        newDisposition = updated.dispositionToPlayer
+                    )
+                } else null
+
+                _uiState.value = _uiState.value.copy(
+                    transcript = _uiState.value.transcript + playerLine + npcLine,
+                    npcMood = result.emotion,
+                    quickIntents = intents,
+                    isFallbackMode = orchestrator.isFallbackActive,
+                    isSceneComplete = isEnding,
+                    relationshipBanner = banner,
+                    isLoading = false
+                )
+
+                if (isEnding) {
+                    sceneInstanceDao.completeScene(
+                        id = sceneInstanceId,
+                        turnCount = turnResults.size,
+                        usedFallback = orchestrator.isFallbackActive
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("DialogueVM", "Failed to process turn", e)
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun dismissRelationshipBanner() {
+        _uiState.value = _uiState.value.copy(relationshipBanner = null)
+    }
+
+    private suspend fun loadCharacterState(slotId: Long): CharacterState {
+        cachedCharState?.let { return it }
+        val state = characterStateDao.getByCharacterId(contract.npcId)?.toModel()
+            ?: CharacterState(characterId = contract.npcId, saveSlotId = slotId)
+        cachedCharState = state
+        return state
+    }
+
+    private fun addTurnResult(result: DialogueTurnResult) {
+        turnResults.add(result)
+        // Keep only recent history to bound memory
+        if (turnResults.size > MAX_TURN_HISTORY) {
+            turnResults.removeAt(0)
+        }
+    }
+
+    private suspend fun persistTurn(speakerId: String, text: String, emotion: String) {
+        val slotId = gameSessionManager.activeSlotId.value ?: return
+        dialogueTurnDao.insert(
+            DialogueTurnEntity(
+                saveSlotId = slotId,
+                sceneId = sceneId,
+                speakerId = speakerId,
+                lineText = text,
+                emotionJson = "{\"primary\":\"$emotion\"}"
+            )
         )
     }
 }
