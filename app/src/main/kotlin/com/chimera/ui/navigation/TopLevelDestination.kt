@@ -22,6 +22,7 @@ enum class TopLevelDestination(
 
 object ChimeraRoutes {
     const val SPLASH = "splash"
+    const val ONBOARDING = "onboarding"
     const val SAVE_SLOT_SELECT = "save_slot_select"
     const val GAME_GRAPH = "game"
     const val HOME = "home"
