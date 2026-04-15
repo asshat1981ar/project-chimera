@@ -18,9 +18,12 @@ The `android/` directory contains a legacy DialogGPT service module (excluded fr
 
 ### Key Components
 
-1. **Room Database** (`core-database/.../ChimeraGameDatabase.kt`): v4 schema with 10 entities: SaveSlots, Characters, CharacterStates, DialogueTurns, MemoryShards, SceneInstances, JournalEntries, Vows, RumorPackets, FactionStates
+1. **Room Database** (`core-database/.../ChimeraGameDatabase.kt`): v5 schema with 11 entities: SaveSlots, Characters, CharacterStates, DialogueTurns, MemoryShards, SceneInstances, JournalEntries, Vows, RumorPackets, FactionStates, Quests
 2. **RelationshipArchetypeEngine** (`core-database/.../engine/RelationshipArchetypeEngine.kt`): Systems-thinking feedback loops driving NPC disposition changes (thread-safe, bounded delayed feedback)
 3. **DialogueOrchestrator** (`app/.../ai/DialogueOrchestrator.kt`): AI provider abstraction with automatic fallback to FakeDialogueProvider, output validation (clamp deltas, bound memory candidates)
+3b. **ProviderRouter** (`app/.../ai/ProviderRouter.kt`): Ordered chain of free AI providers (Gemini → Groq → OpenRouter) with auto-failover
+3c. **PromptAssembler** (`app/.../ai/PromptAssembler.kt`): Builds LLM prompts from SceneContract + CharacterState + memories
+3d. **DialogueResponseParser** (`app/.../ai/DialogueResponseParser.kt`): Robust JSON extraction with markdown fence stripping and manual field fallback
 4. **FakeDialogueProvider** (`app/.../ai/FakeDialogueProvider.kt`): Disposition-aware authored templates with keyword tone detection for offline/fallback dialogue
 5. **GameEventBus** (`app/.../core/events/GameEventBus.kt`): SharedFlow-based event system using `com.chimera.model.GameEvent` sealed hierarchy
 6. **GameSessionManager** (`app/.../data/GameSessionManager.kt`): Holds active save slot ID for the play session
