@@ -1,0 +1,20 @@
+[
+  {
+    "id": "kael",
+    "name": "Kael",
+    "title": "The Forgemaster",
+    "role": "NPC_NEUTRAL",
+    "initialDisposition": 0.0,
+    "archetype": "GROWTH_AND_UNDERINVESTMENT",
+    "portraitResName": null
+  },
+  {
+    "id": "seren",
+    "name": "Seren",
+    "title": "Voice of the Reforged",
+    "role": "FACTION_LEADER",
+    "initialDisposition": -0.1,
+    "archetype": "SHIFTING_THE_BURDEN",
+    "portraitResName": null
+  }
+]

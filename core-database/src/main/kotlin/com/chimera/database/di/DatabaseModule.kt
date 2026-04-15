@@ -8,6 +8,7 @@ import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
+import com.chimera.database.dao.QuestDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
@@ -39,4 +40,5 @@ object DatabaseModule {
     @Provides fun provideVowDao(db: ChimeraGameDatabase): VowDao = db.vowDao()
     @Provides fun provideRumorPacketDao(db: ChimeraGameDatabase): RumorPacketDao = db.rumorPacketDao()
     @Provides fun provideFactionStateDao(db: ChimeraGameDatabase): FactionStateDao = db.factionStateDao()
+    @Provides fun provideQuestDao(db: ChimeraGameDatabase): QuestDao = db.questDao()
 }

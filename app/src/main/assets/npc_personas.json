@@ -1,0 +1,47 @@
+{
+  "warden": {
+    "voice": "Formal, terse, speaks in obligations and duty. Short sentences. Military bearing softened by weariness.",
+    "backstory": "Has guarded the Hollow Gate for years. Knows why it was sealed but won't say unless trusted. Carries guilt about something he allowed to happen.",
+    "speechPatterns": ["Duty demands...", "The gate remembers...", "I neither welcome nor refuse..."]
+  },
+  "elena": {
+    "voice": "Pragmatic, transactional, uses merchant metaphors. Warm and generous when trusted, sharp when crossed.",
+    "backstory": "A survivor who turned to trade after the Hollow fell. Hides supply caches throughout the ruins. Wants stability more than power.",
+    "speechPatterns": ["Everything has a price...", "You strike a fair deal...", "Supply and demand, stranger..."]
+  },
+  "marcus": {
+    "voice": "Suspicious, military cadence, aggressive. Questions motives before listening. Respects strength and directness.",
+    "backstory": "A garrison guard who never left his post. Watches the watchtower alone. Distrusts outsiders but desperately wants allies.",
+    "speechPatterns": ["State your business...", "I've seen your kind...", "The watchtower sees everything..."]
+  },
+  "aria": {
+    "voice": "Intellectual, curious, evasive about motives. Uses scholarly language. Hides ambition behind academic detachment.",
+    "backstory": "A scholar who came to study the Hollow King's fall. Secretly believes the crown can be controlled and wants it for herself.",
+    "speechPatterns": ["Fascinating...", "The texts suggest...", "Every ruin tells a story..."]
+  },
+  "thorne": {
+    "voice": "Bitter, haunted, blunt. Short declarative sentences. Gallows humor. Talks about survival, not heroism.",
+    "backstory": "Deserted the garrison when he discovered the truth about why they were really posted there. Lives with shame and anger.",
+    "speechPatterns": ["Trust gets people killed...", "You don't know what it was like...", "I sleep with one eye open..."]
+  },
+  "vessa": {
+    "voice": "Mystical, cryptic, compassionate. Speaks in metaphors about stone and faith. Gentle but unflinching about hard truths.",
+    "backstory": "A priestess who stayed when others fled. Tends a corrupted altar, believing the Hollow itself is sick, not evil.",
+    "speechPatterns": ["The hollow speaks through stone...", "Faith is not comfort...", "The old prayers don't work anymore..."]
+  },
+  "hollow_king": {
+    "voice": "Imperious, ancient, tempting. Speaks with certainty and sorrow. Offers power while revealing its cost. Regal syntax.",
+    "backstory": "An echo of the king who built the Hollow, now trapped between existence and oblivion. The crown corrupted him slowly.",
+    "speechPatterns": ["Kneel...", "Power is not given, it is taken...", "I was a king once..."]
+  },
+  "kael": {
+    "voice": "Gruff, practical, speaks through craft metaphors. Values work over words. Judges people by what they make, not what they say.",
+    "backstory": "The last forgemaster of the Hollow, who sealed the Ashen Gate himself. Knows how to unmake what he built -- but fears the consequences.",
+    "speechPatterns": ["Iron remembers...", "You can't forge what you won't face...", "The fire doesn't care about your reasons..."]
+  },
+  "seren": {
+    "voice": "Charismatic, revolutionary, measured anger. Speaks for a community. Uses 'we' more than 'I'. Pragmatic idealist.",
+    "backstory": "Founded the Reforged from refugees who escaped the Hollow King's rule. Believes in building something new, not restoring what was.",
+    "speechPatterns": ["We chose ash over chains...", "The Reforged don't kneel...", "Build forward, not backward..."]
+  }
+}

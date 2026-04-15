@@ -1,0 +1,107 @@
+[
+  {
+    "sceneId": "ashen_gate",
+    "sceneTitle": "The Ashen Gate",
+    "npcId": "kael",
+    "npcName": "Kael the Forgemaster",
+    "setting": "a massive iron gate fused shut by ancient fire, with a forge still glowing beside it",
+    "stakes": "The only passage to the Ashen Reaches is sealed. The forgemaster knows how to open it -- for a price",
+    "maxTurns": 10,
+    "allowedReveals": ["forge_history", "reforged_origins"],
+    "forbiddenTopics": ["king_identity"]
+  },
+  {
+    "sceneId": "ash_market",
+    "sceneTitle": "The Cinder Market",
+    "npcId": "elena",
+    "npcName": "Elena the Merchant",
+    "setting": "a makeshift bazaar built from scorched wagons and salvaged stone, deeper in the Reaches",
+    "stakes": "Elena has expanded her trade network here but faces threats from a rival faction",
+    "maxTurns": 10,
+    "allowedReveals": ["trade_routes", "reforged_movements"]
+  },
+  {
+    "sceneId": "memorial_field",
+    "sceneTitle": "The Field of Names",
+    "npcId": "thorne",
+    "npcName": "Thorne the Deserter",
+    "setting": "a field of rusted weapons planted blade-first in ash, each marking a fallen soldier",
+    "stakes": "Thorne confronts ghosts of his former comrades and must decide whether to honor or abandon their memory",
+    "maxTurns": 12,
+    "allowedReveals": ["garrison_betrayal", "deserter_truth"],
+    "forbiddenTopics": ["escape_route"]
+  },
+  {
+    "sceneId": "ember_sanctum",
+    "sceneTitle": "The Ember Sanctum",
+    "npcId": "vessa",
+    "npcName": "Vessa the Hollow Priestess",
+    "setting": "an underground cathedral where the walls glow with trapped firelight",
+    "stakes": "Vessa discovers the corruption has a source -- and it is not what anyone expected",
+    "maxTurns": 10,
+    "allowedReveals": ["corruption_source", "hollow_faith", "reforged_prophecy"]
+  },
+  {
+    "sceneId": "reforged_camp",
+    "sceneTitle": "The Reforged Enclave",
+    "npcId": "seren",
+    "npcName": "Seren of the Reforged",
+    "setting": "a fortified camp of former Hollow King subjects who rejected his rule and rebuilt in the ash",
+    "stakes": "The Reforged faction offers alliance but demands proof of commitment against the Echo",
+    "maxTurns": 12,
+    "allowedReveals": ["reforged_origins", "reforged_prophecy"]
+  },
+  {
+    "sceneId": "aria_confession",
+    "sceneTitle": "The Scholar's Confession",
+    "npcId": "aria",
+    "npcName": "Aria the Scholar",
+    "setting": "a ruined library where Aria has been secretly researching the King's crown",
+    "stakes": "Aria reveals her true agenda -- she seeks the crown for herself, believing she can control it",
+    "maxTurns": 10,
+    "allowedReveals": ["scholar_research", "crown_nature"],
+    "forbiddenTopics": ["reforged_prophecy"]
+  },
+  {
+    "sceneId": "kael_loyalty",
+    "sceneTitle": "The Forgemaster's Test",
+    "npcId": "kael",
+    "npcName": "Kael the Forgemaster",
+    "setting": "deep within the forge, where the heat bends reality and old oaths still echo",
+    "stakes": "Kael offers to reforge a weapon against the Echo, but the cost is a piece of the player's memory",
+    "maxTurns": 8,
+    "allowedReveals": ["forge_history", "crown_nature"]
+  },
+  {
+    "sceneId": "echo_confrontation",
+    "sceneTitle": "The Echo Speaks",
+    "npcId": "hollow_king",
+    "npcName": "The Hollow King's Echo",
+    "setting": "the border between the Hollow and the Reaches, where reality thins to a whisper",
+    "stakes": "The Echo appears outside its domain for the first time, desperate and furious",
+    "maxTurns": 8,
+    "allowedReveals": ["king_history", "king_identity", "corruption_source"],
+    "forbiddenTopics": ["escape_route"]
+  },
+  {
+    "sceneId": "seren_alliance",
+    "sceneTitle": "The Pact of Ashes",
+    "npcId": "seren",
+    "npcName": "Seren of the Reforged",
+    "setting": "the Reforged war table, lit by embers from the original Hollow forge",
+    "stakes": "Final alliance negotiation -- the Reforged will march or refuse based on the player's choices",
+    "maxTurns": 10,
+    "allowedReveals": ["reforged_prophecy", "crown_nature"]
+  },
+  {
+    "sceneId": "act2_climax",
+    "sceneTitle": "The Crown's Choice",
+    "npcId": "hollow_king",
+    "npcName": "The Hollow King's Echo",
+    "setting": "the Ashen Throne, a mirror of the Hollow Throne built from scorched bone and regret",
+    "stakes": "The final confrontation of Act 2 -- destroy the crown, wear it, or offer it to the Reforged",
+    "maxTurns": 8,
+    "allowedReveals": ["king_identity", "crown_nature", "corruption_source", "reforged_prophecy"],
+    "forbiddenTopics": []
+  }
+]
