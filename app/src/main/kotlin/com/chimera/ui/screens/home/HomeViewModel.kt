@@ -3,15 +3,16 @@ package com.chimera.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
-import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.mapper.toModel
-import com.chimera.model.SaveSlot
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -22,26 +23,29 @@ data class HomeUiState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val saveSlotDao: SaveSlotDao,
-    private val gameSessionManager: GameSessionManager
+    saveSlotDao: SaveSlotDao,
+    gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
-
-    init {
-        loadCurrentSave()
-    }
-
-    private fun loadCurrentSave() {
-        viewModelScope.launch {
-            val slotId = gameSessionManager.activeSlotId.value ?: return@launch
-            val slot = saveSlotDao.getById(slotId)?.toModel() ?: return@launch
-            _uiState.value = HomeUiState(
-                playerName = slot.playerName,
-                chapterTag = slot.chapterTag,
-                isLoading = false
-            )
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<HomeUiState> = gameSessionManager.activeSlotId
+        .flatMapLatest { slotId ->
+            if (slotId == null) {
+                flowOf(HomeUiState(isLoading = false))
+            } else {
+                saveSlotDao.observeAll().map { slots ->
+                    val slot = slots.find { it.id == slotId }?.toModel()
+                    if (slot != null) {
+                        HomeUiState(
+                            playerName = slot.playerName,
+                            chapterTag = slot.chapterTag,
+                            isLoading = false
+                        )
+                    } else {
+                        HomeUiState(isLoading = false)
+                    }
+                }
+            }
         }
-    }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
 }

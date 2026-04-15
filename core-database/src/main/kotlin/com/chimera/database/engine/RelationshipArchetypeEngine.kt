@@ -169,7 +169,7 @@ class RelationshipArchetypeEngine {
                 }
                 InteractionType.PERSUADE, InteractionType.GIFT -> {
                     playerAggression.setValue(0.0f)
-                    if (tensionLevel.value > 0.8f && Math.random() < 0.3) {
+                    if (tensionLevel.value > 0.8f && kotlin.random.Random.nextFloat() < 0.3f) {
                         npcAggression.addValue(0.2f)
                     } else {
                         npcAggression.multiplyValue(0.8f)
@@ -219,15 +219,15 @@ class RelationshipArchetypeEngine {
 
     data class Variable(
         val name: String,
-        private var _value: Float,
+        @Volatile private var _value: Float,
         private val min: Float = 0.0f,
         private val max: Float = 1.0f
     ) {
         val value: Float get() = _value
-        fun setValue(v: Float) { _value = v.coerceIn(min, max) }
-        fun addValue(d: Float) { setValue(_value + d) }
-        fun subtractValue(d: Float) { setValue(_value - d) }
-        fun multiplyValue(f: Float) { setValue(_value * f) }
+        @Synchronized fun setValue(v: Float) { _value = v.coerceIn(min, max) }
+        @Synchronized fun addValue(d: Float) { setValue(_value + d) }
+        @Synchronized fun subtractValue(d: Float) { setValue(_value - d) }
+        @Synchronized fun multiplyValue(f: Float) { setValue(_value * f) }
     }
 
     open class FeedbackLoop(
@@ -245,23 +245,30 @@ class RelationshipArchetypeEngine {
         sourceVariable: Variable,
         targetVariable: Variable,
         strength: Float,
-        private val delaySeconds: Float
+        private val delaySeconds: Float,
+        private val maxQueueSize: Int = 64
     ) : FeedbackLoop(name, sourceVariable, targetVariable, strength) {
 
-        private val delayedValues = mutableListOf<Pair<Float, Float>>()
+        private data class DelayedValue(val value: Float, var timeRemaining: Float)
+        private val delayedValues = mutableListOf<DelayedValue>()
 
         override fun calculate(variables: Map<String, Variable>, deltaTime: Float): Float {
-            delayedValues.add(sourceVariable.value * strength to delaySeconds)
-            val readyValues = mutableListOf<Float>()
+            // Add current value to queue (bounded to prevent memory leak)
+            if (delayedValues.size < maxQueueSize) {
+                delayedValues.add(DelayedValue(sourceVariable.value * strength, delaySeconds))
+            }
+            // Decrement timers and collect ready values
+            var total = 0f
             val iterator = delayedValues.iterator()
             while (iterator.hasNext()) {
-                val (value, timeRemaining) = iterator.next()
-                if (timeRemaining - deltaTime <= 0) {
-                    readyValues.add(value)
+                val entry = iterator.next()
+                entry.timeRemaining -= deltaTime
+                if (entry.timeRemaining <= 0f) {
+                    total += entry.value
                     iterator.remove()
                 }
             }
-            return readyValues.sum()
+            return total
         }
     }
 
