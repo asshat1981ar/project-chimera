@@ -47,6 +47,7 @@ data class DialogueUiState(
     val isLoading: Boolean = false,
     val isFallbackMode: Boolean = false,
     val isSceneComplete: Boolean = false,
+    val triggerDuelWith: String? = null,
     val relationshipBanner: RelationshipBanner? = null
 )
 
@@ -215,6 +216,7 @@ class DialogueSceneViewModel @Inject constructor(
 
                 val isEnding = result.flags.contains("scene_ending") ||
                     turnResults.size >= contract.maxTurns
+                val triggerDuel = result.flags.contains("trigger_duel")
 
                 val intents = if (isEnding) {
                     listOf("Farewell.", "[Leave]")
@@ -237,6 +239,7 @@ class DialogueSceneViewModel @Inject constructor(
                     quickIntents = intents,
                     isFallbackMode = orchestrator.isFallbackActive,
                     isSceneComplete = isEnding,
+                    triggerDuelWith = if (triggerDuel) contract.npcId else null,
                     relationshipBanner = banner,
                     isLoading = false
                 )
