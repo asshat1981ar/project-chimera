@@ -1,6 +1,7 @@
 package com.chimera.ui.screens.camp
 
 import androidx.compose.foundation.BorderStroke
+import com.chimera.data.DutyType
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -122,6 +123,53 @@ fun CampScreen(
         } else {
             items(uiState.companions, key = { it.character.id }) { companion ->
                 CompanionCard(data = companion)
+            }
+        }
+
+        // Duty assignments section
+        if (uiState.dutyAssignments.isNotEmpty()) {
+            item {
+                Text(
+                    "Duty Assignments",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = EmberGold,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+            items(uiState.dutyAssignments, key = { it.companionId }) { assignment ->
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(assignment.companionName, style = MaterialTheme.typography.titleSmall)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            DutyType.values().forEach { duty ->
+                                val isSelected = assignment.duty == duty
+                                OutlinedButton(
+                                    onClick = {
+                                        if (isSelected) viewModel.clearDuty(assignment.companionId)
+                                        else viewModel.assignDuty(assignment.companionId, duty)
+                                    },
+                                    border = BorderStroke(
+                                        1.dp,
+                                        if (isSelected) EmberGold else FadedBone.copy(alpha = 0.3f)
+                                    ),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        duty.label,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (isSelected) EmberGold else FadedBone
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 

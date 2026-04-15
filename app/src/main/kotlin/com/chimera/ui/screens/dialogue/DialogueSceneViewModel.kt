@@ -9,6 +9,7 @@ import com.chimera.data.GameSessionManager
 import com.chimera.data.SceneLoader
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
+import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
@@ -73,7 +74,8 @@ class DialogueSceneViewModel @Inject constructor(
     private val memoryShardDao: MemoryShardDao,
     private val characterDao: CharacterDao,
     private val characterStateDao: CharacterStateDao,
-    private val journalEntryDao: JournalEntryDao
+    private val journalEntryDao: JournalEntryDao,
+    private val saveSlotDao: SaveSlotDao
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
@@ -261,6 +263,17 @@ class DialogueSceneViewModel @Inject constructor(
                         usedFallback = orchestrator.isFallbackActive
                     )
                     generateJournalEntry(slotId)
+                    // Persist accumulated playtime
+                    val sessionSeconds = gameSessionManager.getSessionPlaytimeSeconds()
+                    val slot = saveSlotDao.getById(slotId)
+                    if (slot != null) {
+                        saveSlotDao.upsert(
+                            slot.copy(
+                                playtimeSeconds = slot.playtimeSeconds + sessionSeconds,
+                                lastPlayedAt = System.currentTimeMillis()
+                            )
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("DialogueVM", "Failed to process turn", e)
@@ -297,6 +310,8 @@ class DialogueSceneViewModel @Inject constructor(
         } else {
             "A brief encounter with ${contract.npcName}."
         }
+
+        // Story entry (always)
         journalEntryDao.insert(
             JournalEntryEntity(
                 saveSlotId = slotId,
@@ -307,6 +322,34 @@ class DialogueSceneViewModel @Inject constructor(
                 characterId = contract.npcId
             )
         )
+
+        // Companion entry if recruitment happened
+        if (turnResults.any { it.flags.contains("recruit_companion") }) {
+            journalEntryDao.insert(
+                JournalEntryEntity(
+                    saveSlotId = slotId,
+                    title = "${contract.npcName} Joins",
+                    body = "${contract.npcName} has agreed to join your cause.",
+                    category = "companion",
+                    characterId = contract.npcId
+                )
+            )
+        }
+
+        // Companion disposition entry if relationship changed significantly
+        val totalDelta = turnResults.sumOf { it.relationshipDelta.toDouble() }.toFloat()
+        if (kotlin.math.abs(totalDelta) >= 0.1f) {
+            val direction = if (totalDelta > 0) "warmed to" else "grown colder toward"
+            journalEntryDao.insert(
+                JournalEntryEntity(
+                    saveSlotId = slotId,
+                    title = "${contract.npcName}'s Regard",
+                    body = "${contract.npcName} has $direction you after your exchange at ${contract.setting}.",
+                    category = "companion",
+                    characterId = contract.npcId
+                )
+            )
+        }
     }
 
     private suspend fun persistTurn(speakerId: String, text: String, emotion: String) {

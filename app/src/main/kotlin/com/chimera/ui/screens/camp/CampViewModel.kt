@@ -2,7 +2,10 @@ package com.chimera.ui.screens.camp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chimera.data.DutyAssignment
+import com.chimera.data.DutyType
 import com.chimera.data.GameSessionManager
+import com.chimera.data.RumorService
 import com.chimera.data.NightEvent
 import com.chimera.data.NightEventChoice
 import com.chimera.data.NightEventProvider
@@ -33,6 +36,7 @@ data class CampUiState(
     val morale: Float = 0.5f,
     val companions: List<CompanionCardData> = emptyList(),
     val activeVows: List<VowEntity> = emptyList(),
+    val dutyAssignments: List<DutyAssignment> = emptyList(),
     val nightEvent: NightEvent? = null,
     val nightEventOutcome: String? = null,
     val isLoading: Boolean = true
@@ -44,23 +48,26 @@ class CampViewModel @Inject constructor(
     private val characterStateDao: CharacterStateDao,
     private val vowDao: VowDao,
     private val nightEventProvider: NightEventProvider,
-    gameSessionManager: GameSessionManager
+    private val rumorService: RumorService,
+    private val gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
     private val _nightEvent = MutableStateFlow<NightEvent?>(null)
     private val _nightOutcome = MutableStateFlow<String?>(null)
+    private val _dutyAssignments = MutableStateFlow<Map<String, DutyType>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<CampUiState> = gameSessionManager.activeSlotId
         .flatMapLatest { slotId ->
             if (slotId == null) return@flatMapLatest flowOf(CampUiState(isLoading = false))
+            // Combine local state into a single flow to stay within combine's 5-param limit
+            val localState = combine(_nightEvent, _nightOutcome, _dutyAssignments) { e, o, d -> Triple(e, o, d) }
             combine(
                 characterDao.observeCompanions(slotId),
                 characterStateDao.observeBySlot(slotId),
                 vowDao.observeActive(slotId),
-                _nightEvent,
-                _nightOutcome
-            ) { companions, states, vows, event, outcome ->
+                localState
+            ) { companions, states, vows, (event, outcome, duties) ->
                 val stateMap = states.associateBy { it.characterId }
                 val companionCards = companions.map { char ->
                     CompanionCardData(char, stateMap[char.id])
@@ -70,13 +77,24 @@ class CampViewModel @Inject constructor(
                     .map { it.dispositionToPlayer }
                     .takeIf { it.isNotEmpty() }
                     ?.average()?.toFloat() ?: 0.5f
-                val morale = ((avgDisposition + 1f) / 2f).coerceIn(0f, 1f)
+                // Apply duty morale effects
+                val dutyMoraleBonus = duties.values.sumOf { it.moraleEffect.toDouble() }.toFloat()
+                val morale = (((avgDisposition + 1f) / 2f) + dutyMoraleBonus).coerceIn(0f, 1f)
+
+                val dutyList = companions.map { char ->
+                    DutyAssignment(
+                        companionId = char.id,
+                        companionName = char.name,
+                        duty = duties[char.id]
+                    )
+                }
 
                 CampUiState(
                     day = 1,
                     morale = morale,
                     companions = companionCards,
                     activeVows = vows,
+                    dutyAssignments = dutyList,
                     nightEvent = event,
                     nightEventOutcome = outcome,
                     isLoading = false
@@ -98,5 +116,19 @@ class CampViewModel @Inject constructor(
     fun dismissNightEvent() {
         _nightEvent.value = null
         _nightOutcome.value = null
+        // Advance day: decay rumors and clear duty assignments
+        viewModelScope.launch {
+            val slotId = gameSessionManager.activeSlotId.value ?: return@launch
+            rumorService.advanceDay(slotId)
+            _dutyAssignments.value = emptyMap()
+        }
+    }
+
+    fun assignDuty(companionId: String, duty: DutyType) {
+        _dutyAssignments.value = _dutyAssignments.value + (companionId to duty)
+    }
+
+    fun clearDuty(companionId: String) {
+        _dutyAssignments.value = _dutyAssignments.value - companionId
     }
 }
