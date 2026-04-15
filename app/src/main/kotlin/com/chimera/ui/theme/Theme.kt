@@ -1,36 +1,53 @@
 package com.chimera.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF6200EE),
-    secondary = Color(0xFF03DAC6),
-    tertiary = Color(0xFFFF5722),
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E)
+private val ChimeraColorScheme = darkColorScheme(
+    primary = HollowCrimson,
+    onPrimary = ParchmentWhite,
+    primaryContainer = HollowCrimsonLight,
+    onPrimaryContainer = ParchmentWhite,
+    secondary = EmberGold,
+    onSecondary = AshBlack,
+    secondaryContainer = EmberGoldMuted,
+    onSecondaryContainer = ParchmentWhite,
+    tertiary = VoidGreen,
+    onTertiary = ParchmentWhite,
+    tertiaryContainer = VoidGreenBright,
+    onTertiaryContainer = ParchmentWhite,
+    background = AshBlack,
+    onBackground = ParchmentWhite,
+    surface = CharcoalSurface,
+    onSurface = ParchmentWhite,
+    surfaceVariant = CharcoalElevated,
+    onSurfaceVariant = FadedBone,
+    outline = FadedBone,
+    outlineVariant = DimAsh,
+    error = BloodRed,
+    onError = ParchmentWhite
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6200EE),
-    secondary = Color(0xFF03DAC6),
-    tertiary = Color(0xFFFF5722),
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE)
+private val ChimeraShapes = Shapes(
+    extraSmall = RoundedCornerShape(2.dp),
+    small = RoundedCornerShape(4.dp),
+    medium = RoundedCornerShape(6.dp),
+    large = RoundedCornerShape(8.dp),
+    extraLarge = RoundedCornerShape(12.dp)
 )
 
 @Composable
 fun ChimeraTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-    
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography(),
+        colorScheme = ChimeraColorScheme,
+        typography = ChimeraTypography,
+        shapes = ChimeraShapes,
         content = content
     )
 }

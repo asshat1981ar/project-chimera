@@ -1,9 +1,39 @@
 <resources>
-    <string name="app_name">Project Chimera</string>
-    <string name="consciousness_level">Consciousness Level</string>
-    <string name="creativity_metrics">Creativity Metrics</string>
-    <string name="system_archetypes">System Archetypes</string>
-    <string name="npc_interactions">NPC Interactions</string>
-    <string name="emotional_archaeology">Emotional Archaeology</string>
-    <string name="emergent_narrative">Emergent Narrative</string>
+    <string name="app_name">Chimera: Ashes of the Hollow King</string>
+    <string name="app_title_line1">CHIMERA</string>
+    <string name="app_title_line2">Ashes of the Hollow King</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_camp">Camp</string>
+    <string name="nav_journal">Journal</string>
+    <string name="nav_party">Party</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Save Slots -->
+    <string name="save_slots_title">Choose Your Path</string>
+    <string name="new_journey">New Journey</string>
+    <string name="continue_journey">Continue</string>
+    <string name="delete_save">Delete Save</string>
+    <string name="delete_save_confirm">Destroy this save forever?</string>
+    <string name="enter_name">Enter your name</string>
+    <string name="create_save">Begin</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="chapter_label">Chapter: %s</string>
+    <string name="playtime_label">Playtime: %s</string>
+
+    <!-- Home -->
+    <string name="home_welcome">Welcome back, %s</string>
+    <string name="home_continue">Continue Your Journey</string>
+    <string name="home_enter_scene">Enter the Hollow</string>
+
+    <!-- Placeholders -->
+    <string name="coming_soon">The path ahead is shrouded in mist\u2026</string>
+    <string name="map_placeholder">The world map will reveal itself soon.</string>
+    <string name="camp_placeholder">Your camp awaits.</string>
+    <string name="journal_placeholder">Your journal entries will appear here.</string>
+    <string name="party_placeholder">Your companions gather in the shadows.</string>
+    <string name="settings_placeholder">Settings will be forged here.</string>
 </resources>
