@@ -13,6 +13,7 @@ import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
+import com.chimera.database.dao.QuestDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
@@ -23,6 +24,7 @@ import com.chimera.database.entity.DialogueTurnEntity
 import com.chimera.database.entity.FactionStateEntity
 import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.MemoryShardEntity
+import com.chimera.database.entity.QuestEntity
 import com.chimera.database.entity.RumorPacketEntity
 import com.chimera.database.entity.SaveSlotEntity
 import com.chimera.database.entity.SceneInstanceEntity
@@ -39,9 +41,10 @@ import com.chimera.database.entity.VowEntity
         JournalEntryEntity::class,
         VowEntity::class,
         RumorPacketEntity::class,
-        FactionStateEntity::class
+        FactionStateEntity::class,
+        QuestEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -55,6 +58,7 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
     abstract fun sceneInstanceDao(): SceneInstanceDao
     abstract fun journalEntryDao(): JournalEntryDao
     abstract fun vowDao(): VowDao
+    abstract fun questDao(): QuestDao
     abstract fun rumorPacketDao(): RumorPacketDao
     abstract fun factionStateDao(): FactionStateDao
 
