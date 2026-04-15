@@ -15,6 +15,9 @@ import com.chimera.ui.screens.home.HomeScreen
 import com.chimera.ui.screens.journal.JournalScreen
 import com.chimera.ui.screens.map.MapScreen
 import com.chimera.ui.screens.party.PartyScreen
+import androidx.compose.runtime.collectAsState
+import com.chimera.data.ChimeraPreferences
+import com.chimera.ui.screens.onboarding.OnboardingScreen
 import com.chimera.ui.screens.saveslot.SaveSlotSelectScreen
 import com.chimera.ui.screens.settings.SettingsScreen
 import com.chimera.ui.screens.splash.SplashScreen
@@ -22,6 +25,7 @@ import com.chimera.ui.screens.splash.SplashScreen
 @Composable
 fun ChimeraNavHost(
     navController: NavHostController,
+    preferences: ChimeraPreferences,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -30,10 +34,29 @@ fun ChimeraNavHost(
         modifier = modifier
     ) {
         composable(ChimeraRoutes.SPLASH) {
+            val settings by preferences.settings.collectAsState(
+                initial = com.chimera.data.AppSettings()
+            )
             SplashScreen(
                 onFinished = {
-                    navController.navigate(ChimeraRoutes.SAVE_SLOT_SELECT) {
+                    val dest = if (settings.tutorialComplete) {
+                        ChimeraRoutes.SAVE_SLOT_SELECT
+                    } else {
+                        ChimeraRoutes.ONBOARDING
+                    }
+                    navController.navigate(dest) {
                         popUpTo(ChimeraRoutes.SPLASH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(ChimeraRoutes.ONBOARDING) {
+            OnboardingScreen(
+                preferences = preferences,
+                onComplete = {
+                    navController.navigate(ChimeraRoutes.SAVE_SLOT_SELECT) {
+                        popUpTo(ChimeraRoutes.ONBOARDING) { inclusive = true }
                     }
                 }
             )

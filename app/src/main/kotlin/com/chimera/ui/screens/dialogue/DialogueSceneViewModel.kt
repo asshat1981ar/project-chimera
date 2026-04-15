@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.chimera.ai.DialogueOrchestrator
 import com.chimera.data.GameSessionManager
 import com.chimera.data.SceneLoader
+import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.JournalEntryDao
@@ -70,6 +71,7 @@ class DialogueSceneViewModel @Inject constructor(
     private val dialogueTurnDao: DialogueTurnDao,
     private val sceneInstanceDao: SceneInstanceDao,
     private val memoryShardDao: MemoryShardDao,
+    private val characterDao: CharacterDao,
     private val characterStateDao: CharacterStateDao,
     private val journalEntryDao: JournalEntryDao
 ) : ViewModel() {
@@ -204,7 +206,15 @@ class DialogueSceneViewModel @Inject constructor(
 
                 if (result.relationshipDelta != 0f) {
                     characterStateDao.adjustDisposition(contract.npcId, result.relationshipDelta)
-                    cachedCharState = null // invalidate cache after mutation
+                    cachedCharState = null
+                }
+
+                // Companion recruitment: promote NPC role to COMPANION
+                if (result.flags.contains("recruit_companion")) {
+                    val existing = characterDao.getById(contract.npcId)
+                    if (existing != null && existing.role != "COMPANION") {
+                        characterDao.upsert(existing.copy(role = "COMPANION"))
+                    }
                 }
 
                 val npcLine = DialogueLine(

@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
 import com.chimera.data.MapNodeLoader
+import com.chimera.database.dao.CharacterStateDao
+import kotlinx.serialization.json.Json
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SceneInstanceDao
@@ -44,6 +46,7 @@ class MapViewModel @Inject constructor(
     private val sceneInstanceDao: SceneInstanceDao,
     private val rumorPacketDao: RumorPacketDao,
     private val factionStateDao: FactionStateDao,
+    private val characterStateDao: CharacterStateDao,
     private val mapNodeLoader: MapNodeLoader,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
@@ -68,13 +71,24 @@ class MapViewModel @Inject constructor(
                 val rumorsByLocation = rumors.groupBy { it.locationId }
                     .mapValues { (_, list) -> list.count { it.heatLevel > 0.3f } }
 
+                val json = Json { ignoreUnknownKeys = true }
                 val factionByLocation = factions.flatMap { faction ->
-                    // Simple mapping: faction controls locations listed in JSON
-                    listOf<Pair<String, String>>() // TODO: parse controlledLocationsJson
+                    try {
+                        val locations = json.decodeFromString<List<String>>(faction.controlledLocationsJson)
+                        locations.map { it to faction.factionName }
+                    } catch (_: Exception) {
+                        emptyList()
+                    }
                 }.toMap()
+
+                // Load character states for relationship-based unlock checks
+                val charStates = characterStateDao.observeBySlot(slotId)
+                val dispositions = mutableMapOf<String, Float>()
+                // Build a simple disposition lookup (using cached data from combine)
 
                 val nodes = baseNodes.map { node ->
                     val isCompleted = node.sceneId in completedScenes
+                    // Unlock if: node is default unlocked, OR a connected node is completed
                     val isUnlocked = node.isUnlocked || node.connectedTo.any { connId ->
                         baseNodes.find { it.id == connId }?.let { conn ->
                             conn.isUnlocked || conn.sceneId in completedScenes
