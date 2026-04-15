@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -142,6 +145,66 @@ fun CampScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(12.dp)
                     )
+                }
+            }
+        }
+
+        // Night event trigger
+        item {
+            if (uiState.nightEvent == null) {
+                Button(
+                    onClick = { viewModel.triggerNightEvent() },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
+                ) {
+                    Text("Rest for the Night")
+                }
+            }
+        }
+
+        // Night event display
+        uiState.nightEvent?.let { event ->
+            item {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    border = BorderStroke(1.dp, EmberGold.copy(alpha = 0.5f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text(event.title, style = MaterialTheme.typography.titleMedium, color = EmberGold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(event.narrative, style = MaterialTheme.typography.bodyMedium)
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        if (uiState.nightEventOutcome != null) {
+                            Text(
+                                uiState.nightEventOutcome!!,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = VoidGreen
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            OutlinedButton(
+                                onClick = { viewModel.dismissNightEvent() },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Dawn Breaks")
+                            }
+                        } else {
+                            event.choices.forEach { choice ->
+                                OutlinedButton(
+                                    onClick = { viewModel.resolveNightEvent(choice) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                    border = BorderStroke(1.dp, FadedBone.copy(alpha = 0.3f))
+                                ) {
+                                    Text(choice.text)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

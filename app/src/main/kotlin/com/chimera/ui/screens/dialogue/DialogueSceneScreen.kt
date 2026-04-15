@@ -62,9 +62,17 @@ import com.chimera.ui.theme.VoidGreen
 fun DialogueSceneScreen(
     sceneId: String,
     onSceneComplete: () -> Unit,
+    onTriggerDuel: (opponentId: String) -> Unit = {},
     viewModel: DialogueSceneViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Navigate to duel when triggered
+    LaunchedEffect(uiState.triggerDuelWith) {
+        uiState.triggerDuelWith?.let { opponentId ->
+            onTriggerDuel(opponentId)
+        }
+    }
     val listState = rememberLazyListState()
     var typedInput by remember { mutableStateOf("") }
 

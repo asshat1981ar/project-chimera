@@ -100,7 +100,10 @@ fun ChimeraNavHost(
                 val sceneId = backStackEntry.arguments?.getString("sceneId") ?: return@composable
                 DialogueSceneScreen(
                     sceneId = sceneId,
-                    onSceneComplete = { navController.popBackStack() }
+                    onSceneComplete = { navController.popBackStack() },
+                    onTriggerDuel = { opponentId ->
+                        navController.navigate(ChimeraRoutes.duel(opponentId))
+                    }
                 )
             }
 
