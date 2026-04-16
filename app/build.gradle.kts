@@ -34,6 +34,10 @@ android {
         // CHIMERA_CLOUD_SAVE_TOKEN=<secret — set via: wrangler secret put API_TOKEN>
         buildConfigField("String", "CLOUD_SAVE_URL",   "\"${project.findProperty("CHIMERA_CLOUD_SAVE_URL")   ?: ""}\"")
         buildConfigField("String", "CLOUD_SAVE_TOKEN", "\"${project.findProperty("CHIMERA_CLOUD_SAVE_TOKEN") ?: ""}\"")
+
+        // HuggingFace — portrait generation via Inference API
+        // HUGGING_FACE_TOKEN=hf_... (read/inference scope, set via local.properties or CI)
+        buildConfigField("String", "HUGGING_FACE_TOKEN", "\"${project.findProperty("HUGGING_FACE_TOKEN") ?: ""}\"")
     }
 
     flavorDimensions += "environment"
@@ -197,6 +201,11 @@ dependencies {
 
     // DataStore
     implementation(libs.datastore.preferences)
+
+    // WorkManager + Hilt integration — NPC portrait sync, background tasks
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.work.compiler)
 
     // Testing
     testImplementation(libs.junit)

@@ -30,4 +30,12 @@ interface CharacterDao {
 
     @Query("DELETE FROM characters WHERE save_slot_id = :slotId")
     suspend fun deleteBySlot(slotId: Long)
+
+    /** Updates only the portrait URL — used by portrait sync service. */
+    @Query("UPDATE characters SET portrait_res_name = :url WHERE id = :id")
+    suspend fun updatePortraitResName(id: String, url: String?)
+
+    /** Returns non-player characters without a portrait assigned. */
+    @Query("SELECT * FROM characters WHERE save_slot_id = :slotId AND is_player_character = 0 AND portrait_res_name IS NULL")
+    suspend fun getBySlotWithoutPortrait(slotId: Long): List<CharacterEntity>
 }

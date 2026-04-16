@@ -1,8 +1,15 @@
 package com.chimera.ui.screens.saveslot
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.chimera.data.CraftingRecipeSeeder
 import com.chimera.data.FactionSeeder
 import com.chimera.data.GameSessionManager
@@ -15,7 +22,9 @@ import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.SaveSlotEntity
 import com.chimera.database.mapper.toModel
 import com.chimera.model.SaveSlot
+import com.chimera.workers.NpcPortraitSyncWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +36,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SaveSlotSelectViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val saveSlotDao: SaveSlotDao,
     private val characterDao: CharacterDao,
     private val multiActNpcSeeder: MultiActNpcSeeder,
@@ -89,6 +99,20 @@ class SaveSlotSelectViewModel @Inject constructor(
                 }
 
                 onCreated(slotId)
+
+                // Schedule background portrait generation — requires network, runs once per slot
+                WorkManager.getInstance(context).enqueueUniqueWork(
+                    "${NpcPortraitSyncWorker.WORK_NAME}_$slotId",
+                    ExistingWorkPolicy.KEEP,
+                    OneTimeWorkRequestBuilder<NpcPortraitSyncWorker>()
+                        .setInputData(workDataOf(NpcPortraitSyncWorker.KEY_SLOT_ID to slotId))
+                        .setConstraints(
+                            Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build()
+                        )
+                        .build()
+                )
             } catch (e: Exception) {
                 Log.e("SaveSlotVM", "Failed to create new game", e)
                 _error.value = "Failed to create save"
