@@ -15,6 +15,7 @@ import com.chimera.data.CraftingRecipeSeeder
 import com.chimera.data.FactionSeeder
 import com.chimera.data.GameSessionManager
 import com.chimera.data.MultiActNpcSeeder
+import com.chimera.data.SceneLoader
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.FactionStateDao
@@ -27,7 +28,10 @@ import com.chimera.network.SnapshotCharacterState
 import com.chimera.network.SnapshotFactionStanding
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.entity.CharacterEntity
+import com.chimera.database.entity.CharacterStateEntity
+import com.chimera.database.entity.FactionStateEntity
 import com.chimera.database.entity.SaveSlotEntity
+import com.chimera.database.entity.SceneInstanceEntity
 import com.chimera.database.mapper.toModel
 import com.chimera.model.SaveSlot
 import com.chimera.workers.NpcPortraitSyncWorker
@@ -51,6 +55,7 @@ class SaveSlotSelectViewModel @Inject constructor(
     private val characterStateDao: CharacterStateDao,
     private val factionStateDao: FactionStateDao,
     private val sceneInstanceDao: SceneInstanceDao,
+    private val sceneLoader: SceneLoader,
     private val multiActNpcSeeder: MultiActNpcSeeder,
     private val craftingRecipeSeeder: CraftingRecipeSeeder,
     private val factionSeeder: FactionSeeder,
@@ -154,17 +159,10 @@ class SaveSlotSelectViewModel @Inject constructor(
                     val cloudSave = cloudResult.getOrNull()
 
                     if (cloudSave != null && cloudSave.updatedAt > slot.lastPlayedAt) {
-                        // Stage 3: Apply — cloud is newer, update local Room entities
+                        // Stage 3: Apply — cloud is newer, restore full snapshot into Room
                         Log.d("SaveSlotVM", "Cloud save newer for slot $slotId, restoring")
-                        saveSlotDao.upsert(
-                            slot.copy(
-                                playerName      = cloudSave.playerName,
-                                chapterTag      = cloudSave.chapterTag,
-                                playtimeSeconds = cloudSave.playtimeSeconds,
-                                lastPlayedAt    = cloudSave.updatedAt
-                            )
-                        )
-                        // Stage 4: Verify — Room is now up to date; proceed
+                        applySnapshot(slotId, cloudSave.saveDataJson, cloudSave)
+                        // Stage 4: verify — Room updated; shallow SaveSlot row updated inside applySnapshot
                     } else if (cloudSave != null && cloudSave.updatedAt < slot.lastPlayedAt) {
                         // Local is newer — push full snapshot to cloud
                         viewModelScope.launch {
@@ -216,6 +214,112 @@ class SaveSlotSelectViewModel @Inject constructor(
                 Log.e("SaveSlotVM", "Failed to delete save", e)
                 _error.value = "Failed to delete save"
             }
+        }
+    }
+
+    /**
+     * Applies a [CloudSaveResponse] to local Room — the Stage 3 of the cloud restore pipeline.
+     * PromptForge SEQUENCE: parse → upsert slot → upsert characters → upsert states → upsert scenes → upsert factions
+     * Any error falls back to shallow restore (only SaveSlot row updated). Never throws.
+     */
+    private suspend fun applySnapshot(
+        slotId: Long,
+        saveDataJson: String,
+        cloudSave: com.chimera.network.CloudSaveResponse
+    ) {
+        // Always update the SaveSlot row (shallow restore — always safe)
+        val slot = saveSlotDao.getById(slotId) ?: return
+        saveSlotDao.upsert(
+            slot.copy(
+                playerName      = cloudSave.playerName,
+                chapterTag      = cloudSave.chapterTag,
+                playtimeSeconds = cloudSave.playtimeSeconds,
+                lastPlayedAt    = cloudSave.updatedAt
+            )
+        )
+
+        // Skip deep restore for empty/legacy snapshots
+        if (saveDataJson == "{}" || saveDataJson.isBlank()) return
+
+        try {
+            val snapshot = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+                .decodeFromString(SaveDataSnapshot.serializer(), saveDataJson)
+
+            // Stage 2: Characters
+            if (snapshot.characters.isNotEmpty()) {
+                characterDao.upsertAll(snapshot.characters.map { c ->
+                    CharacterEntity(
+                        id               = c.id,
+                        saveSlotId       = slotId,
+                        name             = c.name,
+                        title            = c.title,
+                        role             = c.role,
+                        isPlayerCharacter = c.isPlayer,
+                        portraitResName  = c.portraitUrl
+                    )
+                })
+            }
+
+            // Stage 3: Character states
+            snapshot.characterStates.forEach { s ->
+                characterStateDao.upsert(
+                    CharacterStateEntity(
+                        characterId          = s.characterId,
+                        saveSlotId           = slotId,
+                        dispositionToPlayer  = s.disposition,
+                        activeArchetype      = s.activeArchetype,
+                        lastInteractionEpoch = s.lastInteractionEpoch
+                    )
+                )
+            }
+
+            // Stage 4: Completed scenes — upsert as status=completed using SceneLoader for npcId
+            snapshot.completedScenes.forEach { sceneId ->
+                val npcId = sceneLoader.getScene(sceneId)?.npcId ?: "unknown"
+                val now   = System.currentTimeMillis()
+                val existing = sceneInstanceDao.getActiveScene(slotId, sceneId)
+                if (existing == null) {
+                    sceneInstanceDao.upsert(
+                        SceneInstanceEntity(
+                            saveSlotId   = slotId,
+                            sceneId      = sceneId,
+                            npcId        = npcId,
+                            status       = "completed",
+                            startedAt    = now,
+                            completedAt  = now
+                        )
+                    )
+                }
+                // Already exists → leave it; don't overwrite real session data
+            }
+
+            // Stage 5: Faction standings
+            snapshot.factionStandings.forEach { f ->
+                val existing = factionStateDao.getByFaction(slotId, f.factionId)
+                if (existing != null) {
+                    factionStateDao.upsert(existing.copy(
+                        playerStanding = f.playerStanding,
+                        influence      = f.worldInfluence
+                    ))
+                } else {
+                    factionStateDao.upsert(
+                        FactionStateEntity(
+                            saveSlotId   = slotId,
+                            factionId    = f.factionId,
+                            factionName  = f.factionId.replaceFirstChar { it.uppercase() },
+                            playerStanding = f.playerStanding,
+                            influence    = f.worldInfluence
+                        )
+                    )
+                }
+            }
+
+            Log.d("SaveSlotVM", "Snapshot applied: ${snapshot.characters.size} chars, " +
+                "${snapshot.completedScenes.size} scenes, ${snapshot.factionStandings.size} factions")
+
+        } catch (e: Exception) {
+            // JSON parse or DB error — shallow restore already applied above; continue
+            Log.w("SaveSlotVM", "Deep snapshot apply failed, using shallow restore: ${e.message}")
         }
     }
 
