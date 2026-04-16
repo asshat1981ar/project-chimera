@@ -100,7 +100,12 @@ android {
 dependencies {
     // Project modules
     implementation(project(":core-model"))
+    implementation(project(":core-ui"))
     implementation(project(":core-database"))
+    implementation(project(":core-network"))
+    implementation(project(":core-ai"))
+    implementation(project(":core-data"))
+    implementation(project(":domain"))
 
     // Core Android
     implementation(libs.androidx.core.ktx)

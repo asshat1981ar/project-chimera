@@ -16,4 +16,9 @@ dependencyResolutionManagement {
 rootProject.name = "Project Chimera"
 include(":app")
 include(":core-model")
+include(":core-ui")
 include(":core-database")
+include(":core-network")
+include(":core-ai")
+include(":core-data")
+include(":domain")
