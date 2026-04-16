@@ -1,7 +1,7 @@
 package com.chimera.data
 
 import android.content.Context
-import com.chimera.ui.screens.map.MapNode
+import com.chimera.model.MapNode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

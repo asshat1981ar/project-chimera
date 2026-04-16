@@ -3,7 +3,7 @@ package com.chimera.data
 import android.content.Context
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.dao.SaveSlotDao
-import com.chimera.ui.screens.map.MapNode
+import com.chimera.model.MapNode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
