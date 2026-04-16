@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "intents": {
+    "default": [
+      {
+        "id": "strike",
+        "label": "Strike Hard",
+        "description": "Press the attack. High risk, high reward.",
+        "statBonus": 2,
+        "resultBands": {
+          "critical": "You land a decisive blow. Opponent loses 2 Resolve.",
+          "success": "A clean hit. Opponent loses 1 Resolve.",
+          "partial": "You strike but take the brunt of the counter. Both lose 1 Resolve.",
+          "failure": "Your attack is turned aside. You lose 1 Resolve.",
+          "criticalFailure": "You overextend. You lose 2 Resolve."
+        }
+      },
+      {
+        "id": "defend",
+        "label": "Hold Ground",
+        "description": "Brace for impact. Recover Resolve on success.",
+        "statBonus": 0,
+        "resultBands": {
+          "critical": "You weather the storm and find an opening. You recover 1 Resolve.",
+          "success": "You hold firm. No Resolve lost.",
+          "partial": "A near miss. You lose 1 Resolve but the worst is avoided.",
+          "failure": "The blow lands. You lose 1 Resolve.",
+          "criticalFailure": "Badly shaken. You lose 2 Resolve."
+        }
+      },
+      {
+        "id": "outmaneuver",
+        "label": "Outmaneuver",
+        "description": "Use speed and cunning over force.",
+        "statBonus": 1,
+        "resultBands": {
+          "critical": "You slip past every guard. Opponent loses 2 Resolve.",
+          "success": "You find the gap. Opponent loses 1 Resolve.",
+          "partial": "Clever but not enough. You lose 1 Resolve.",
+          "failure": "Anticipated. You lose 1 Resolve.",
+          "criticalFailure": "Walked into a trap. You lose 2 Resolve."
+        }
+      },
+      {
+        "id": "parley",
+        "label": "Parley",
+        "description": "Words cut deeper than steel. Requires disposition > -0.5.",
+        "statBonus": -1,
+        "requiresDispositionAbove": -0.5,
+        "resultBands": {
+          "critical": "They falter. Opponent loses 2 Resolve and disposition rises.",
+          "success": "Doubt enters their eyes. Opponent loses 1 Resolve.",
+          "partial": "They listen, then laugh. You lose 1 Resolve.",
+          "failure": "Your words ring hollow. You lose 1 Resolve.",
+          "criticalFailure": "You've only made them angrier. You lose 2 Resolve, disposition falls."
+        }
+      }
+    ],
+    "ESCALATION": [
+      {
+        "id": "strike",
+        "label": "Match Their Fury",
+        "description": "Meet aggression with aggression.",
+        "statBonus": 3
+      },
+      {
+        "id": "defend",
+        "label": "Absorb and Wait",
+        "description": "Let their rage exhaust itself.",
+        "statBonus": 1
+      },
+      {
+        "id": "outmaneuver",
+        "label": "Disrupt Rhythm",
+        "description": "Break the pattern of escalation.",
+        "statBonus": 1
+      }
+    ],
+    "SHIFTING_THE_BURDEN": [
+      {
+        "id": "expose",
+        "label": "Expose the Lie",
+        "description": "Name the dependency that drives them.",
+        "statBonus": 2,
+        "resultBands": {
+          "critical": "They crumble. Opponent loses 2 Resolve, disposition shifts.",
+          "success": "A crack appears. Opponent loses 1 Resolve.",
+          "partial": "They deflect. You both lose 1 Resolve.",
+          "failure": "They deny it. You lose 1 Resolve.",
+          "criticalFailure": "You've touched a wound. You lose 2 Resolve."
+        }
+      },
+      {
+        "id": "strike",
+        "label": "Strike Hard",
+        "description": "Cut through the deflection with force.",
+        "statBonus": 1
+      },
+      {
+        "id": "parley",
+        "label": "Offer a Way Out",
+        "description": "Give them an alternative to the burden.",
+        "statBonus": 2
+      }
+    ],
+    "FIXES_THAT_FAIL": [
+      {
+        "id": "patient_pressure",
+        "label": "Patient Pressure",
+        "description": "Let their own fix unravel. Wait and exploit.",
+        "statBonus": 2,
+        "resultBands": {
+          "critical": "The flaw opens wide. Opponent loses 2 Resolve.",
+          "success": "The crack widens. Opponent loses 1 Resolve.",
+          "partial": "They patch it in time. Both lose 1 Resolve.",
+          "failure": "The fix holds for now. You lose 1 Resolve.",
+          "criticalFailure": "They adapt. You lose 2 Resolve."
+        }
+      },
+      {
+        "id": "outmaneuver",
+        "label": "Outmaneuver",
+        "description": "Stay ahead of their corrections.",
+        "statBonus": 2
+      },
+      {
+        "id": "strike",
+        "label": "Strike Hard",
+        "description": "Overwhelm before they can respond.",
+        "statBonus": 0
+      }
+    ],
+    "GROWTH_AND_UNDERINVESTMENT": [
+      {
+        "id": "overwhelm",
+        "label": "Overwhelm the Gap",
+        "description": "Push where they're stretched too thin.",
+        "statBonus": 3,
+        "resultBands": {
+          "critical": "The gap collapses. Opponent loses 2 Resolve.",
+          "success": "You find the opening. Opponent loses 1 Resolve.",
+          "partial": "They scramble to cover. You lose 1 Resolve.",
+          "failure": "They adapt faster than expected. You lose 1 Resolve.",
+          "criticalFailure": "The gap was bait. You lose 2 Resolve."
+        }
+      },
+      {
+        "id": "defend",
+        "label": "Hold Ground",
+        "description": "Let their overextension exhaust them.",
+        "statBonus": 1
+      },
+      {
+        "id": "parley",
+        "label": "Negotiate",
+        "description": "Exploit their need for allies.",
+        "statBonus": 1
+      }
+    ]
+  },
+  "resultBandThresholds": {
+    "criticalSuccess": 20,
+    "success": 15,
+    "partial": 10,
+    "failure": 5,
+    "criticalFailure": 0
+  },
+  "maxRolls": 3,
+  "resolveSegments": 3
+}
