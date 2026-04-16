@@ -101,7 +101,26 @@ fun ChimeraNavHost(
             }
 
             composable(ChimeraRoutes.CAMP) {
-                CampScreen()
+                CampScreen(
+                    onNavigateToInventory = {
+                        navController.navigate(ChimeraRoutes.INVENTORY)
+                    },
+                    onNavigateToCrafting = {
+                        navController.navigate(ChimeraRoutes.CRAFTING)
+                    }
+                )
+            }
+
+            composable(ChimeraRoutes.INVENTORY) {
+                com.chimera.feature.camp.InventoryScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(ChimeraRoutes.CRAFTING) {
+                com.chimera.feature.camp.CraftingScreen(
+                    onBack = { navController.popBackStack() }
+                )
             }
 
             composable(ChimeraRoutes.JOURNAL) {
