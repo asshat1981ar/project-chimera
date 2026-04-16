@@ -9,8 +9,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.chimera.database.converter.Converters
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
+import com.chimera.database.dao.CraftingRecipeDao
 import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.FactionStateDao
+import com.chimera.database.dao.InventoryDao
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.QuestDao
@@ -20,8 +22,10 @@ import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.dao.VowDao
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.CharacterStateEntity
+import com.chimera.database.entity.CraftingRecipeEntity
 import com.chimera.database.entity.DialogueTurnEntity
 import com.chimera.database.entity.FactionStateEntity
+import com.chimera.database.entity.InventoryItemEntity
 import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.database.entity.QuestEntity
@@ -42,9 +46,11 @@ import com.chimera.database.entity.VowEntity
         VowEntity::class,
         RumorPacketEntity::class,
         FactionStateEntity::class,
-        QuestEntity::class
+        QuestEntity::class,
+        InventoryItemEntity::class,
+        CraftingRecipeEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -59,6 +65,8 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
     abstract fun journalEntryDao(): JournalEntryDao
     abstract fun vowDao(): VowDao
     abstract fun questDao(): QuestDao
+    abstract fun inventoryDao(): InventoryDao
+    abstract fun craftingRecipeDao(): CraftingRecipeDao
     abstract fun rumorPacketDao(): RumorPacketDao
     abstract fun factionStateDao(): FactionStateDao
 

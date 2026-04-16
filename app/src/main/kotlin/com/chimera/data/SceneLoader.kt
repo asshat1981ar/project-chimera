@@ -14,7 +14,7 @@ class SceneLoader @Inject constructor(
     private val json = Json { ignoreUnknownKeys = true }
     private var cache: Map<String, SceneContract>? = null
 
-    private val sceneFiles = listOf("act1_scenes.json", "act2_scenes.json")
+    private val sceneFiles = listOf("act1_scenes.json", "act2_scenes.json", "act3_scenes.json")
 
     fun getScene(sceneId: String): SceneContract? {
         return loadAll()[sceneId]

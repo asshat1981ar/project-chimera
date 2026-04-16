@@ -4,7 +4,9 @@ import android.content.Context
 import com.chimera.database.ChimeraGameDatabase
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
+import com.chimera.database.dao.CraftingRecipeDao
 import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.InventoryDao
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
@@ -41,4 +43,6 @@ object DatabaseModule {
     @Provides fun provideRumorPacketDao(db: ChimeraGameDatabase): RumorPacketDao = db.rumorPacketDao()
     @Provides fun provideFactionStateDao(db: ChimeraGameDatabase): FactionStateDao = db.factionStateDao()
     @Provides fun provideQuestDao(db: ChimeraGameDatabase): QuestDao = db.questDao()
+    @Provides fun provideInventoryDao(db: ChimeraGameDatabase): InventoryDao = db.inventoryDao()
+    @Provides fun provideCraftingRecipeDao(db: ChimeraGameDatabase): CraftingRecipeDao = db.craftingRecipeDao()
 }
