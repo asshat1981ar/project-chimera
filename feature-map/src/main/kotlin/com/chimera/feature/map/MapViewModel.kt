@@ -27,6 +27,7 @@ data class MapNode(
     val description: String,
     val isUnlocked: Boolean = false,
     val isCompleted: Boolean = false,
+    val isRevealed: Boolean = false,  // fog-of-war: false = hidden (not shown on map)
     val rumorCount: Int = 0,
     val faction: String? = null,
     val connectedTo: List<String> = emptyList(),
@@ -52,7 +53,7 @@ class MapViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _selectedNode = MutableStateFlow<MapNode?>(null)
-    private val baseNodes: List<MapNode> by lazy { mapNodeLoader.loadNodes() }
+    private val baseNodes: List<MapNode> by lazy { mapNodeLoader.loadNodesSync() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<MapUiState> = gameSessionManager.activeSlotId
@@ -94,16 +95,32 @@ class MapViewModel @Inject constructor(
                             conn.isUnlocked || conn.sceneId in completedScenes
                         } ?: false
                     }
+                    // Fog-of-war reveal rules (computed, not persisted):
+                    //  1. Node is the act-start node (isUnlocked=true in JSON) → always revealed
+                    //  2. Node is completed → revealed
+                    //  3. Any connected neighbor is completed → revealed
+                    //  4. All other nodes → hidden (isRevealed=false)
+                    val isRevealed = node.isUnlocked ||   // act-start nodes are pre-unlocked in JSON
+                        isCompleted ||
+                        node.connectedTo.any { connId ->
+                            val neighbor = baseNodes.find { it.id == connId }
+                            neighbor?.sceneId in completedScenes || neighbor?.isUnlocked == true
+                        }
                     node.copy(
                         isUnlocked = isUnlocked,
                         isCompleted = isCompleted,
+                        isRevealed = isRevealed,
                         rumorCount = rumorsByLocation[node.id] ?: 0,
                         faction = factionByLocation[node.id]
                     )
                 }
 
+                // Fog filter: only pass revealed nodes to the UI
+                // Fog placeholder nodes are rendered by MapScreen from connectedTo refs
+                val revealedNodes = nodes.filter { it.isRevealed }
+
                 MapUiState(
-                    nodes = nodes,
+                    nodes = revealedNodes,
                     factions = factions,
                     selectedNode = selected
                 )
@@ -117,5 +134,23 @@ class MapViewModel @Inject constructor(
 
     fun clearSelection() {
         _selectedNode.value = null
+    }
+
+    /**
+     * Returns (xFraction, yFraction) pairs for nodes that are NOT yet revealed
+     * but are connected to at least one revealed node in [visibleNodes].
+     * Used by MapScreen to render fog-of-war placeholder dots at the right positions.
+     * Computed from [baseNodes] so positions are always available regardless of reveal state.
+     */
+    fun fogAdjacentPositions(visibleNodes: List<MapNode>): List<Pair<Float, Float>> {
+        val visibleIds = visibleNodes.map { it.id }.toSet()
+        return baseNodes
+            .filter { candidate ->
+                // Not already visible
+                candidate.id !in visibleIds &&
+                // Connected to at least one visible node
+                candidate.connectedTo.any { it in visibleIds }
+            }
+            .map { it.xFraction to it.yFraction }
     }
 }
