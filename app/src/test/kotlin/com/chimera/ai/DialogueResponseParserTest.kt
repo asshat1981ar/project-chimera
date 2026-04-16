@@ -1,5 +1,6 @@
 package com.chimera.ai
 
+import com.chimera.model.SceneContract
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -109,5 +110,45 @@ class DialogueResponseParserTest {
         val result = DialogueResponseParser.parse(json)
         assertNotNull(result)
         assertTrue(result!!.memoryCandidates.size <= 3)
+    }
+
+    // --- SceneContract validation tests ---
+
+    private val contractWithForbidden = SceneContract(
+        sceneId = "test", sceneTitle = "Test", npcId = "npc", npcName = "NPC",
+        setting = "room", forbiddenTopics = listOf("escape_route", "king_identity")
+    )
+
+    @Test
+    fun `parseAndValidate passes clean response`() {
+        val json = """{"npcLine":"The hollow is ancient.","emotion":"neutral","relationshipDelta":0.0,"flags":[],"memoryCandidates":[]}"""
+        val result = DialogueResponseParser.parseAndValidate(json, contractWithForbidden)
+        assertNotNull(result)
+        assertEquals("The hollow is ancient.", result!!.npcLine)
+    }
+
+    @Test
+    fun `parseAndValidate strips forbidden topic mention`() {
+        val json = """{"npcLine":"Let me tell you about the escape route out of here.","emotion":"neutral","relationshipDelta":0.0,"flags":[],"memoryCandidates":[]}"""
+        val result = DialogueResponseParser.parseAndValidate(json, contractWithForbidden)
+        assertNotNull(result)
+        assertTrue(result!!.npcLine.contains("cannot speak"))
+    }
+
+    @Test
+    fun `parseAndValidate detects underscore-separated forbidden topics`() {
+        val json = """{"npcLine":"The king identity is known to few.","emotion":"neutral","relationshipDelta":0.0,"flags":[],"memoryCandidates":[]}"""
+        val result = DialogueResponseParser.parseAndValidate(json, contractWithForbidden)
+        assertNotNull(result)
+        assertTrue(result!!.npcLine.contains("cannot speak"))
+    }
+
+    @Test
+    fun `parseAndValidate with no forbidden topics passes everything`() {
+        val noForbidden = contractWithForbidden.copy(forbiddenTopics = emptyList())
+        val json = """{"npcLine":"Talk about escape route freely.","emotion":"neutral","relationshipDelta":0.0,"flags":[],"memoryCandidates":[]}"""
+        val result = DialogueResponseParser.parseAndValidate(json, noForbidden)
+        assertNotNull(result)
+        assertEquals("Talk about escape route freely.", result!!.npcLine)
     }
 }
