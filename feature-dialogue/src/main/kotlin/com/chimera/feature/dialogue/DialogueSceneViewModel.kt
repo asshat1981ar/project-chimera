@@ -44,8 +44,11 @@ data class DialogueLine(
 data class DialogueUiState(
     val sceneId: String = "",
     val sceneTitle: String = "",
+    val npcId: String = "",
     val npcName: String = "",
     val npcMood: String = "neutral",
+    val npcDisposition: Float = 0f,
+    val npcArchetype: String? = null,
     val transcript: List<DialogueLine> = emptyList(),
     val quickIntents: List<String> = emptyList(),
     val isLoading: Boolean = false,
@@ -148,7 +151,10 @@ class DialogueSceneViewModel @Inject constructor(
                             emotion = result.emotion
                         )
                     ),
+                    npcId = contract.npcId,
                     npcMood = result.emotion,
+                    npcDisposition = charState.dispositionToPlayer,
+                    npcArchetype = charState.activeArchetype,
                     quickIntents = intents,
                     isFallbackMode = orchestrator.isFallbackActive,
                     isLoading = false
@@ -251,6 +257,7 @@ class DialogueSceneViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     transcript = _uiState.value.transcript + playerLine + npcLine,
                     npcMood = result.emotion,
+                    npcDisposition = banner?.newDisposition ?: _uiState.value.npcDisposition,
                     quickIntents = intents,
                     isFallbackMode = orchestrator.isFallbackActive,
                     isSceneComplete = isEnding,

@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
+import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.CharacterStateEntity
+import com.chimera.database.entity.FactionStateEntity
 import com.chimera.database.entity.MemoryShardEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,33 +32,21 @@ data class PartyMember(
 
 data class PartyUiState(
     val members: List<PartyMember> = emptyList(),
+    val factions: List<FactionStateEntity> = emptyList(),
     val selectedMember: PartyMember? = null,
     val isLoading: Boolean = true
 )
 
-/**
- * Fixed version of [PartyViewModel].
- *
- * BUG-03 fix: the original [loadMemories] called [MemoryShardDao.getTopMemories]
- * but never propagated the result back into the [StateFlow]. The [_memoryCache]
- * [MutableStateFlow] is now included in the [combine] chain so memory data
- * appears in the UI as soon as it loads.
- */
 @HiltViewModel
 class PartyViewModel @Inject constructor(
     private val characterDao: CharacterDao,
     private val characterStateDao: CharacterStateDao,
     private val memoryShardDao: MemoryShardDao,
+    private val factionStateDao: FactionStateDao,
     private val gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
     private val _selectedId = MutableStateFlow<String?>(null)
-
-    /**
-     * Cache: characterId → loaded memory shards.
-     * Starts empty; populated lazily when a party member is selected.
-     * Included in the combine chain so StateFlow re-emits on cache updates.
-     */
     private val _memoryCache = MutableStateFlow<Map<String, List<MemoryShardEntity>>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -66,20 +56,27 @@ class PartyViewModel @Inject constructor(
             combine(
                 characterDao.observeBySlot(slotId),
                 characterStateDao.observeBySlot(slotId),
+                factionStateDao.observeAll(slotId),
                 _selectedId,
-                _memoryCache                          // ← BUG-03 fix: was missing
-            ) { characters, states, selectedId, memoryCache ->
+                _memoryCache
+            ) { characters, states, factions, selectedId, memoryCache ->
                 val stateMap = states.associateBy { it.characterId }
-                val nonPlayerChars = characters.filter { !it.isPlayerCharacter }
-                val members = nonPlayerChars.map { char ->
-                    PartyMember(
-                        character = char,
-                        state = stateMap[char.id],
-                        recentMemories = memoryCache[char.id] ?: emptyList()
-                    )
-                }
+                val members = characters
+                    .filter { !it.isPlayerCharacter }
+                    .map { char ->
+                        PartyMember(
+                            character = char,
+                            state = stateMap[char.id],
+                            recentMemories = memoryCache[char.id] ?: emptyList()
+                        )
+                    }
                 val selected = selectedId?.let { id -> members.find { it.character.id == id } }
-                PartyUiState(members = members, selectedMember = selected, isLoading = false)
+                PartyUiState(
+                    members = members,
+                    factions = factions,
+                    selectedMember = selected,
+                    isLoading = false
+                )
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), PartyUiState())
@@ -93,10 +90,6 @@ class PartyViewModel @Inject constructor(
         _selectedId.value = null
     }
 
-    /**
-     * Fixed: loads memories and updates [_memoryCache], which is part of the
-     * combine chain, so [uiState] re-emits with the populated memory list.
-     */
     private fun loadMemories(characterId: String) {
         val slotId = gameSessionManager.activeSlotId.value ?: return
         viewModelScope.launch {
@@ -105,7 +98,3 @@ class PartyViewModel @Inject constructor(
         }
     }
 }
-
-// NOTE: Faction states are loaded in the FactionViewModel (see feature-party module).
-// PartyScreen renders them via FactionStandingRow — inject FactionStateDao and
-// add an observeAll(slotId) flow here when wiring the full faction tab.

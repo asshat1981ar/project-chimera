@@ -259,7 +259,13 @@ private fun NewGameDialog(
 }
 
 private fun formatPlaytime(seconds: Long): String {
-    val hours = seconds / 3600
+    if (seconds < 60) return "< 1m"
+    val days    = seconds / 86400
+    val hours   = (seconds % 86400) / 3600
     val minutes = (seconds % 3600) / 60
-    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+    return when {
+        days  > 0 -> "${days}d ${hours}h"
+        hours > 0 -> "${hours}h ${minutes}m"
+        else      -> "${minutes}m"
+    }
 }
