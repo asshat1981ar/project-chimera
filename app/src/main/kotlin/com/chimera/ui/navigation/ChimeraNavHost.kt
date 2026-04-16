@@ -8,18 +8,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.chimera.ui.screens.camp.CampScreen
-import com.chimera.ui.screens.dialogue.DialogueSceneScreen
+import com.chimera.feature.camp.CampScreen
+import com.chimera.feature.dialogue.DialogueSceneScreen
 import com.chimera.ui.screens.duel.DuelScreen
-import com.chimera.ui.screens.home.HomeScreen
-import com.chimera.ui.screens.journal.JournalScreen
-import com.chimera.ui.screens.map.MapScreen
-import com.chimera.ui.screens.party.PartyScreen
+import com.chimera.feature.home.HomeScreen
+import com.chimera.feature.journal.JournalScreen
+import com.chimera.feature.map.MapScreen
+import com.chimera.feature.party.PartyScreen
 import androidx.compose.runtime.collectAsState
 import com.chimera.data.ChimeraPreferences
 import com.chimera.ui.screens.onboarding.OnboardingScreen
 import com.chimera.ui.screens.saveslot.SaveSlotSelectScreen
-import com.chimera.ui.screens.settings.SettingsScreen
+import com.chimera.feature.settings.SettingsScreen
 import com.chimera.ui.screens.splash.SplashScreen
 
 @Composable
