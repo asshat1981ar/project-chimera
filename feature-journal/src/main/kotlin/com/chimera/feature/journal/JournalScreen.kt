@@ -9,12 +9,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -39,6 +47,7 @@ fun JournalScreen(
     viewModel: JournalViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Header
@@ -47,6 +56,34 @@ fun JournalScreen(
             style = MaterialTheme.typography.headlineMedium,
             color = EmberGold,
             modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 8.dp)
+        )
+
+        // Search bar
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = viewModel::setSearchQuery,
+            placeholder = { Text("Search entries…", color = DimAsh) },
+            leadingIcon = {
+                Icon(Icons.Default.Search, contentDescription = null,
+                    modifier = Modifier.size(18.dp), tint = DimAsh)
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = viewModel::clearSearch) {
+                        Icon(Icons.Default.Clear, contentDescription = "Clear search",
+                            modifier = Modifier.size(18.dp), tint = DimAsh)
+                    }
+                }
+            },
+            singleLine = true,
+            textStyle = MaterialTheme.typography.bodySmall,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = EmberGold,
+                unfocusedBorderColor = DimAsh.copy(alpha = 0.4f)
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
         )
 
         // Tabs
