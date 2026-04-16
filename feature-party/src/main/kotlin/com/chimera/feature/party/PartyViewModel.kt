@@ -105,3 +105,7 @@ class PartyViewModel @Inject constructor(
         }
     }
 }
+
+// NOTE: Faction states are loaded in the FactionViewModel (see feature-party module).
+// PartyScreen renders them via FactionStandingRow — inject FactionStateDao and
+// add an observeAll(slotId) flow here when wiring the full faction tab.

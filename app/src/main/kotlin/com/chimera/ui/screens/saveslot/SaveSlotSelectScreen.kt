@@ -197,7 +197,7 @@ private fun SaveSlotCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Chapter: ${slot.chapterTag.replaceFirstChar { it.uppercase() }}",
+                        text = com.chimera.ui.util.ChapterDisplayStrings.tagToTitle(slot.chapterTag),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(

@@ -27,4 +27,10 @@ interface CraftingRecipeDao {
 
     @Query("UPDATE crafting_recipes SET is_discovered = 1 WHERE id = :id")
     suspend fun discover(id: String)
+
+    @Query("UPDATE crafting_recipes SET is_discovered = 1 WHERE required_scene = :sceneId")
+    suspend fun discoverByScene(sceneId: String)
+
+    @Query("UPDATE crafting_recipes SET is_discovered = 1 WHERE required_npc = :npcId")
+    suspend fun discoverByNpc(npcId: String)
 }

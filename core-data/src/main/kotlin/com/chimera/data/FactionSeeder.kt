@@ -2,27 +2,22 @@ package com.chimera.data
 
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.entity.FactionStateEntity
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * Seeds the three canonical factions into [FactionStateEntity] rows for a
- * new save slot.
- *
- * Faction definitions are authored here rather than in a JSON file because
- * they are fixed game-design constants (names, initial influence, controlled
- * locations) that don't change between builds.
- *
- * Call this once during new-game creation alongside [MultiActNpcSeeder] and
- * [CraftingRecipeSeeder].
- *
- * Initial standing is 0.0 (neutral) for all factions. Player choices during
- * dialogue scenes adjust standing via [FactionStateDao.adjustStanding].
+ * new save slot. Idempotent — uses upsert.
  */
 @Singleton
 class FactionSeeder @Inject constructor(
     private val factionStateDao: FactionStateDao
 ) {
+    private val json = Json { ignoreUnknownKeys = true }
+
     data class FactionDef(
         val id: String,
         val name: String,
@@ -61,9 +56,6 @@ class FactionSeeder @Inject constructor(
         )
     )
 
-    /**
-     * Seeds all three factions for [slotId]. Idempotent — uses upsert.
-     */
     suspend fun seedFactionsForSlot(slotId: Long) {
         factions.forEach { def ->
             factionStateDao.upsert(
@@ -73,13 +65,10 @@ class FactionSeeder @Inject constructor(
                     factionName = def.name,
                     influence = def.initialInfluence,
                     playerStanding = 0f,
-                    controlledLocationsJson = kotlinx.serialization.json.Json
-                        .encodeToString(
-                            kotlinx.serialization.builtins.ListSerializer(
-                                kotlinx.serialization.builtins.serializer<String>()
-                            ),
-                            def.controlledLocations
-                        )
+                    controlledLocationsJson = json.encodeToString(
+                        ListSerializer(String.serializer()),
+                        def.controlledLocations
+                    )
                 )
             )
         }
