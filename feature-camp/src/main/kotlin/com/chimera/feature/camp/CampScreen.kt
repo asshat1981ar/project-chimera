@@ -40,6 +40,7 @@ import com.chimera.ui.theme.VoidGreen
 
 @Composable
 fun CampScreen(
+    onNavigateToInventory: () -> Unit = {},
     viewModel: CampViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -194,6 +195,19 @@ fun CampScreen(
                         modifier = Modifier.padding(12.dp)
                     )
                 }
+            }
+        }
+
+        // Night event trigger
+        item {
+            Button(
+                onClick = onNavigateToInventory,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Text("View Inventory")
             }
         }
 

@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.ai.DialogueOrchestrator
 import com.chimera.data.GameSessionManager
+import com.chimera.data.CraftingRecipeSeeder
 import com.chimera.data.SceneLoader
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.VowDao
+import com.chimera.domain.usecase.ChapterProgressionUseCase
 import com.chimera.database.entity.VowEntity
 import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.JournalEntryDao
@@ -78,7 +80,9 @@ class DialogueSceneViewModel @Inject constructor(
     private val characterStateDao: CharacterStateDao,
     private val journalEntryDao: JournalEntryDao,
     private val saveSlotDao: SaveSlotDao,
-    private val vowDao: VowDao
+    private val vowDao: VowDao,
+    private val craftingRecipeSeeder: CraftingRecipeSeeder,
+    private val chapterProgressionUseCase: ChapterProgressionUseCase
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
@@ -265,6 +269,10 @@ class DialogueSceneViewModel @Inject constructor(
                         turnCount = turnResults.size,
                         usedFallback = orchestrator.isFallbackActive
                     )
+                    // Discover recipes gated on this scene
+                    craftingRecipeSeeder.discoverRecipesForScene(sceneId)
+                    // Update chapter tag
+                    chapterProgressionUseCase()
                     generateJournalEntry(slotId)
                     generateVows(slotId)
                     // Persist accumulated playtime

@@ -42,6 +42,7 @@ class PartyViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _selectedId = MutableStateFlow<String?>(null)
+    private val _memoryCache = MutableStateFlow<Map<String, List<MemoryShardEntity>>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<PartyUiState> = gameSessionManager.activeSlotId
@@ -50,12 +51,17 @@ class PartyViewModel @Inject constructor(
             combine(
                 characterDao.observeBySlot(slotId),
                 characterStateDao.observeBySlot(slotId),
-                _selectedId
-            ) { characters, states, selectedId ->
+                _selectedId,
+                _memoryCache
+            ) { characters, states, selectedId, memoryCache ->
                 val stateMap = states.associateBy { it.characterId }
                 val nonPlayerChars = characters.filter { !it.isPlayerCharacter }
                 val members = nonPlayerChars.map { char ->
-                    PartyMember(character = char, state = stateMap[char.id])
+                    PartyMember(
+                        character = char,
+                        state = stateMap[char.id],
+                        recentMemories = memoryCache[char.id] ?: emptyList()
+                    )
                 }
                 val selected = selectedId?.let { id ->
                     members.find { it.character.id == id }
@@ -78,12 +84,7 @@ class PartyViewModel @Inject constructor(
         viewModelScope.launch {
             val slotId = gameSessionManager.activeSlotId.value ?: return@launch
             val memories = memoryShardDao.getTopMemories(slotId, characterId, 10)
-            // Update selected member with memories
-            val current = uiState.value
-            val member = current.members.find { it.character.id == characterId }
-            if (member != null) {
-                _selectedId.value = characterId // trigger recomposition with memories loaded
-            }
+            _memoryCache.value = _memoryCache.value + (characterId to memories)
         }
     }
 }

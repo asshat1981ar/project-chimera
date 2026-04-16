@@ -3,13 +3,14 @@ package com.chimera.feature.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
-import com.chimera.data.MapNodeLoader
+import com.chimera.data.MultiActMapNodeLoader
 import com.chimera.database.dao.CharacterStateDao
 import kotlinx.serialization.json.Json
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.entity.FactionStateEntity
+import com.chimera.model.MapNode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,20 +21,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-
-data class MapNode(
-    val id: String,
-    val name: String,
-    val description: String,
-    val isUnlocked: Boolean = false,
-    val isCompleted: Boolean = false,
-    val rumorCount: Int = 0,
-    val faction: String? = null,
-    val connectedTo: List<String> = emptyList(),
-    val sceneId: String? = null,
-    val xFraction: Float = 0.5f,
-    val yFraction: Float = 0.5f
-)
 
 data class MapUiState(
     val nodes: List<MapNode> = emptyList(),
@@ -47,12 +34,11 @@ class MapViewModel @Inject constructor(
     private val rumorPacketDao: RumorPacketDao,
     private val factionStateDao: FactionStateDao,
     private val characterStateDao: CharacterStateDao,
-    private val mapNodeLoader: MapNodeLoader,
+    private val mapNodeLoader: MultiActMapNodeLoader,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
     private val _selectedNode = MutableStateFlow<MapNode?>(null)
-    private val baseNodes: List<MapNode> by lazy { mapNodeLoader.loadNodes() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<MapUiState> = gameSessionManager.activeSlotId
@@ -82,10 +68,7 @@ class MapViewModel @Inject constructor(
                 }.toMap()
 
                 // Load character states for relationship-based unlock checks
-                val charStates = characterStateDao.observeBySlot(slotId)
-                val dispositions = mutableMapOf<String, Float>()
-                // Build a simple disposition lookup (using cached data from combine)
-
+                val baseNodes = mapNodeLoader.loadNodesForSlot(slotId)
                 val nodes = baseNodes.map { node ->
                     val isCompleted = node.sceneId in completedScenes
                     // Unlock if: node is default unlocked, OR a connected node is completed

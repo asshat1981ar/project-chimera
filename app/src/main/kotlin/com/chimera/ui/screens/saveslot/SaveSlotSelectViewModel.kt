@@ -3,8 +3,10 @@ package com.chimera.ui.screens.saveslot
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chimera.data.CraftingRecipeSeeder
+import com.chimera.data.FactionSeeder
 import com.chimera.data.GameSessionManager
-import com.chimera.data.NpcSeeder
+import com.chimera.data.MultiActNpcSeeder
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.entity.CharacterEntity
@@ -25,7 +27,9 @@ import javax.inject.Inject
 class SaveSlotSelectViewModel @Inject constructor(
     private val saveSlotDao: SaveSlotDao,
     private val characterDao: CharacterDao,
-    private val npcSeeder: NpcSeeder,
+    private val multiActNpcSeeder: MultiActNpcSeeder,
+    private val craftingRecipeSeeder: CraftingRecipeSeeder,
+    private val factionSeeder: FactionSeeder,
     private val gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
@@ -63,8 +67,10 @@ class SaveSlotSelectViewModel @Inject constructor(
                         isPlayerCharacter = true
                     )
                 )
-                // Seed NPCs from assets for this save slot
-                npcSeeder.seedNpcsForSlot(slotId)
+                // Seed game data for this save slot
+                multiActNpcSeeder.seedNpcsForSlot(slotId)
+                craftingRecipeSeeder.seedRecipesForSlot()
+                factionSeeder.seedFactionsForSlot(slotId)
                 gameSessionManager.setActiveSlot(slotId)
                 onCreated(slotId)
             } catch (e: Exception) {

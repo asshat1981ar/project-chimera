@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.chimera.feature.camp.CampScreen
+import com.chimera.feature.camp.InventoryScreen
 import com.chimera.feature.dialogue.DialogueSceneScreen
 import com.chimera.ui.screens.duel.DuelScreen
 import com.chimera.feature.home.HomeScreen
@@ -97,7 +98,11 @@ fun ChimeraNavHost(
             }
 
             composable(ChimeraRoutes.CAMP) {
-                CampScreen()
+                CampScreen(
+                    onNavigateToInventory = {
+                        navController.navigate(ChimeraRoutes.INVENTORY)
+                    }
+                )
             }
 
             composable(ChimeraRoutes.JOURNAL) {
@@ -139,6 +144,10 @@ fun ChimeraNavHost(
                 DuelScreen(
                     onDuelComplete = { navController.popBackStack() }
                 )
+            }
+
+            composable(ChimeraRoutes.INVENTORY) {
+                InventoryScreen(onBack = { navController.popBackStack() })
             }
         }
     }
