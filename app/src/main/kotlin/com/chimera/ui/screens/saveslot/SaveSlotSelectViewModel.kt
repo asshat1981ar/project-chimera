@@ -10,6 +10,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.chimera.data.ChimeraPreferences
 import com.chimera.data.CraftingRecipeSeeder
 import com.chimera.data.FactionSeeder
 import com.chimera.data.GameSessionManager
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -43,11 +45,16 @@ class SaveSlotSelectViewModel @Inject constructor(
     private val craftingRecipeSeeder: CraftingRecipeSeeder,
     private val factionSeeder: FactionSeeder,
     private val gameSessionManager: GameSessionManager,
-    private val cloudSaveRepository: CloudSaveRepository
+    private val cloudSaveRepository: CloudSaveRepository,
+    private val preferences: ChimeraPreferences
 ) : ViewModel() {
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
+
+    /** True while downloading a newer cloud save — disables slot tap during restore. */
+    private val _isRestoring = MutableStateFlow(false)
+    val isRestoring: StateFlow<Boolean> = _isRestoring.asStateFlow()
 
     val saveSlots: StateFlow<List<SaveSlot>> = saveSlotDao.observeAll()
         .map { entities -> entities.map { it.toModel() } }
@@ -125,24 +132,49 @@ class SaveSlotSelectViewModel @Inject constructor(
             try {
                 val slot = saveSlotDao.getById(slotId) ?: return@launch
                 if (slot.isEmpty) return@launch
-                val updated = slot.copy(lastPlayedAt = System.currentTimeMillis())
-                saveSlotDao.upsert(updated)
-                gameSessionManager.setActiveSlot(slotId)
 
-                // Sync playtime to cloud (best-effort)
-                viewModelScope.launch {
-                    cloudSaveRepository.uploadSave(
-                        CloudSaveRequest(
-                            slotId          = slotId,
-                            playerName      = slot.playerName,
-                            chapterTag      = slot.chapterTag,
-                            playtimeSeconds = slot.playtimeSeconds
+                // Stage 1: Check — is cloud sync enabled?
+                val cloudEnabled = preferences.settings.first().cloudSyncEnabled
+                if (cloudEnabled) {
+                    // Stage 2: Branch — fetch cloud save and compare timestamps
+                    _isRestoring.value = true
+                    val cloudResult = cloudSaveRepository.downloadSave(slotId)
+                    val cloudSave = cloudResult.getOrNull()
+
+                    if (cloudSave != null && cloudSave.updatedAt > slot.lastPlayedAt) {
+                        // Stage 3: Apply — cloud is newer, update local Room entities
+                        Log.d("SaveSlotVM", "Cloud save newer for slot $slotId, restoring")
+                        saveSlotDao.upsert(
+                            slot.copy(
+                                playerName      = cloudSave.playerName,
+                                chapterTag      = cloudSave.chapterTag,
+                                playtimeSeconds = cloudSave.playtimeSeconds,
+                                lastPlayedAt    = cloudSave.updatedAt
+                            )
                         )
-                    )
+                        // Stage 4: Verify — Room is now up to date; proceed
+                    } else if (cloudSave != null && cloudSave.updatedAt < slot.lastPlayedAt) {
+                        // Local is newer — push to cloud silently
+                        viewModelScope.launch {
+                            cloudSaveRepository.uploadSave(
+                                CloudSaveRequest(
+                                    slotId          = slotId,
+                                    playerName      = slot.playerName,
+                                    chapterTag      = slot.chapterTag,
+                                    playtimeSeconds = slot.playtimeSeconds
+                                )
+                            )
+                        }
+                    }
+                    _isRestoring.value = false
                 }
 
+                saveSlotDao.upsert(slot.copy(lastPlayedAt = System.currentTimeMillis()))
+                gameSessionManager.setActiveSlot(slotId)
                 onSelected(slotId)
+
             } catch (e: Exception) {
+                _isRestoring.value = false
                 Log.e("SaveSlotVM", "Failed to select slot", e)
                 _error.value = "Failed to load save"
             }

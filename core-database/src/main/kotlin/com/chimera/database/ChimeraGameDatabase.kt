@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.chimera.database.converter.Converters
 import com.chimera.database.dao.CharacterDao
@@ -50,7 +51,7 @@ import com.chimera.database.entity.VowEntity
         InventoryItemEntity::class,
         CraftingRecipeEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -80,8 +81,33 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
                 DATABASE_NAME
             )
                 .addCallback(PrepopulateCallback())
+                .addMigrations(MIGRATION_7_8)
                 .fallbackToDestructiveMigration()
                 .build()
+        }
+
+        /**
+         * 7 → 8: Add FTS5 virtual table for journal full-text search.
+         * Additive only — journal_entries table is not modified.
+         * content= keeps FTS in sync with the main table automatically.
+         */
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE VIRTUAL TABLE IF NOT EXISTS journal_entries_fts
+                    USING fts5(
+                        title,
+                        body,
+                        content='journal_entries',
+                        content_rowid='id'
+                    )
+                """.trimIndent())
+                // Populate FTS index from existing rows
+                db.execSQL("""
+                    INSERT INTO journal_entries_fts(rowid, title, body)
+                    SELECT id, title, body FROM journal_entries
+                """.trimIndent())
+            }
         }
     }
 

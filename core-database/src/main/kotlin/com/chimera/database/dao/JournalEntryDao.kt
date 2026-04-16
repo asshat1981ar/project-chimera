@@ -15,6 +15,37 @@ interface JournalEntryDao {
     @Query("SELECT * FROM journal_entries WHERE save_slot_id = :slotId AND category = :category ORDER BY created_at DESC")
     fun observeByCategory(slotId: Long, category: String): Flow<List<JournalEntryEntity>>
 
+    /**
+     * FTS5 full-text search. [escapedQuery] must have special chars pre-escaped by caller.
+     * Returns entries for [slotId] whose rowid is in the FTS index match set.
+     * Empty query must never be passed — use [observeAll] instead (empty MATCH crashes).
+     */
+    @Query("""
+        SELECT je.* FROM journal_entries je
+        WHERE je.save_slot_id = :slotId
+          AND je.id IN (
+              SELECT rowid FROM journal_entries_fts
+              WHERE journal_entries_fts MATCH :escapedQuery
+          )
+        ORDER BY je.created_at DESC
+    """)
+    fun searchEntries(slotId: Long, escapedQuery: String): Flow<List<JournalEntryEntity>>
+
+    /**
+     * FTS5 search scoped to a category.
+     */
+    @Query("""
+        SELECT je.* FROM journal_entries je
+        WHERE je.save_slot_id = :slotId
+          AND je.category = :category
+          AND je.id IN (
+              SELECT rowid FROM journal_entries_fts
+              WHERE journal_entries_fts MATCH :escapedQuery
+          )
+        ORDER BY je.created_at DESC
+    """)
+    fun searchEntriesByCategory(slotId: Long, category: String, escapedQuery: String): Flow<List<JournalEntryEntity>>
+
     @Insert
     suspend fun insert(entry: JournalEntryEntity): Long
 

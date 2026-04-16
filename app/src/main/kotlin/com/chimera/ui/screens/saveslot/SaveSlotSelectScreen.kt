@@ -2,8 +2,10 @@ package com.chimera.ui.screens.saveslot
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -48,46 +51,71 @@ fun SaveSlotSelectScreen(
     viewModel: SaveSlotSelectViewModel = hiltViewModel()
 ) {
     val slots by viewModel.saveSlots.collectAsStateWithLifecycle()
+    val isRestoring by viewModel.isRestoring.collectAsStateWithLifecycle()
     var showNewGameDialog by remember { mutableStateOf<Int?>(null) }
     var showDeleteDialog by remember { mutableStateOf<SaveSlot?>(null) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Text(
-            text = "Choose Your Path",
-            style = MaterialTheme.typography.headlineLarge,
-            color = EmberGold,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(slots, key = { it.slotIndex }) { slot ->
-                SaveSlotCard(
-                    slot = slot,
-                    onClick = {
-                        if (slot.isEmpty) {
-                            showNewGameDialog = slot.slotIndex
-                        } else {
-                            viewModel.selectSlot(slot.id, onSlotSelected)
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Text(
+                text = "Choose Your Path",
+                style = MaterialTheme.typography.headlineLarge,
+                color = EmberGold,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(slots, key = { it.slotIndex }) { slot ->
+                    SaveSlotCard(
+                        slot = slot,
+                        onClick = {
+                            if (!isRestoring) {
+                                if (slot.isEmpty) {
+                                    showNewGameDialog = slot.slotIndex
+                                } else {
+                                    viewModel.selectSlot(slot.id, onSlotSelected)
+                                }
+                            }
+                        },
+                        onLongClick = {
+                            if (!slot.isEmpty && !isRestoring) {
+                                showDeleteDialog = slot
+                            }
                         }
-                    },
-                    onLongClick = {
-                        if (!slot.isEmpty) {
-                            showDeleteDialog = slot
-                        }
-                    }
-                )
+                    )
+                }
+            }
+        }
+
+        // Cloud restore overlay — shown while downloading newer save from cloud
+        if (isRestoring) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.75f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = EmberGold, strokeWidth = 3.dp)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        "Restoring from cloud…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = FadedBone
+                    )
+                }
             }
         }
     }

@@ -9,10 +9,12 @@ import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.VowEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -31,9 +33,15 @@ data class JournalUiState(
     val selectedTab: JournalTab = JournalTab.ALL,
     val entries: List<JournalEntryEntity> = emptyList(),
     val vows: List<VowEntity> = emptyList(),
-    val unreadCount: Int = 0
+    val unreadCount: Int = 0,
+    val searchQuery: String = ""
 )
 
+/** Escapes FTS5 special characters in a query string. */
+private fun escapeFtsQuery(raw: String): String =
+    "\"${raw.replace("\"", "\"\"")}\"*"   // phrase prefix match; safe for all inputs
+
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class JournalViewModel @Inject constructor(
     private val journalEntryDao: JournalEntryDao,
@@ -42,35 +50,66 @@ class JournalViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _selectedTab = MutableStateFlow(JournalTab.ALL)
+    private val _searchQuery = MutableStateFlow("")
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    /** Exposed for the search bar composable. */
+    val searchQuery: StateFlow<String> = _searchQuery
+
     val uiState: StateFlow<JournalUiState> = gameSessionManager.activeSlotId
         .flatMapLatest { slotId ->
             if (slotId == null) return@flatMapLatest flowOf(JournalUiState())
+
+            // Debounce search 300 ms to avoid FTS churn on every keypress
+            val debouncedQuery = _searchQuery.debounce(300L)
+
             combine(
                 _selectedTab,
-                journalEntryDao.observeAll(slotId),
+                debouncedQuery,
                 vowDao.observeAll(slotId),
                 journalEntryDao.observeUnreadCount(slotId)
-            ) { tab, allEntries, vows, unread ->
-                val filtered = when {
-                    tab == JournalTab.ALL -> allEntries
-                    tab == JournalTab.VOWS -> emptyList()
-                    tab.category != null -> allEntries.filter { it.category == tab.category }
-                    else -> allEntries
+            ) { tab, query, vows, unread ->
+                Triple(tab, query.trim(), vows to unread)
+            }.flatMapLatest { (tab, query, vowsAndUnread) ->
+                val (vows, unread) = vowsAndUnread
+                val entriesFlow = when {
+                    // No search — use existing category flows
+                    query.isBlank() && tab == JournalTab.ALL ->
+                        journalEntryDao.observeAll(slotId)
+                    query.isBlank() && tab.category != null ->
+                        journalEntryDao.observeByCategory(slotId, tab.category)
+                    query.isBlank() ->
+                        journalEntryDao.observeAll(slotId)
+                    // FTS search with optional category scope
+                    tab.category != null ->
+                        journalEntryDao.searchEntriesByCategory(slotId, tab.category, escapeFtsQuery(query))
+                    else ->
+                        journalEntryDao.searchEntries(slotId, escapeFtsQuery(query))
                 }
-                JournalUiState(
-                    selectedTab = tab,
-                    entries = filtered,
-                    vows = vows,
-                    unreadCount = unread
-                )
+                entriesFlow.flatMapLatest { entries ->
+                    val filtered = if (tab == JournalTab.VOWS) emptyList() else entries
+                    flowOf(JournalUiState(
+                        selectedTab = tab,
+                        entries = filtered,
+                        vows = vows,
+                        unreadCount = unread,
+                        searchQuery = query
+                    ))
+                }
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), JournalUiState())
 
     fun selectTab(tab: JournalTab) {
         _selectedTab.value = tab
+        _searchQuery.value = ""   // clear search on tab switch
+    }
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun clearSearch() {
+        _searchQuery.value = ""
     }
 
     fun markRead(entryId: Long) {

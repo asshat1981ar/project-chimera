@@ -43,4 +43,8 @@ class SettingsViewModel @Inject constructor(
     fun setVoiceEnabled(enabled: Boolean) {
         viewModelScope.launch { preferences.setVoiceEnabled(enabled) }
     }
+
+    fun setCloudSyncEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferences.setCloudSyncEnabled(enabled) }
+    }
 }

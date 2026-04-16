@@ -114,6 +114,16 @@ fun MapScreen(
                     modifier = Modifier.fillMaxSize()
                 )
             }
+
+            // Fog placeholders — faint "?" dots for unrevealed nodes connected to revealed ones
+            // Uses base node positions from the ViewModel's exposed fogAdjacentNodes
+            viewModel.fogAdjacentPositions(uiState.nodes).forEach { (xFrac, yFrac) ->
+                FogNodePlaceholder(
+                    xFraction = xFrac,
+                    yFraction = yFrac,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }
@@ -277,5 +287,33 @@ private fun NodeDetailSheet(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+/**
+ * Renders a faint fog-of-war placeholder at [xFraction]/[yFraction] of the canvas.
+ * Shows location without revealing name — exploration tension without dead-end confusion.
+ */
+@Composable
+private fun FogNodePlaceholder(
+    xFraction: Float,
+    yFraction: Float,
+    modifier: Modifier = Modifier
+) {
+    Canvas(modifier = modifier) {
+        val cx = size.width * xFraction
+        val cy = size.height * yFraction
+        // Outer dim ring
+        drawCircle(
+            color = Color.White.copy(alpha = 0.06f),
+            radius = 22f,
+            center = Offset(cx, cy)
+        )
+        // Inner dot
+        drawCircle(
+            color = Color.White.copy(alpha = 0.12f),
+            radius = 10f,
+            center = Offset(cx, cy)
+        )
     }
 }

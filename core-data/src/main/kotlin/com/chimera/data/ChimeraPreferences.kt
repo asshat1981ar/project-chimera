@@ -22,7 +22,8 @@ data class AppSettings(
     val aiMode: AiMode = AiMode.AUTO,
     val analyticsOptIn: Boolean = false,
     val tutorialComplete: Boolean = false,
-    val voiceEnabled: Boolean = false  // NPC TTS voice — off by default (battery consideration)
+    val voiceEnabled: Boolean = false,  // NPC TTS voice — off by default (battery consideration)
+    val cloudSyncEnabled: Boolean = true  // Download newer cloud save on slot select
 )
 
 enum class AiMode(val label: String) {
@@ -41,6 +42,7 @@ class ChimeraPreferences @Inject constructor(
         val ANALYTICS_OPT_IN = booleanPreferencesKey("analytics_opt_in")
         val TUTORIAL_COMPLETE = booleanPreferencesKey("tutorial_complete")
         val VOICE_ENABLED = booleanPreferencesKey("voice_enabled")
+        val CLOUD_SYNC_ENABLED = booleanPreferencesKey("cloud_sync_enabled")
     }
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { prefs ->
@@ -50,7 +52,8 @@ class ChimeraPreferences @Inject constructor(
             aiMode = prefs[Keys.AI_MODE]?.let { AiMode.valueOf(it) } ?: AiMode.AUTO,
             analyticsOptIn = prefs[Keys.ANALYTICS_OPT_IN] ?: false,
             tutorialComplete = prefs[Keys.TUTORIAL_COMPLETE] ?: false,
-            voiceEnabled = prefs[Keys.VOICE_ENABLED] ?: false
+            voiceEnabled = prefs[Keys.VOICE_ENABLED] ?: false,
+            cloudSyncEnabled = prefs[Keys.CLOUD_SYNC_ENABLED] ?: true
         )
     }
 
@@ -76,5 +79,9 @@ class ChimeraPreferences @Inject constructor(
 
     suspend fun setVoiceEnabled(enabled: Boolean) {
         context.dataStore.edit { it[Keys.VOICE_ENABLED] = enabled }
+    }
+
+    suspend fun setCloudSyncEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.CLOUD_SYNC_ENABLED] = enabled }
     }
 }
