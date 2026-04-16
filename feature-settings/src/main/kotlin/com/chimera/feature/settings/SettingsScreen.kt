@@ -100,6 +100,18 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // Cloud section
+        SettingsSection("Cloud") {
+            ToggleSetting(
+                label = "Cloud Save Sync",
+                description = "Restore newer saves from cloud when loading a slot",
+                checked = settings.cloudSyncEnabled,
+                onToggle = viewModel::setCloudSyncEnabled
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         // Privacy section
         SettingsSection("Privacy") {
             ToggleSetting(
