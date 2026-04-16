@@ -22,6 +22,9 @@ interface CharacterDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(characters: List<CharacterEntity>)
 
+    @Query("SELECT * FROM characters WHERE save_slot_id = :slotId")
+    suspend fun getBySlot(slotId: Long): List<CharacterEntity>
+
     @Query("SELECT * FROM characters WHERE save_slot_id = :slotId AND is_player_character = 1 LIMIT 1")
     suspend fun getPlayerCharacter(slotId: Long): CharacterEntity?
 

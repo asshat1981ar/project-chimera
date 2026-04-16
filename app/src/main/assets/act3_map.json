@@ -4,16 +4,24 @@
     "name": "The Broken Shore",
     "description": "A windswept beach littered with wreckage. The air tastes of salt and ash.",
     "sceneId": "coastal_arrival",
-    "connectedTo": ["ashen_throne", "salvage_yard", "smugglers_cove"],
+    "connectedTo": [
+      "ashen_throne",
+      "salvage_yard",
+      "smugglers_cove"
+    ],
     "xFraction": 0.5,
-    "yFraction": 0.9
+    "yFraction": 0.9,
+    "isUnlocked": true
   },
   {
     "id": "salvage_yard",
     "name": "Salvage Yard",
     "description": "A massive forge built from shipwrecks. Metal screams under Kael's hammer.",
     "sceneId": "salvage_yard",
-    "connectedTo": ["broken_shore", "tidewall"],
+    "connectedTo": [
+      "broken_shore",
+      "tidewall"
+    ],
     "xFraction": 0.2,
     "yFraction": 0.7
   },
@@ -22,7 +30,10 @@
     "name": "Smuggler's Cove",
     "description": "A hidden cove where salvage is traded in whispers and shadows.",
     "sceneId": "smugglers_cove",
-    "connectedTo": ["broken_shore", "drowned_temple"],
+    "connectedTo": [
+      "broken_shore",
+      "drowned_temple"
+    ],
     "xFraction": 0.8,
     "yFraction": 0.65
   },
@@ -31,7 +42,11 @@
     "name": "The Tidewall",
     "description": "A sea wall garrison. Waves crash below and guards pace above.",
     "sceneId": "tidewall_garrison",
-    "connectedTo": ["salvage_yard", "tidal_lab", "reforged_fleet"],
+    "connectedTo": [
+      "salvage_yard",
+      "tidal_lab",
+      "reforged_fleet"
+    ],
     "xFraction": 0.25,
     "yFraction": 0.45
   },
@@ -40,7 +55,10 @@
     "name": "Drowned Temple",
     "description": "Half-submerged stone columns rise from the tide. Something sacred lingers.",
     "sceneId": "drowned_temple",
-    "connectedTo": ["smugglers_cove", "tide_amphitheater"],
+    "connectedTo": [
+      "smugglers_cove",
+      "tide_amphitheater"
+    ],
     "xFraction": 0.75,
     "yFraction": 0.4
   },
@@ -49,7 +67,10 @@
     "name": "Tidal Laboratory",
     "description": "A cave system converted to a research lab. Glass vials glow with corruption samples.",
     "sceneId": "aria_laboratory",
-    "connectedTo": ["tidewall", "tide_amphitheater"],
+    "connectedTo": [
+      "tidewall",
+      "tide_amphitheater"
+    ],
     "xFraction": 0.4,
     "yFraction": 0.25
   },
@@ -58,7 +79,11 @@
     "name": "Tide Amphitheater",
     "description": "A natural amphitheater carved by waves. Tidal pools glow at night.",
     "sceneId": "dara_ritual",
-    "connectedTo": ["drowned_temple", "tidal_lab", "heart_of_tide"],
+    "connectedTo": [
+      "drowned_temple",
+      "tidal_lab",
+      "heart_of_tide"
+    ],
     "xFraction": 0.6,
     "yFraction": 0.15
   },
@@ -67,7 +92,10 @@
     "name": "Reforged Fleet",
     "description": "Warships anchored in formation. The Reforged banner flies from every mast.",
     "sceneId": "seren_fleet",
-    "connectedTo": ["tidewall", "heart_of_tide"],
+    "connectedTo": [
+      "tidewall",
+      "heart_of_tide"
+    ],
     "xFraction": 0.15,
     "yFraction": 0.1
   },
@@ -76,11 +104,17 @@
     "name": "Heart of the Tide",
     "description": "An undersea cavern where corruption has built a throne of living crystal.",
     "sceneId": "act3_climax",
-    "connectedTo": ["tide_amphitheater", "reforged_fleet"],
+    "connectedTo": [
+      "tide_amphitheater",
+      "reforged_fleet"
+    ],
     "xFraction": 0.5,
     "yFraction": 0.02,
     "unlockRequirements": {
-      "completedScenes": ["dara_ritual", "seren_fleet"]
+      "completedScenes": [
+        "dara_ritual",
+        "seren_fleet"
+      ]
     }
   }
 ]

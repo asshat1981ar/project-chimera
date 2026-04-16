@@ -4,16 +4,25 @@
     "name": "The Ashen Gate",
     "description": "A massive iron gate fused shut by ancient fire. A forge glows beside it.",
     "sceneId": "ashen_gate",
-    "connectedTo": ["hollow_approach", "ash_market", "memorial_field"],
+    "connectedTo": [
+      "hollow_approach",
+      "ash_market",
+      "memorial_field"
+    ],
     "xFraction": 0.5,
-    "yFraction": 0.9
+    "yFraction": 0.9,
+    "isUnlocked": true
   },
   {
     "id": "ash_market",
     "name": "Cinder Market",
     "description": "A bazaar of scorched wagons and salvaged stone. Commerce persists even here.",
     "sceneId": "ash_market",
-    "connectedTo": ["ashen_gate", "ember_sanctum", "reforged_camp"],
+    "connectedTo": [
+      "ashen_gate",
+      "ember_sanctum",
+      "reforged_camp"
+    ],
     "xFraction": 0.25,
     "yFraction": 0.7
   },
@@ -22,7 +31,10 @@
     "name": "Field of Names",
     "description": "Rusted weapons planted blade-first in ash, each marking a fallen soldier.",
     "sceneId": "memorial_field",
-    "connectedTo": ["ashen_gate", "ruined_library"],
+    "connectedTo": [
+      "ashen_gate",
+      "ruined_library"
+    ],
     "xFraction": 0.75,
     "yFraction": 0.65
   },
@@ -31,7 +43,10 @@
     "name": "Ember Sanctum",
     "description": "An underground cathedral where the walls glow with trapped firelight.",
     "sceneId": "ember_sanctum",
-    "connectedTo": ["ash_market", "reforged_camp"],
+    "connectedTo": [
+      "ash_market",
+      "reforged_camp"
+    ],
     "xFraction": 0.15,
     "yFraction": 0.45
   },
@@ -40,7 +55,11 @@
     "name": "Reforged Enclave",
     "description": "A fortified camp of the Reforged faction, rebuilt from ash and defiance.",
     "sceneId": "reforged_camp",
-    "connectedTo": ["ash_market", "ember_sanctum", "ashen_throne"],
+    "connectedTo": [
+      "ash_market",
+      "ember_sanctum",
+      "ashen_throne"
+    ],
     "xFraction": 0.4,
     "yFraction": 0.35
   },
@@ -49,7 +68,10 @@
     "name": "The Burned Archive",
     "description": "Charred shelves hold fragments of knowledge. Someone has been reading here.",
     "sceneId": "aria_confession",
-    "connectedTo": ["memorial_field", "deep_forge"],
+    "connectedTo": [
+      "memorial_field",
+      "deep_forge"
+    ],
     "xFraction": 0.8,
     "yFraction": 0.4
   },
@@ -58,7 +80,10 @@
     "name": "The Deep Forge",
     "description": "Where heat bends reality and old oaths echo. The forgemaster's domain.",
     "sceneId": "kael_loyalty",
-    "connectedTo": ["ruined_library", "ashen_throne"],
+    "connectedTo": [
+      "ruined_library",
+      "ashen_throne"
+    ],
     "xFraction": 0.65,
     "yFraction": 0.2
   },
@@ -67,11 +92,17 @@
     "name": "The Ashen Throne",
     "description": "A mirror of the Hollow Throne, built from scorched bone and regret.",
     "sceneId": "act2_climax",
-    "connectedTo": ["reforged_camp", "deep_forge"],
+    "connectedTo": [
+      "reforged_camp",
+      "deep_forge"
+    ],
     "xFraction": 0.5,
     "yFraction": 0.05,
     "unlockRequirements": {
-      "completedScenes": ["reforged_camp", "kael_loyalty"]
+      "completedScenes": [
+        "reforged_camp",
+        "kael_loyalty"
+      ]
     }
   }
 ]

@@ -16,8 +16,15 @@ import com.chimera.data.FactionSeeder
 import com.chimera.data.GameSessionManager
 import com.chimera.data.MultiActNpcSeeder
 import com.chimera.database.dao.CharacterDao
+import com.chimera.database.dao.CharacterStateDao
+import com.chimera.database.dao.FactionStateDao
+import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.network.CloudSaveRepository
 import com.chimera.network.CloudSaveRequest
+import com.chimera.network.SaveDataSnapshot
+import com.chimera.network.SnapshotCharacter
+import com.chimera.network.SnapshotCharacterState
+import com.chimera.network.SnapshotFactionStanding
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.SaveSlotEntity
@@ -41,6 +48,9 @@ class SaveSlotSelectViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val saveSlotDao: SaveSlotDao,
     private val characterDao: CharacterDao,
+    private val characterStateDao: CharacterStateDao,
+    private val factionStateDao: FactionStateDao,
+    private val sceneInstanceDao: SceneInstanceDao,
     private val multiActNpcSeeder: MultiActNpcSeeder,
     private val craftingRecipeSeeder: CraftingRecipeSeeder,
     private val factionSeeder: FactionSeeder,
@@ -93,14 +103,16 @@ class SaveSlotSelectViewModel @Inject constructor(
                 factionSeeder.seedFactionsForSlot(slotId)
                 gameSessionManager.setActiveSlot(slotId)
 
-                // Fire-and-forget cloud sync — local DB is source of truth; failure is silent
+                // Fire-and-forget cloud sync with full snapshot
                 viewModelScope.launch {
+                    val saveDataJson = buildSnapshot(slotId, "prologue", 0L)
                     cloudSaveRepository.uploadSave(
                         CloudSaveRequest(
                             slotId          = slotId,
                             playerName      = playerName.trim(),
                             chapterTag      = "prologue",
-                            playtimeSeconds = 0
+                            playtimeSeconds = 0,
+                            saveDataJson    = saveDataJson
                         )
                     )
                 }
@@ -154,14 +166,16 @@ class SaveSlotSelectViewModel @Inject constructor(
                         )
                         // Stage 4: Verify — Room is now up to date; proceed
                     } else if (cloudSave != null && cloudSave.updatedAt < slot.lastPlayedAt) {
-                        // Local is newer — push to cloud silently
+                        // Local is newer — push full snapshot to cloud
                         viewModelScope.launch {
+                            val saveDataJson = buildSnapshot(slotId, slot.chapterTag, slot.playtimeSeconds)
                             cloudSaveRepository.uploadSave(
                                 CloudSaveRequest(
                                     slotId          = slotId,
                                     playerName      = slot.playerName,
                                     chapterTag      = slot.chapterTag,
-                                    playtimeSeconds = slot.playtimeSeconds
+                                    playtimeSeconds = slot.playtimeSeconds,
+                                    saveDataJson    = saveDataJson
                                 )
                             )
                         }
@@ -207,5 +221,56 @@ class SaveSlotSelectViewModel @Inject constructor(
 
     fun clearError() {
         _error.value = null
+    }
+
+    /**
+     * Builds a [SaveDataSnapshot] from live Room data for [slotId].
+     * Called before every cloud upload so the cloud save always has a full snapshot.
+     * PromptForge SEQUENCE: load characters → load states → load completed scenes → load factions → serialize
+     */
+    private suspend fun buildSnapshot(slotId: Long, chapterTag: String, playtimeSeconds: Long): String {
+        return try {
+            val characters = characterDao.getBySlot(slotId)
+            val states = characterStateDao.getBySlot(slotId)
+            val completedScenes = sceneInstanceDao.getBySlot(slotId)
+                .filter { it.status == "completed" }
+                .map { it.sceneId }
+            val factions = factionStateDao.getBySlot(slotId)
+
+            val snapshot = SaveDataSnapshot(
+                chapterTag      = chapterTag,
+                playtimeSeconds = playtimeSeconds,
+                characters      = characters.map { c ->
+                    SnapshotCharacter(
+                        id          = c.id,
+                        name        = c.name,
+                        title       = c.title,
+                        role        = c.role,
+                        isPlayer    = c.isPlayerCharacter,
+                        portraitUrl = c.portraitResName
+                    )
+                },
+                characterStates = states.map { s ->
+                    SnapshotCharacterState(
+                        characterId        = s.characterId,
+                        disposition        = s.dispositionToPlayer,
+                        activeArchetype    = s.activeArchetype,
+                        lastInteractionEpoch = s.lastInteractionEpoch
+                    )
+                },
+                completedScenes  = completedScenes,
+                factionStandings = factions.map { f ->
+                    SnapshotFactionStanding(
+                        factionId      = f.factionId,
+                        playerStanding = f.playerStanding,
+                        worldInfluence = f.influence
+                    )
+                }
+            )
+            kotlinx.serialization.json.Json.encodeToString(SaveDataSnapshot.serializer(), snapshot)
+        } catch (e: Exception) {
+            Log.w("SaveSlotVM", "buildSnapshot failed, using empty JSON: ${e.message}")
+            "{}"
+        }
     }
 }

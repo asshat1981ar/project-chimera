@@ -122,7 +122,8 @@ fun JournalScreen(
         } else {
             EntryList(
                 entries = uiState.entries,
-                onEntryClick = { viewModel.markRead(it.id) }
+                onEntryClick = { viewModel.markRead(it.id) },
+                searchQuery = uiState.searchQuery
             )
         }
     }
@@ -131,7 +132,8 @@ fun JournalScreen(
 @Composable
 private fun EntryList(
     entries: List<JournalEntryEntity>,
-    onEntryClick: (JournalEntryEntity) -> Unit
+    onEntryClick: (JournalEntryEntity) -> Unit,
+    searchQuery: String = ""
 ) {
     if (entries.isEmpty()) {
         Column(
@@ -141,16 +143,31 @@ private fun EntryList(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                "No entries yet.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = DimAsh
-            )
-            Text(
-                "Your deeds will be recorded here.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = DimAsh
-            )
+            if (searchQuery.isNotBlank()) {
+                Text(
+                    "No results for \"$searchQuery\"",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = DimAsh
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Try a different word or clear the search.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = DimAsh
+                )
+            } else {
+                Text(
+                    "No entries yet.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = DimAsh
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Your deeds will be recorded here.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = DimAsh
+                )
+            }
         }
         return
     }

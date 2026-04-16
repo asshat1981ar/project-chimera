@@ -13,6 +13,9 @@ interface FactionStateDao {
     @Query("SELECT * FROM faction_states WHERE save_slot_id = :slotId")
     fun observeAll(slotId: Long): Flow<List<FactionStateEntity>>
 
+    @Query("SELECT * FROM faction_states WHERE save_slot_id = :slotId")
+    suspend fun getBySlot(slotId: Long): List<FactionStateEntity>
+
     @Query("SELECT * FROM faction_states WHERE save_slot_id = :slotId AND faction_id = :factionId")
     suspend fun getByFaction(slotId: Long, factionId: String): FactionStateEntity?
 

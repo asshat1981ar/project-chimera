@@ -14,6 +14,9 @@ interface CharacterStateDao {
     suspend fun getByCharacterId(characterId: String): CharacterStateEntity?
 
     @Query("SELECT * FROM character_states WHERE save_slot_id = :slotId")
+    suspend fun getBySlot(slotId: Long): List<CharacterStateEntity>
+
+    @Query("SELECT * FROM character_states WHERE save_slot_id = :slotId")
     fun observeBySlot(slotId: Long): Flow<List<CharacterStateEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
