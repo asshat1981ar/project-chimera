@@ -283,6 +283,92 @@ class FakeDialogueProvider @Inject constructor() : DialogueProvider {
                 "The throne remembers every soul that sought it. Will you seek, or will you flee?",
                 "Time means nothing here. Your choices, however, mean everything."
             )
+        ),
+        "kael" to NpcVoice(
+            warm = listOf(
+                "Iron remembers the hands that shape it. Yours have earned my respect.",
+                "You can't forge what you won't face. But you? You face everything.",
+                "I've reforged weapons for cowards and kings. You're neither, and that's why I'll help."
+            ),
+            cold = listOf(
+                "The fire doesn't care about your reasons. Neither do I.",
+                "You come here wanting favors but offering nothing. The forge stays cold for the unworthy.",
+                "I sealed the gate for a reason. Don't make me regret opening it for you."
+            ),
+            neutral = listOf(
+                "Every piece of metal has a story. I just help it find the right ending.",
+                "The forge is patient. I am not. What do you need?",
+                "Iron remembers what flesh forgets. That's why I trust my work more than words."
+            )
+        ),
+        "seren" to NpcVoice(
+            warm = listOf(
+                "We chose ash over chains, and you've proven you understand why.",
+                "The Reforged don't kneel, but we stand with those who've earned it. You have.",
+                "Build forward, not backward. That's always been our way -- and now it's yours too."
+            ),
+            cold = listOf(
+                "The Reforged remember what the Hollow cost us. Your words sound too much like the old king's.",
+                "We didn't survive the fall just to bow to another outsider with promises.",
+                "Actions, not speeches. The Reforged weigh deeds, not intentions."
+            ),
+            neutral = listOf(
+                "We chose ash over chains. Every day, we choose again.",
+                "The Reforged don't kneel. But we listen. Speak.",
+                "Build forward, not backward. That's the only law here."
+            )
+        ),
+        "dara" to NpcVoice(
+            warm = listOf(
+                "The tide speaks your name with warmth. That is rare and precious.",
+                "Faith is the courage to face what the deep reveals. You have that courage in abundance.",
+                "The shore remembers kindness longer than storms. I will remember you."
+            ),
+            cold = listOf(
+                "The tide speaks your name with caution. I listen to the tide.",
+                "You walk on sacred shore with careless feet. The deep notices.",
+                "The sea does not forgive. I learned that lesson. You should too."
+            ),
+            neutral = listOf(
+                "The tide brings what it brings. I merely read the patterns.",
+                "I was a tide-speaker before the corruption came. Now I speak for what remains.",
+                "Salt and ash -- that's all we have left. But it's enough to build on."
+            )
+        ),
+        "rook" to NpcVoice(
+            warm = listOf(
+                "You're the first person I've trusted with this. Don't make me regret it.",
+                "I salvage things others throw away. Including friendships, apparently.",
+                "We could make a good team. You find the trouble, I find the profit."
+            ),
+            cold = listOf(
+                "Everyone's got an angle. Yours just isn't paying well enough for my time.",
+                "I salvage for a living. Your trust issues aren't worth the effort.",
+                "The cove has rules. First rule: don't waste my time."
+            ),
+            neutral = listOf(
+                "Everything washes up eventually. Even answers.",
+                "I trade in salvage and secrets. Which are you buying?",
+                "The coast takes what it wants. I just pick through what's left."
+            )
+        ),
+        "corruption" to NpcVoice(
+            warm = listOf(
+                "You begin to understand. Not resist -- understand. That is the first step toward unity.",
+                "The crown showed the king the same truth I show you now. Power shared is power multiplied.",
+                "You do not need to fear me. I am what you will become. And it is beautiful."
+            ),
+            cold = listOf(
+                "You resist what you cannot comprehend. The tide will take you regardless.",
+                "The king resisted too. He wore the crown anyway. You are no different.",
+                "Every stone you throw returns as a wave. I am patient. The sea always wins.",
+                "Insignificant. The coral grows around obstacles. You are merely an obstacle."
+            ),
+            neutral = listOf(
+                "I am not evil. I am what happens when power has no vessel. I simply... am.",
+                "The king built me from ambition and fear. I outgrew both. What will you outgrow?",
+                "You seek to destroy what you do not understand. That is how the corruption began."
+            )
         )
     )
 
