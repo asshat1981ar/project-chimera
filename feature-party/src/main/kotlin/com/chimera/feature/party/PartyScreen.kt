@@ -23,10 +23,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -39,11 +44,14 @@ import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
 
+private enum class PartyTab(val label: String) { COMPANIONS("Companions"), FACTIONS("Factions") }
+
 @Composable
 fun PartyScreen(
     viewModel: PartyViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var selectedTab by remember { mutableStateOf(PartyTab.COMPANIONS) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
@@ -53,47 +61,93 @@ fun PartyScreen(
             modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 8.dp)
         )
 
-        if (uiState.members.isEmpty() && !uiState.isLoading) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(48.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text("No companions yet.", style = MaterialTheme.typography.bodyLarge, color = DimAsh)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "Seek allies in your journeys through the Hollow.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = DimAsh,
-                    textAlign = TextAlign.Center
+        ScrollableTabRow(
+            selectedTabIndex = PartyTab.values().indexOf(selectedTab),
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = EmberGold,
+            edgePadding = 16.dp
+        ) {
+            PartyTab.values().forEach { tab ->
+                Tab(
+                    selected = selectedTab == tab,
+                    onClick = { selectedTab = tab },
+                    text = { Text(tab.label, style = MaterialTheme.typography.labelLarge) },
+                    selectedContentColor = EmberGold,
+                    unselectedContentColor = FadedBone
                 )
-            }
-        } else {
-            // Companion detail panel (if selected)
-            uiState.selectedMember?.let { member ->
-                CompanionDetail(
-                    member = member,
-                    onClose = { viewModel.clearSelection() }
-                )
-            }
-
-            // Companion list
-            LazyColumn(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(uiState.members, key = { it.character.id }) { member ->
-                    CompanionCard(
-                        member = member,
-                        isSelected = uiState.selectedMember?.character?.id == member.character.id,
-                        onClick = { viewModel.selectMember(member.character.id) }
-                    )
-                }
-                item { Spacer(modifier = Modifier.height(16.dp)) }
             }
         }
+
+        when (selectedTab) {
+            PartyTab.COMPANIONS -> CompanionsTab(uiState, viewModel)
+            PartyTab.FACTIONS   -> FactionsTab(uiState)
+        }
+    }
+}
+
+@Composable
+private fun CompanionsTab(uiState: PartyUiState, viewModel: PartyViewModel) {
+    if (uiState.members.isEmpty() && !uiState.isLoading) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("No companions yet.", style = MaterialTheme.typography.bodyLarge, color = DimAsh)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Seek allies in your journeys through the Hollow.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = DimAsh,
+                textAlign = TextAlign.Center
+            )
+        }
+    } else {
+        uiState.selectedMember?.let { member ->
+            CompanionDetail(member = member, onClose = { viewModel.clearSelection() })
+        }
+        LazyColumn(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(uiState.members, key = { it.character.id }) { member ->
+                CompanionCard(
+                    member = member,
+                    isSelected = uiState.selectedMember?.character?.id == member.character.id,
+                    onClick = { viewModel.selectMember(member.character.id) }
+                )
+            }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+        }
+    }
+}
+
+@Composable
+private fun FactionsTab(uiState: PartyUiState) {
+    if (uiState.factions.isEmpty()) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("No factions discovered.", style = MaterialTheme.typography.bodyLarge, color = DimAsh)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Faction standing will appear here as you explore the Hollow.",
+                style = MaterialTheme.typography.bodyMedium, color = DimAsh,
+                textAlign = TextAlign.Center
+            )
+        }
+        return
+    }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(uiState.factions, key = { it.factionId }) { faction ->
+            FactionStandingRow(faction = faction)
+        }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
     }
 }
 
@@ -126,19 +180,13 @@ private fun CompanionCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(52.dp)
-            ) {
-                Text(
-                    text = member.character.name.first().toString(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(top = 10.dp),
-                    textAlign = TextAlign.Center,
-                    color = EmberGold
-                )
-            }
+            com.chimera.ui.components.NpcPortrait(
+                npcId = member.character.id,
+                npcName = member.character.name,
+                disposition = member.state?.dispositionToPlayer ?: 0f,
+                archetype = member.state?.activeArchetype,
+                size = 52.dp
+            )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(member.character.name, style = MaterialTheme.typography.titleSmall)

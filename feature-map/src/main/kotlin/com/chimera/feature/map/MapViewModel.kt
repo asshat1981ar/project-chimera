@@ -3,7 +3,7 @@ package com.chimera.feature.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
-import com.chimera.data.MapNodeLoader
+import com.chimera.data.MultiActMapNodeLoader
 import com.chimera.database.dao.CharacterStateDao
 import kotlinx.serialization.json.Json
 import com.chimera.database.dao.FactionStateDao
@@ -47,7 +47,7 @@ class MapViewModel @Inject constructor(
     private val rumorPacketDao: RumorPacketDao,
     private val factionStateDao: FactionStateDao,
     private val characterStateDao: CharacterStateDao,
-    private val mapNodeLoader: MapNodeLoader,
+    private val mapNodeLoader: MultiActMapNodeLoader,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
 

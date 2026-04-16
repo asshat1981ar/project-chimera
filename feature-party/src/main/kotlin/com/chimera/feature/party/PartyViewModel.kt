@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
+import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.CharacterStateEntity
+import com.chimera.database.entity.FactionStateEntity
 import com.chimera.database.entity.MemoryShardEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +32,7 @@ data class PartyMember(
 
 data class PartyUiState(
     val members: List<PartyMember> = emptyList(),
+    val factions: List<FactionStateEntity> = emptyList(),
     val selectedMember: PartyMember? = null,
     val isLoading: Boolean = true
 )
@@ -38,10 +42,12 @@ class PartyViewModel @Inject constructor(
     private val characterDao: CharacterDao,
     private val characterStateDao: CharacterStateDao,
     private val memoryShardDao: MemoryShardDao,
+    private val factionStateDao: FactionStateDao,
     private val gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
     private val _selectedId = MutableStateFlow<String?>(null)
+    private val _memoryCache = MutableStateFlow<Map<String, List<MemoryShardEntity>>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<PartyUiState> = gameSessionManager.activeSlotId
@@ -50,17 +56,27 @@ class PartyViewModel @Inject constructor(
             combine(
                 characterDao.observeBySlot(slotId),
                 characterStateDao.observeBySlot(slotId),
-                _selectedId
-            ) { characters, states, selectedId ->
+                factionStateDao.observeAll(slotId),
+                _selectedId,
+                _memoryCache
+            ) { characters, states, factions, selectedId, memoryCache ->
                 val stateMap = states.associateBy { it.characterId }
-                val nonPlayerChars = characters.filter { !it.isPlayerCharacter }
-                val members = nonPlayerChars.map { char ->
-                    PartyMember(character = char, state = stateMap[char.id])
-                }
-                val selected = selectedId?.let { id ->
-                    members.find { it.character.id == id }
-                }
-                PartyUiState(members = members, selectedMember = selected, isLoading = false)
+                val members = characters
+                    .filter { !it.isPlayerCharacter }
+                    .map { char ->
+                        PartyMember(
+                            character = char,
+                            state = stateMap[char.id],
+                            recentMemories = memoryCache[char.id] ?: emptyList()
+                        )
+                    }
+                val selected = selectedId?.let { id -> members.find { it.character.id == id } }
+                PartyUiState(
+                    members = members,
+                    factions = factions,
+                    selectedMember = selected,
+                    isLoading = false
+                )
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), PartyUiState())
@@ -75,15 +91,10 @@ class PartyViewModel @Inject constructor(
     }
 
     private fun loadMemories(characterId: String) {
+        val slotId = gameSessionManager.activeSlotId.value ?: return
         viewModelScope.launch {
-            val slotId = gameSessionManager.activeSlotId.value ?: return@launch
-            val memories = memoryShardDao.getTopMemories(slotId, characterId, 10)
-            // Update selected member with memories
-            val current = uiState.value
-            val member = current.members.find { it.character.id == characterId }
-            if (member != null) {
-                _selectedId.value = characterId // trigger recomposition with memories loaded
-            }
+            val memories = memoryShardDao.getTopMemories(slotId, characterId, limit = 10)
+            _memoryCache.update { cache -> cache + (characterId to memories) }
         }
     }
 }

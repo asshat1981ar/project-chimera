@@ -95,17 +95,25 @@ fun DialogueSceneScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                    .padding(horizontal = 8.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onSceneComplete) {
                     Icon(Icons.Default.ArrowBack, "Leave scene", tint = FadedBone)
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+                // NPC portrait with live disposition ring
+                com.chimera.ui.components.NpcPortrait(
+                    npcId = uiState.npcId.ifBlank { uiState.npcName },
+                    npcName = uiState.npcName,
+                    disposition = uiState.npcDisposition,
+                    archetype = uiState.npcArchetype,
+                    size = 40.dp
+                )
+                Spacer(modifier = Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(uiState.sceneTitle, style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "${uiState.npcName} -- ${uiState.npcMood}",
+                        "${uiState.npcName} — ${uiState.npcMood}",
                         style = MaterialTheme.typography.bodySmall,
                         color = FadedBone
                     )

@@ -38,4 +38,8 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
 
     debugImplementation(libs.compose.ui.tooling)
+
+    // Coil — async image loading (portrait system)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }
