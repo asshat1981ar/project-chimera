@@ -1,0 +1,106 @@
+[
+  {
+    "sceneId": "coastal_arrival",
+    "sceneTitle": "The Broken Shore",
+    "npcId": "dara",
+    "npcName": "Dara the Tide-Speaker",
+    "setting": "a windswept beach littered with wreckage from the Hollow's collapse",
+    "stakes": "A mystic of the coast warns that the corruption has spread to the sea itself",
+    "maxTurns": 10,
+    "allowedReveals": ["coastal_corruption", "tide_prophecy"]
+  },
+  {
+    "sceneId": "salvage_yard",
+    "sceneTitle": "The Salvage Yard",
+    "npcId": "kael",
+    "npcName": "Kael the Forgemaster",
+    "setting": "a massive open-air forge built from shipwrecks, where Kael has set up a new workshop",
+    "stakes": "Kael can craft weapons against the spreading corruption -- but needs rare materials",
+    "maxTurns": 10,
+    "allowedReveals": ["forge_history", "corruption_weakness"]
+  },
+  {
+    "sceneId": "drowned_temple",
+    "sceneTitle": "The Drowned Temple",
+    "npcId": "vessa",
+    "npcName": "Vessa the Hollow Priestess",
+    "setting": "a half-submerged temple where the tide brings offerings no one asked for",
+    "stakes": "Vessa believes the corruption can be purified here -- but the ritual demands sacrifice",
+    "maxTurns": 12,
+    "allowedReveals": ["corruption_source", "purification_ritual", "hollow_faith"],
+    "forbiddenTopics": ["escape_route"]
+  },
+  {
+    "sceneId": "smugglers_cove",
+    "sceneTitle": "The Smuggler's Cove",
+    "npcId": "rook",
+    "npcName": "Rook the Salvager",
+    "setting": "a hidden cove where salvaged goods are traded outside faction control",
+    "stakes": "Rook has crafting materials but trades only in secrets and favors",
+    "maxTurns": 10,
+    "allowedReveals": ["trade_routes", "faction_secrets"]
+  },
+  {
+    "sceneId": "tidewall_garrison",
+    "sceneTitle": "The Tidewall",
+    "npcId": "marcus",
+    "npcName": "Marcus the Guard",
+    "setting": "a sea wall garrison where Marcus has been reassigned after the Hollow fell",
+    "stakes": "Marcus has intel on coastal faction movements but his loyalty is divided",
+    "maxTurns": 10,
+    "allowedReveals": ["garrison_movements", "faction_secrets"],
+    "forbiddenTopics": ["deserter_truth"]
+  },
+  {
+    "sceneId": "aria_laboratory",
+    "sceneTitle": "The Tidal Laboratory",
+    "npcId": "aria",
+    "npcName": "Aria the Scholar",
+    "setting": "a cave system Aria has converted into a research lab, studying corruption samples",
+    "stakes": "Aria's research reveals the corruption is alive -- and it's evolving to resist purification",
+    "maxTurns": 12,
+    "allowedReveals": ["corruption_nature", "crown_nature", "evolution_theory"]
+  },
+  {
+    "sceneId": "dara_ritual",
+    "sceneTitle": "The Tide Ritual",
+    "npcId": "dara",
+    "npcName": "Dara the Tide-Speaker",
+    "setting": "a natural amphitheater carved by centuries of waves, filled with tidal pools that glow",
+    "stakes": "Dara leads a purification ritual but the corruption fights back violently",
+    "maxTurns": 8,
+    "allowedReveals": ["tide_prophecy", "purification_ritual", "corruption_weakness"]
+  },
+  {
+    "sceneId": "rook_betrayal",
+    "sceneTitle": "The Double Cross",
+    "npcId": "rook",
+    "npcName": "Rook the Salvager",
+    "setting": "a trap set in the smuggler's cove -- the exits are blocked",
+    "stakes": "Rook reveals they've been selling information to the corruption itself",
+    "maxTurns": 8,
+    "allowedReveals": ["faction_secrets", "corruption_nature"],
+    "forbiddenTopics": ["purification_ritual"]
+  },
+  {
+    "sceneId": "seren_fleet",
+    "sceneTitle": "The Reforged Fleet",
+    "npcId": "seren",
+    "npcName": "Seren of the Reforged",
+    "setting": "aboard a repurposed warship, the flagship of the Reforged coastal fleet",
+    "stakes": "Seren has built a fleet to assault the corruption's source -- but needs your alliance",
+    "maxTurns": 10,
+    "allowedReveals": ["reforged_prophecy", "corruption_weakness"]
+  },
+  {
+    "sceneId": "act3_climax",
+    "sceneTitle": "The Heart of the Tide",
+    "npcId": "corruption",
+    "npcName": "The Living Corruption",
+    "setting": "a massive undersea cavern where the corruption has built a new throne from living crystal",
+    "stakes": "The final confrontation -- purify, dominate, or merge with the corruption",
+    "maxTurns": 8,
+    "allowedReveals": ["corruption_nature", "corruption_weakness", "evolution_theory", "tide_prophecy"],
+    "forbiddenTopics": []
+  }
+]

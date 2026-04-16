@@ -1,0 +1,29 @@
+[
+  {
+    "id": "dara",
+    "name": "Dara",
+    "title": "The Tide-Speaker",
+    "role": "NPC_ALLY",
+    "initialDisposition": 0.1,
+    "archetype": "GROWTH_AND_UNDERINVESTMENT",
+    "portraitResName": null
+  },
+  {
+    "id": "rook",
+    "name": "Rook",
+    "title": "The Salvager",
+    "role": "NPC_NEUTRAL",
+    "initialDisposition": 0.0,
+    "archetype": "FIXES_THAT_FAIL",
+    "portraitResName": null
+  },
+  {
+    "id": "corruption",
+    "name": "The Living Corruption",
+    "title": "The Tide's Hunger",
+    "role": "NPC_HOSTILE",
+    "initialDisposition": -0.8,
+    "archetype": null,
+    "portraitResName": null
+  }
+]

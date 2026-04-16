@@ -1,0 +1,62 @@
+[
+  {
+    "id": "tide_ward",
+    "name": "Tide Ward",
+    "description": "A protective charm against the corruption's influence. Requires purified coral and hollow iron.",
+    "resultItemId": "tide_ward",
+    "resultName": "Tide Ward",
+    "resultCategory": "artifact",
+    "resultRarity": "rare",
+    "ingredientsJson": "[{\"itemId\":\"purified_coral\",\"quantity\":2},{\"itemId\":\"hollow_iron\",\"quantity\":1}]",
+    "requiredScene": "drowned_temple",
+    "requiredNpc": "vessa"
+  },
+  {
+    "id": "echo_blade",
+    "name": "Echo Blade",
+    "description": "A weapon forged from the Hollow King's resonance. Cuts through corruption like truth through lies.",
+    "resultItemId": "echo_blade",
+    "resultName": "Echo Blade",
+    "resultCategory": "artifact",
+    "resultRarity": "legendary",
+    "ingredientsJson": "[{\"itemId\":\"hollow_iron\",\"quantity\":3},{\"itemId\":\"king_shard\",\"quantity\":1},{\"itemId\":\"forge_ember\",\"quantity\":2}]",
+    "requiredScene": "salvage_yard",
+    "requiredNpc": "kael"
+  },
+  {
+    "id": "memory_vial",
+    "name": "Memory Vial",
+    "description": "Distilled memories that can restore forgotten knowledge. Useful in negotiations.",
+    "resultItemId": "memory_vial",
+    "resultName": "Memory Vial",
+    "resultCategory": "consumable",
+    "resultRarity": "uncommon",
+    "ingredientsJson": "[{\"itemId\":\"memory_dust\",\"quantity\":3},{\"itemId\":\"glass_flask\",\"quantity\":1}]",
+    "requiredScene": null,
+    "requiredNpc": "aria"
+  },
+  {
+    "id": "signal_flare",
+    "name": "Reforged Signal Flare",
+    "description": "A device that summons Reforged allies in battle. One use only.",
+    "resultItemId": "signal_flare",
+    "resultName": "Signal Flare",
+    "resultCategory": "consumable",
+    "resultRarity": "rare",
+    "ingredientsJson": "[{\"itemId\":\"forge_ember\",\"quantity\":2},{\"itemId\":\"salt_crystal\",\"quantity\":1}]",
+    "requiredScene": null,
+    "requiredNpc": "seren"
+  },
+  {
+    "id": "purification_totem",
+    "name": "Purification Totem",
+    "description": "Cleanses corruption from a small area. Essential for the final ritual.",
+    "resultItemId": "purification_totem",
+    "resultName": "Purification Totem",
+    "resultCategory": "key_item",
+    "resultRarity": "legendary",
+    "ingredientsJson": "[{\"itemId\":\"purified_coral\",\"quantity\":3},{\"itemId\":\"tide_essence\",\"quantity\":2},{\"itemId\":\"king_shard\",\"quantity\":1}]",
+    "requiredScene": "dara_ritual",
+    "requiredNpc": "dara"
+  }
+]
