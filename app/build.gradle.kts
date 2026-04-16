@@ -29,6 +29,26 @@ android {
         buildConfigField("String", "OPENROUTER_API_KEY", "\"${project.findProperty("OPENROUTER_API_KEY") ?: ""}\"")
     }
 
+    flavorDimensions += "environment"
+    productFlavors {
+        create("mock") {
+            dimension = "environment"
+            applicationIdSuffix = ".mock"
+            buildConfigField("String", "PROVIDER_MODE", "\"FAKE\"")
+            buildConfigField("String", "API_BASE_URL", "\"http://localhost:8080\"")
+        }
+        create("dev") {
+            dimension = "environment"
+            buildConfigField("String", "PROVIDER_MODE", "\"AUTO\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://api.chimera-rpg.dev\"")
+        }
+        create("prod") {
+            dimension = "environment"
+            buildConfigField("String", "PROVIDER_MODE", "\"AUTO\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://api.chimera-rpg.app\"")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
