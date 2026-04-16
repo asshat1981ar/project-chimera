@@ -40,6 +40,8 @@ import com.chimera.ui.theme.VoidGreen
 
 @Composable
 fun CampScreen(
+    onNavigateToInventory: () -> Unit = {},
+    onNavigateToCrafting: () -> Unit = {},
     viewModel: CampViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,6 +71,29 @@ fun CampScreen(
                         color = FadedBone
                     )
                 }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Inventory + Crafting navigation
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onNavigateToInventory,
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, FadedBone.copy(alpha = 0.3f))
+                    ) {
+                        Text("Inventory", color = FadedBone)
+                    }
+                    OutlinedButton(
+                        onClick = onNavigateToCrafting,
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, EmberGold.copy(alpha = 0.3f))
+                    ) {
+                        Text("Crafting", color = EmberGold)
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Morale bar
