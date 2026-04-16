@@ -129,6 +129,7 @@ android {
 
 dependencies {
     // Project modules
+    implementation(project(":chimera-core"))
     implementation(project(":core-model"))
     implementation(project(":core-ui"))
     implementation(project(":core-database"))
