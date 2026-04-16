@@ -2,6 +2,7 @@ package com.chimera.ai
 
 import android.util.Log
 import com.chimera.model.DialogueTurnResult
+import com.chimera.model.SceneContract
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.float
@@ -15,6 +16,29 @@ import kotlinx.serialization.json.jsonPrimitive
 object DialogueResponseParser {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+
+    /**
+     * Parse and validate against scene contract constraints.
+     * Strips forbidden topic mentions from the NPC line.
+     */
+    fun parseAndValidate(raw: String, contract: SceneContract): DialogueTurnResult? {
+        val result = parse(raw) ?: return null
+        if (contract.forbiddenTopics.isEmpty()) return result
+
+        val lower = result.npcLine.lowercase()
+        val violated = contract.forbiddenTopics.any { topic ->
+            lower.contains(topic.replace("_", " "))
+        }
+        return if (violated) {
+            Log.w("DialogueParser", "Forbidden topic detected, sanitizing response")
+            result.copy(
+                npcLine = "I... cannot speak of that. Ask me something else.",
+                directorNotes = "Original response violated forbidden topics: ${contract.forbiddenTopics}"
+            )
+        } else {
+            result
+        }
+    }
 
     /**
      * Parse a raw AI response string into a DialogueTurnResult.
