@@ -121,13 +121,23 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build Release APK
-      run: ./gradlew assembleRelease
+      run: ./gradlew assembleProdRelease
+
+    - name: Build Release AAB (Play Store)
+      run: ./gradlew bundleProdRelease
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
         name: chimera-release-apk
-        path: app/build/outputs/apk/release/*.apk
+        path: app/build/outputs/apk/prodRelease/*.apk
+        retention-days: 90
+
+    - name: Upload Release AAB
+      uses: actions/upload-artifact@v4
+      with:
+        name: chimera-release-aab
+        path: app/build/outputs/bundle/prodRelease/*.aab
         retention-days: 90
 
   build-demo:
@@ -179,14 +189,20 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: chimera-release-apk
-        path: release-apk/
+        path: release-artifacts/
+
+    - name: Download Release AAB
+      uses: actions/download-artifact@v4
+      with:
+        name: chimera-release-aab
+        path: release-artifacts/
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        files: release-apk/*.apk
+        files: release-artifacts/*
         generate_release_notes: true
         body: |
-          Chimera: Ashes of the Hollow King
+          Chimera: Ashes of the Hollow King - Beta Release
 
-          Download the APK to begin your journey into the Hollow.
+          Download the APK for direct install, or use the AAB for Play Store upload.

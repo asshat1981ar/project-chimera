@@ -1,0 +1,30 @@
+Chimera: Ashes of the Hollow King is a narrative RPG where every conversation matters.
+
+YOUR WORDS SHAPE THE WORLD
+Speak freely with NPCs who remember your promises, reinterpret your actions, and unlock or block future paths based on trust, fear, and faction pressure. No dialogue trees -- real consequences.
+
+AI-ASSISTED DIALOGUE
+NPCs respond with authored personality when offline, and with AI-enhanced dialogue when connected. The game works fully offline with rich, hand-crafted responses.
+
+COMPANION RELATIONSHIPS
+Recruit companions whose loyalty evolves through your choices. Each companion has a personal arc that unlocks through deepening trust.
+
+RITUAL DUELS
+Settle disputes through stance-based ritual combat. Your prior dialogue choices grant advantages -- or disadvantages.
+
+EXPLORE THE HOLLOW
+Navigate a node-based world map across two story acts. Discover rumors, track faction influence, and uncover the truth behind the Hollow King's fall.
+
+CAMP & JOURNAL
+Rest at camp, assign companion duties, resolve night events. Your journal tracks every story beat, rumor, vow, and companion interaction.
+
+FEATURES
+- 20 authored scenes across 2 acts
+- 9 unique NPCs with distinct personalities
+- 3 recruitable companions with loyalty arcs
+- Stance-based ritual duel system
+- Persistent vow and quest tracking
+- Morale-driven camp system with night events
+- Faction influence and rumor heat mechanics
+- Works fully offline with authored fallback dialogue
+- Dark fantasy aesthetic with serif typography
