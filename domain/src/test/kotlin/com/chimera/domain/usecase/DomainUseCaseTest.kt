@@ -113,7 +113,7 @@ class DomainUseCaseTest {
     private lateinit var journalEntryDao: com.chimera.database.dao.JournalEntryDao
 
     @Before
-    fun setUpRelationship() {
+    fun setUpApplyRelationshipDelta() {
         characterRepository = mock()
         journalEntryDao = mock()
         applyRelationshipDeltaUseCase = ApplyRelationshipDeltaUseCase(characterRepository, journalEntryDao)
