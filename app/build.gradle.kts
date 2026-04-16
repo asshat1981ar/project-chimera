@@ -135,6 +135,13 @@ dependencies {
     implementation(project(":core-ai"))
     implementation(project(":core-data"))
     implementation(project(":domain"))
+    implementation(project(":feature-home"))
+    implementation(project(":feature-map"))
+    implementation(project(":feature-dialogue"))
+    implementation(project(":feature-camp"))
+    implementation(project(":feature-journal"))
+    implementation(project(":feature-party"))
+    implementation(project(":feature-settings"))
 
     // Core Android
     implementation(libs.androidx.core.ktx)
