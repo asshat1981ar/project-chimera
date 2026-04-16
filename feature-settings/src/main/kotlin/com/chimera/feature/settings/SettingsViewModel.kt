@@ -39,4 +39,8 @@ class SettingsViewModel @Inject constructor(
     fun setAnalyticsOptIn(optIn: Boolean) {
         viewModelScope.launch { preferences.setAnalyticsOptIn(optIn) }
     }
+
+    fun setVoiceEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferences.setVoiceEnabled(enabled) }
+    }
 }

@@ -88,6 +88,18 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // Audio section
+        SettingsSection("Audio") {
+            ToggleSetting(
+                label = "NPC Voice",
+                description = "Speak NPC dialogue lines aloud using on-device TTS",
+                checked = settings.voiceEnabled,
+                onToggle = viewModel::setVoiceEnabled
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         // Privacy section
         SettingsSection("Privacy") {
             ToggleSetting(

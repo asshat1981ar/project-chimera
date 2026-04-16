@@ -21,7 +21,8 @@ data class AppSettings(
     val reduceMotion: Boolean = false,
     val aiMode: AiMode = AiMode.AUTO,
     val analyticsOptIn: Boolean = false,
-    val tutorialComplete: Boolean = false
+    val tutorialComplete: Boolean = false,
+    val voiceEnabled: Boolean = false  // NPC TTS voice — off by default (battery consideration)
 )
 
 enum class AiMode(val label: String) {
@@ -39,6 +40,7 @@ class ChimeraPreferences @Inject constructor(
         val AI_MODE = stringPreferencesKey("ai_mode")
         val ANALYTICS_OPT_IN = booleanPreferencesKey("analytics_opt_in")
         val TUTORIAL_COMPLETE = booleanPreferencesKey("tutorial_complete")
+        val VOICE_ENABLED = booleanPreferencesKey("voice_enabled")
     }
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { prefs ->
@@ -47,7 +49,8 @@ class ChimeraPreferences @Inject constructor(
             reduceMotion = prefs[Keys.REDUCE_MOTION] ?: false,
             aiMode = prefs[Keys.AI_MODE]?.let { AiMode.valueOf(it) } ?: AiMode.AUTO,
             analyticsOptIn = prefs[Keys.ANALYTICS_OPT_IN] ?: false,
-            tutorialComplete = prefs[Keys.TUTORIAL_COMPLETE] ?: false
+            tutorialComplete = prefs[Keys.TUTORIAL_COMPLETE] ?: false,
+            voiceEnabled = prefs[Keys.VOICE_ENABLED] ?: false
         )
     }
 
@@ -69,5 +72,9 @@ class ChimeraPreferences @Inject constructor(
 
     suspend fun setTutorialComplete(complete: Boolean) {
         context.dataStore.edit { it[Keys.TUTORIAL_COMPLETE] = complete }
+    }
+
+    suspend fun setVoiceEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.VOICE_ENABLED] = enabled }
     }
 }

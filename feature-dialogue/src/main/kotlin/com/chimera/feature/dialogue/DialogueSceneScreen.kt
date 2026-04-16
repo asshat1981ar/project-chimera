@@ -1,10 +1,17 @@
 package com.chimera.feature.dialogue
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -124,6 +131,18 @@ fun DialogueSceneScreen(
                         style = MaterialTheme.typography.labelSmall,
                         color = EmberGold.copy(alpha = 0.6f),
                         modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+                // Animated wave bars — visible while TTS is speaking an NPC line
+                AnimatedVisibility(
+                    visible = uiState.isSpeaking,
+                    enter = fadeIn(tween(200)),
+                    exit = fadeOut(tween(300))
+                ) {
+                    SpeakingWaveIcon(
+                        modifier = Modifier
+                            .padding(end = 6.dp)
+                            .size(width = 20.dp, height = 16.dp)
                     )
                 }
                 if (uiState.isLoading) {
@@ -283,6 +302,55 @@ private fun DialogueBubble(line: DialogueLine) {
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(12.dp),
                 color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+/**
+ * Three animated vertical bars that pulse out of phase — a minimal "speaking" indicator.
+ * Renders in EmberGold so it matches the rest of the dialogue chrome.
+ */
+@Composable
+private fun SpeakingWaveIcon(modifier: Modifier = Modifier) {
+    val transition = rememberInfiniteTransition(label = "wave")
+    val barColor = EmberGold
+
+    // Each bar gets a staggered delay so they ripple left-to-right
+    val h1 by transition.animateFloat(
+        initialValue = 0.3f, targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            tween(420, easing = FastOutSlowInEasing), RepeatMode.Reverse
+        ), label = "bar1"
+    )
+    val h2 by transition.animateFloat(
+        initialValue = 0.3f, targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            tween(420, 140, easing = FastOutSlowInEasing), RepeatMode.Reverse
+        ), label = "bar2"
+    )
+    val h3 by transition.animateFloat(
+        initialValue = 0.3f, targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            tween(420, 280, easing = FastOutSlowInEasing), RepeatMode.Reverse
+        ), label = "bar3"
+    )
+
+    Canvas(modifier = modifier) {
+        val barW = size.width / 5f          // 3 bars + 2 gaps in 5 equal parts
+        val gap  = barW                     // gap == bar width
+        val maxH = size.height
+        val barHeights = listOf(h1, h2, h3)
+
+        barHeights.forEachIndexed { i, fraction ->
+            val barH  = maxH * fraction
+            val left  = i * (barW + gap)
+            val top   = (maxH - barH) / 2f
+            drawRoundRect(
+                color        = barColor,
+                topLeft      = androidx.compose.ui.geometry.Offset(left, top),
+                size         = androidx.compose.ui.geometry.Size(barW, barH),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(barW / 2f)
             )
         }
     }
