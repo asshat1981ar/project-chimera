@@ -38,6 +38,14 @@ data class RumorPacketEntity(
     @ColumnInfo(name = "heat_level")
     val heatLevel: Float = 0.5f, // 0.0 = cold, 1.0 = hot
 
+    @ColumnInfo(name = "truth_level")
+    val truthLevel: Float = 0.5f, // 0.0 = false, 1.0 = confirmed true
+
+    val sentiment: String = "neutral", // positive, negative, neutral, threatening
+
+    @ColumnInfo(name = "spread_score")
+    val spreadScore: Float = 0.0f, // how far the rumor has spread (0.0..1.0)
+
     @ColumnInfo(name = "is_verified")
     val isVerified: Boolean = false,
 

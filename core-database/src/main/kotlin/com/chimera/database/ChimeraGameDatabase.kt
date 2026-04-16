@@ -44,7 +44,7 @@ import com.chimera.database.entity.VowEntity
         FactionStateEntity::class,
         QuestEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(Converters::class)

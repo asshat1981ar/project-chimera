@@ -31,4 +31,10 @@ interface MemoryShardDao {
 
     @Query("SELECT COUNT(*) FROM memory_shards WHERE save_slot_id = :slotId")
     suspend fun countBySlot(slotId: Long): Int
+
+    @Query(
+        "SELECT COUNT(*) FROM memory_shards " +
+        "WHERE save_slot_id = :slotId AND character_id = :characterId AND summary = :summary"
+    )
+    suspend fun countDuplicates(slotId: Long, characterId: String, summary: String): Int
 }

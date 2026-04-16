@@ -45,7 +45,12 @@ class DialogueRepository @Inject constructor(
         memoryShardDao.getTopMemories(slotId, characterId, limit).map { it.toModel() }
 
     suspend fun insertMemoryShards(shards: List<MemoryShardEntity>) {
-        if (shards.isNotEmpty()) memoryShardDao.insertAll(shards)
+        if (shards.isEmpty()) return
+        // Deduplicate: skip shards with identical summary for the same character in the same slot
+        val deduped = shards.filter { shard ->
+            memoryShardDao.countDuplicates(shard.saveSlotId, shard.characterId, shard.summary) == 0
+        }
+        if (deduped.isNotEmpty()) memoryShardDao.insertAll(deduped)
     }
 
     suspend fun getCompletedSceneIds(slotId: Long): Set<String> =
