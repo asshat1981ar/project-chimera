@@ -26,8 +26,11 @@ dependencies {
     implementation(project(":core-model"))
     implementation(project(":core-network"))
 
-    // Ktor (for adapters)
+    // Ktor (for AI adapters and portrait generation)
     implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.json)
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)

@@ -1,0 +1,13 @@
+name            = "chimera-saves"
+main            = "worker.js"
+compatibility_date = "2024-09-23"
+account_id      = "f3c298a429d04732860e78263267bfa8"
+workers_dev     = true
+
+[[d1_databases]]
+binding      = "DB"
+database_name = "chimera-saves"
+database_id  = "ae8754bb-cc29-40e4-9cf4-de05d7ebd816"
+
+# API_TOKEN secret is set — do not commit its value.
+# To rotate: wrangler secret put API_TOKEN

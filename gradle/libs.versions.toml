@@ -19,6 +19,8 @@ junit = "4.13.2"
 turbine = "1.0.0"
 truth = "1.1.4"
 coil = "3.4.0"
+work = "2.9.0"
+hilt-work = "1.2.0"
 espresso = "3.5.1"
 androidx-test-ext = "1.1.5"
 detekt = "1.23.4"
@@ -89,6 +91,11 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 # Coil image loading
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+
+# WorkManager
+work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-work" }
+hilt-work-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-work" }
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

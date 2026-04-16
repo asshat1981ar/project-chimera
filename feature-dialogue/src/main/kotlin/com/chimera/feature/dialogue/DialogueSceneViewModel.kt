@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chimera.ai.AudioProvider
 import com.chimera.ai.DialogueOrchestrator
 import com.chimera.data.GameSessionManager
 import com.chimera.data.SceneLoader
@@ -26,10 +27,14 @@ import com.chimera.model.DialogueTurnResult
 import com.chimera.model.MemoryShard
 import com.chimera.model.PlayerInput
 import com.chimera.model.SceneContract
+import com.chimera.data.ChimeraPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -55,7 +60,8 @@ data class DialogueUiState(
     val isFallbackMode: Boolean = false,
     val isSceneComplete: Boolean = false,
     val triggerDuelWith: String? = null,
-    val relationshipBanner: RelationshipBanner? = null
+    val relationshipBanner: RelationshipBanner? = null,
+    val isSpeaking: Boolean = false   // true while TTS is playing an NPC line
 )
 
 data class RelationshipBanner(
@@ -81,7 +87,9 @@ class DialogueSceneViewModel @Inject constructor(
     private val characterStateDao: CharacterStateDao,
     private val journalEntryDao: JournalEntryDao,
     private val saveSlotDao: SaveSlotDao,
-    private val vowDao: VowDao
+    private val vowDao: VowDao,
+    private val audioProvider: AudioProvider,
+    private val preferences: ChimeraPreferences
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
@@ -95,6 +103,25 @@ class DialogueSceneViewModel @Inject constructor(
 
     companion object {
         private const val MAX_TURN_HISTORY = 20
+    }
+
+    /** Speaks an NPC line if voiceEnabled in settings. Sets isSpeaking flag around TTS call. */
+    private fun speakNpcLine(text: String, npcId: String) {
+        viewModelScope.launch {
+            val voiceOn = preferences.settings
+                .map { it.voiceEnabled }
+                .first()
+            if (!voiceOn) return@launch
+            _uiState.update { it.copy(isSpeaking = true) }
+            audioProvider.speak(text, npcId)
+            _uiState.update { it.copy(isSpeaking = false) }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioProvider.stop()
+        audioProvider.release()
     }
 
     private val contract: SceneContract = sceneLoader.getScene(sceneId) ?: SceneContract(
@@ -265,6 +292,9 @@ class DialogueSceneViewModel @Inject constructor(
                     relationshipBanner = banner,
                     isLoading = false
                 )
+
+                // Speak NPC line aloud if voice is enabled (fire-and-forget, stops on scene complete)
+                if (!isEnding) speakNpcLine(result.npcLine, contract.npcId)
 
                 if (isEnding) {
                     sceneInstanceDao.completeScene(
