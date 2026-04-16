@@ -4,93 +4,82 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Architecture
 
-**Chimera: Ashes of the Hollow King** is an Android-first narrative RPG with AI-assisted dialogue and stateful companion relationships.
+**Chimera: Ashes of the Hollow King** is an Android-first narrative RPG built on a deterministic NPC simulation engine.
+
+### North Star
+
+NPC simulation SDK for story-driven Android games. Chimera Core owns truth (deterministic state transitions, archetype simulation, relationship reducers). Android client owns play. AI service owns expression (optional dialogue flavor).
 
 ### Module Structure
 
 ```
+:chimera-core    Pure Kotlin simulation engine (zero Android deps)
 :core-model      Pure Kotlin domain data classes (no Android deps)
-:core-database   Android library: Room entities, DAOs, Hilt DI, RelationshipArchetypeEngine
-:app             Android application: Compose UI, navigation, screens, AI provider layer, DI
+:core-database   Android library: Room entities, DAOs, Hilt DI
+:core-network    Android library: Ktor HTTP client
+:core-ai         Optional AI adapter: providers, parser, assembler (plugin, not core)
+:core-data       Android library: repositories, services, data loaders
+:core-ui         Android library: shared Compose theme + components
+:domain          Use cases bridging core logic and data
+:feature-*       7 feature modules (home, map, dialogue, camp, journal, party, settings)
+:app             Android application: navigation, DI, entry point
 ```
-
-The `android/` directory contains a legacy DialogGPT service module (excluded from build, reference only). **The root-level `:app` module is the canonical Android entrypoint.** Do not treat `android/` as an active build target.
 
 ### Key Components
 
-1. **Room Database** (`core-database/.../ChimeraGameDatabase.kt`): v6 schema with 11 entities: SaveSlots, Characters, CharacterStates, DialogueTurns, MemoryShards, SceneInstances, JournalEntries, Vows, RumorPackets, FactionStates, Quests
-2. **RelationshipArchetypeEngine** (`core-database/.../engine/RelationshipArchetypeEngine.kt`): Systems-thinking feedback loops driving NPC disposition changes (thread-safe, bounded delayed feedback)
-3. **DialogueOrchestrator** (`app/.../ai/DialogueOrchestrator.kt`): AI provider abstraction with automatic fallback to FakeDialogueProvider, output validation (clamp deltas, bound memory candidates)
-3b. **ProviderRouter** (`app/.../ai/ProviderRouter.kt`): Ordered chain of free AI providers (Gemini → Groq → OpenRouter) with auto-failover
-3c. **PromptAssembler** (`app/.../ai/PromptAssembler.kt`): Builds LLM prompts from SceneContract + CharacterState + memories
-3d. **DialogueResponseParser** (`app/.../ai/DialogueResponseParser.kt`): Robust JSON extraction with markdown fence stripping and manual field fallback
-4. **FakeDialogueProvider** (`app/.../ai/FakeDialogueProvider.kt`): Disposition-aware authored templates with keyword tone detection for offline/fallback dialogue
-5. **GameEventBus** (`app/.../core/events/GameEventBus.kt`): SharedFlow-based event system using `com.chimera.model.GameEvent` sealed hierarchy
-6. **GameSessionManager** (`app/.../data/GameSessionManager.kt`): Holds active save slot ID for the play session
-7. **Navigation** (`app/.../ui/navigation/`): Compose Navigation with bottom bar (Home, Map, Camp, Journal, Party) and fullscreen dialogue/duel scenes
-8. **DuelEngine** (`app/.../ui/screens/duel/DuelEngine.kt`): Stance-based ritual duel (strike/ward/feint) with omen resources and resolve attrition
+1. **chimera-core** (pure Kotlin, no Android):
+   - `RelationshipArchetypeEngine`: Systems-thinking feedback loops (Shifting the Burden, Escalation, Growth & Underinvestment, Fixes That Fail)
+   - `DuelEngine`: Stance-based ritual combat (strike/ward/feint) with omen resources
+   - `GameStateMachine`: Deterministic phase transitions
+   - `GameEventBus`: SharedFlow-based event system
+
+2. **Room Database** (`core-database`): v7 schema with 13 entities
+
+3. **AI Adapter** (`core-ai`): Optional plugin providing dialogue flavor via free-tier providers (Gemini, Groq, OpenRouter). Game works fully offline with authored `FakeDialogueProvider`. AI does not own game state or progression.
+
+4. **Repositories** (`core-data`): Save, Character, Dialogue, Journal, Camp
+
+5. **Use Cases** (`domain`): 7 orchestration classes
 
 ### Data Flow
 - Player selects save slot -> GameSessionManager stores active slot
 - Player enters scene from Map/Home -> ChimeraNavHost navigates to DialogueSceneScreen
 - DialogueSceneViewModel creates SceneInstance, loads CharacterState and MemoryShards
-- Player submits input -> DialogueOrchestrator generates turn (AI or fallback)
+- Player submits input -> DialogueOrchestrator generates turn (AI or authored fallback)
+- **chimera-core** owns relationship state transitions via RelationshipArchetypeEngine
 - Turn persisted to DialogueTurnDao, memory candidates batch-inserted via MemoryShardDao
-- Relationship delta applied via CharacterStateDao.adjustDisposition
 - Scene completion generates JournalEntry automatically
 - Journal/Camp/Party/Map screens read state through DAOs scoped to active save slot
-
-### Domain Models (core-model)
-- `SaveSlot`: Save game slot with player name, chapter, playtime
-- `Character`: NPC/companion definition with role enum
-- `CharacterState`: Mutable state (disposition, emotions, archetype variables)
-- `GameEvent`: Sealed event hierarchy for cross-system communication
-- `DialogueTurnResult`: Provider output contract (npcLine, emotion, relationshipDelta, flags, memoryCandidates)
-- `SceneContract`: Constrains what AI can generate per scene
-- `MemoryShard`: Compact canonical summary of dialogue moments
-
-### Screen Inventory
-- **Splash**: Branded fade-in, auto-advance
-- **Save Slot Select**: 3-slot create/load/delete with name entry dialog
-- **Home**: Welcome, chapter info, story CTA, active vow reminders
-- **Map**: Canvas node graph with connection lines, rumor badges, faction markers, bottom sheet detail
-- **Camp**: Morale bar, companion roster with disposition, active vow reminders
-- **Journal**: Tabbed (All/Story/Rumors/Vows/Companions), unread badges, color-coded cards
-- **Dialogue Scene**: Transcript, quick intents, text input, relationship banners, fallback indicator
-- **Ritual Duel**: Stance selection, omen/resolve bars, combat log, outcome narrative
-- **Party/Settings**: Placeholder screens
 
 ## Development Commands
 
 ### Build (from project root)
 ```bash
-./gradlew build          # Build all modules
-./gradlew test           # Run tests
-./gradlew clean build    # Clean build
-./gradlew assembleDebug  # Build debug APK
-./gradlew assembleDemo   # Build demo APK
-```
-
-### Legacy Android module (reference only)
-```bash
-cd android && ./gradlew test  # Run legacy tests
+./gradlew assembleMockDebug      # Build with offline AI
+./gradlew assembleProdRelease    # Build with cloud AI
+./gradlew testMockDebugUnitTest  # Run all tests
+./gradlew :chimera-core:test     # Core engine tests only (no Android)
+./gradlew detekt                 # Static analysis
+./gradlew clean build            # Clean build
 ```
 
 ## Testing
-- New tests go in module-specific test directories
-- DAOs: use in-memory Room database
-- ViewModels: use Turbine for StateFlow testing
-- DuelEngine: pure unit tests (no Android deps needed)
+- chimera-core tests: pure JUnit, no Android framework needed
+- DAO tests: in-memory Room database
+- ViewModels: Turbine for StateFlow testing
+- DuelEngine: pure unit tests in chimera-core
 - Uses JUnit 4, Coroutines Test, Turbine, Google Truth
 
 ## Dependencies
 - **Android**: Kotlin 1.9.10, Jetpack Compose (BOM 2023.10.01), Hilt 2.48, Room 2.6.1
 - **Navigation**: Compose Navigation 2.7.6, Hilt Navigation Compose 1.1.0
 - **Serialization**: kotlinx-serialization-json 1.6.0
+- **Network**: Ktor 2.3.7 (for AI adapter only)
 - **Build**: Gradle 8.4, AGP 8.1.2, Version Catalog (`gradle/libs.versions.toml`)
+- **Quality**: detekt 1.23.4
 
 ## CI/CD
-- **GitHub Actions**: `.github/workflows/android.yml` (lint/test/build pipeline with Gradle caching, Android SDK setup, debug/release/demo APK jobs)
+- **GitHub Actions**: `.github/workflows/android.yml` (lint/test/build pipeline with Gradle caching, Android SDK setup, mock/prod APK + AAB jobs)
 - **PR Checks**: `.github/workflows/build-deploy.yml` (validates PRs against main)
-- **Release**: Tag-based (`refs/tags/v*`) GitHub Release with APK artifacts
+- **Release**: Tag-based (`refs/tags/v*`) GitHub Release with APK + AAB artifacts
 - **Requirements**: Java 17, Android SDK 34

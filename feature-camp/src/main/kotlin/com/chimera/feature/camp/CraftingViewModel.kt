@@ -2,7 +2,6 @@ package com.chimera.feature.camp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.chimera.data.repository.SaveRepository
 import com.chimera.database.dao.CraftingRecipeDao
 import com.chimera.database.dao.InventoryDao
 import com.chimera.database.entity.CraftingRecipeEntity
