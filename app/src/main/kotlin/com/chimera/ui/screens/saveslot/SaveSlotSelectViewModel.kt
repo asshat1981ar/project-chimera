@@ -8,6 +8,8 @@ import com.chimera.data.FactionSeeder
 import com.chimera.data.GameSessionManager
 import com.chimera.data.MultiActNpcSeeder
 import com.chimera.database.dao.CharacterDao
+import com.chimera.network.CloudSaveRepository
+import com.chimera.network.CloudSaveRequest
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.SaveSlotEntity
@@ -30,7 +32,8 @@ class SaveSlotSelectViewModel @Inject constructor(
     private val multiActNpcSeeder: MultiActNpcSeeder,
     private val craftingRecipeSeeder: CraftingRecipeSeeder,
     private val factionSeeder: FactionSeeder,
-    private val gameSessionManager: GameSessionManager
+    private val gameSessionManager: GameSessionManager,
+    private val cloudSaveRepository: CloudSaveRepository
 ) : ViewModel() {
 
     private val _error = MutableStateFlow<String?>(null)
@@ -72,6 +75,19 @@ class SaveSlotSelectViewModel @Inject constructor(
                 craftingRecipeSeeder.seedRecipesForSlot()
                 factionSeeder.seedFactionsForSlot(slotId)
                 gameSessionManager.setActiveSlot(slotId)
+
+                // Fire-and-forget cloud sync — local DB is source of truth; failure is silent
+                viewModelScope.launch {
+                    cloudSaveRepository.uploadSave(
+                        CloudSaveRequest(
+                            slotId          = slotId,
+                            playerName      = playerName.trim(),
+                            chapterTag      = "prologue",
+                            playtimeSeconds = 0
+                        )
+                    )
+                }
+
                 onCreated(slotId)
             } catch (e: Exception) {
                 Log.e("SaveSlotVM", "Failed to create new game", e)
@@ -85,8 +101,22 @@ class SaveSlotSelectViewModel @Inject constructor(
             try {
                 val slot = saveSlotDao.getById(slotId) ?: return@launch
                 if (slot.isEmpty) return@launch
-                saveSlotDao.upsert(slot.copy(lastPlayedAt = System.currentTimeMillis()))
+                val updated = slot.copy(lastPlayedAt = System.currentTimeMillis())
+                saveSlotDao.upsert(updated)
                 gameSessionManager.setActiveSlot(slotId)
+
+                // Sync playtime to cloud (best-effort)
+                viewModelScope.launch {
+                    cloudSaveRepository.uploadSave(
+                        CloudSaveRequest(
+                            slotId          = slotId,
+                            playerName      = slot.playerName,
+                            chapterTag      = slot.chapterTag,
+                            playtimeSeconds = slot.playtimeSeconds
+                        )
+                    )
+                }
+
                 onSelected(slotId)
             } catch (e: Exception) {
                 Log.e("SaveSlotVM", "Failed to select slot", e)
@@ -101,13 +131,17 @@ class SaveSlotSelectViewModel @Inject constructor(
                 val slot = saveSlotDao.getById(slotId) ?: return@launch
                 saveSlotDao.upsert(
                     slot.copy(
-                        playerName = "",
-                        chapterTag = "prologue",
+                        playerName      = "",
+                        chapterTag      = "prologue",
                         playtimeSeconds = 0,
-                        isEmpty = true
+                        isEmpty         = true
                     )
                 )
                 characterDao.deleteBySlot(slotId)
+
+                // Delete from cloud (best-effort)
+                viewModelScope.launch { cloudSaveRepository.deleteSave(slotId) }
+
             } catch (e: Exception) {
                 Log.e("SaveSlotVM", "Failed to delete save", e)
                 _error.value = "Failed to delete save"

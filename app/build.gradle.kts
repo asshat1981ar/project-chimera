@@ -28,6 +28,12 @@ android {
         buildConfigField("String", "GROQ_API_KEY", "\"${project.findProperty("GROQ_API_KEY") ?: ""}\"")
         buildConfigField("String", "OPENROUTER_API_KEY", "\"${project.findProperty("OPENROUTER_API_KEY") ?: ""}\"")
         buildConfigField("Boolean", "DEMO_MODE", "false")
+
+        // Cloudflare cloud-save Worker (set via local.properties or CI secrets)
+        // CHIMERA_CLOUD_SAVE_URL=https://chimera-saves.<account>.workers.dev
+        // CHIMERA_CLOUD_SAVE_TOKEN=<secret — set via: wrangler secret put API_TOKEN>
+        buildConfigField("String", "CLOUD_SAVE_URL",   "\"${project.findProperty("CHIMERA_CLOUD_SAVE_URL")   ?: ""}\"")
+        buildConfigField("String", "CLOUD_SAVE_TOKEN", "\"${project.findProperty("CHIMERA_CLOUD_SAVE_TOKEN") ?: ""}\"")
     }
 
     flavorDimensions += "environment"
