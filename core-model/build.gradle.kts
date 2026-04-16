@@ -1,7 +1,7 @@
 plugins {
     id("java-library")
+    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
-    id("org.jetbrains.kotlin.jvm") version libs.versions.kotlin.get()
 }
 
 java {

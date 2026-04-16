@@ -28,15 +28,8 @@ object EnvironmentConfig {
     }
 
     val apiBaseUrl: String = BuildConfig.API_BASE_URL
-
-    val isDemoMode: Boolean = try {
-        BuildConfig.DEMO_MODE
-    } catch (_: Exception) {
-        false
-    }
-
+    val isDemoMode: Boolean = BuildConfig.DEMO_MODE
     val isDebug: Boolean = BuildConfig.DEBUG
-
     val geminiApiKey: String = BuildConfig.GEMINI_API_KEY
     val groqApiKey: String = BuildConfig.GROQ_API_KEY
     val openRouterApiKey: String = BuildConfig.OPENROUTER_API_KEY

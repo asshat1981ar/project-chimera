@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     id("kotlin-kapt")
 }
@@ -34,6 +35,12 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+
+    // Serialization (for SceneLoader, MapNodeLoader)
+    implementation(libs.kotlinx.serialization.json)
+
+    // DataStore (for ChimeraPreferences)
+    implementation(libs.datastore.preferences)
 
     // Room (for entity types in repository signatures)
     implementation(libs.room.runtime)
