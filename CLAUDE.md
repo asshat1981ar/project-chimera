@@ -14,11 +14,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 :app             Android application: Compose UI, navigation, screens, AI provider layer, DI
 ```
 
-The `android/` directory contains a legacy DialogGPT service module (excluded from build, reference only).
+The `android/` directory contains a legacy DialogGPT service module (excluded from build, reference only). **The root-level `:app` module is the canonical Android entrypoint.** Do not treat `android/` as an active build target.
 
 ### Key Components
 
-1. **Room Database** (`core-database/.../ChimeraGameDatabase.kt`): v5 schema with 11 entities: SaveSlots, Characters, CharacterStates, DialogueTurns, MemoryShards, SceneInstances, JournalEntries, Vows, RumorPackets, FactionStates, Quests
+1. **Room Database** (`core-database/.../ChimeraGameDatabase.kt`): v6 schema with 11 entities: SaveSlots, Characters, CharacterStates, DialogueTurns, MemoryShards, SceneInstances, JournalEntries, Vows, RumorPackets, FactionStates, Quests
 2. **RelationshipArchetypeEngine** (`core-database/.../engine/RelationshipArchetypeEngine.kt`): Systems-thinking feedback loops driving NPC disposition changes (thread-safe, bounded delayed feedback)
 3. **DialogueOrchestrator** (`app/.../ai/DialogueOrchestrator.kt`): AI provider abstraction with automatic fallback to FakeDialogueProvider, output validation (clamp deltas, bound memory candidates)
 3b. **ProviderRouter** (`app/.../ai/ProviderRouter.kt`): Ordered chain of free AI providers (Gemini → Groq → OpenRouter) with auto-failover
