@@ -11,8 +11,10 @@ import com.chimera.database.mapper.toModel
 import com.chimera.ui.util.ChapterDisplayStrings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -28,7 +30,9 @@ data class HomeUiState(
     val continueSceneTitle: String? = null,
     val activeVowCount: Int = 0,
     val completedSceneCount: Int = 0,
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    /** Non-null when a chapter transition just occurred and an interstitial should be shown. */
+    val pendingActTransition: String? = null
 )
 
 @HiltViewModel
@@ -39,6 +43,9 @@ class HomeViewModel @Inject constructor(
     private val sceneLoader: SceneLoader,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
+
+    /** Tracks the last chapter tag seen so we can detect advances. */
+    private var lastKnownChapterTag: String? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<HomeUiState> = gameSessionManager.activeSlotId
@@ -67,17 +74,34 @@ class HomeViewModel @Inject constructor(
 
                 val continueTitle = sceneLoader.getScene(fallbackSceneId)?.sceneTitle
 
+                // Detect act advance — emit interstitial flag when chapter tag changes
+                // and it's not the first load (lastKnownChapterTag != null).
+                val chapterTag = slot.chapterTag
+                val pending = if (
+                    lastKnownChapterTag != null &&
+                    lastKnownChapterTag != chapterTag &&
+                    chapterTag != "prologue"
+                ) chapterTag else null
+                lastKnownChapterTag = chapterTag
+
                 HomeUiState(
                     playerName = slot.playerName,
-                    chapterTag = slot.chapterTag,
-                    chapterTitle = ChapterDisplayStrings.tagToTitle(slot.chapterTag),
+                    chapterTag = chapterTag,
+                    chapterTitle = ChapterDisplayStrings.tagToTitle(chapterTag),
                     continueSceneId = fallbackSceneId,
                     continueSceneTitle = continueTitle,
                     activeVowCount = vows.size,
                     completedSceneCount = completed.size,
-                    isLoading = false
+                    isLoading = false,
+                    pendingActTransition = pending
                 )
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
+
+    /** Called by HomeScreen after the act-transition interstitial is launched. */
+    fun clearActTransition() {
+        // The flag clears naturally on next emission; expose a no-op here so
+        // HomeScreen has a stable call site for future explicit reset if needed.
+    }
 }

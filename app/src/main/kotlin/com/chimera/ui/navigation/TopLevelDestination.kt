@@ -33,7 +33,9 @@ object ChimeraRoutes {
     const val SETTINGS = "settings"
     const val DIALOGUE = "dialogue/{sceneId}"
     const val DUEL = "duel/{opponentId}"
+    const val ACT_TRANSITION = "act_transition/{actTag}"
 
     fun dialogue(sceneId: String) = "dialogue/$sceneId"
     fun duel(opponentId: String) = "duel/$opponentId"
+    fun actTransition(actTag: String) = "act_transition/$actTag"
 }

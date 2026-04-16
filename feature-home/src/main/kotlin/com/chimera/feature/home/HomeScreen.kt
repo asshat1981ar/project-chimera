@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
+import androidx.compose.runtime.LaunchedEffect
 import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
 
@@ -44,9 +45,18 @@ import com.chimera.ui.theme.VoidGreen
 fun HomeScreen(
     onEnterScene: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onActTransition: (String) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Fire act-transition interstitial exactly once per chapter advance
+    LaunchedEffect(uiState.pendingActTransition) {
+        uiState.pendingActTransition?.let { actTag ->
+            onActTransition(actTag)
+            viewModel.clearActTransition()
+        }
+    }
 
     if (uiState.isLoading) {
         Column(

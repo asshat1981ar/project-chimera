@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -21,17 +20,21 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.chimera.ui.theme.DimAsh
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.chimera.ui.theme.EmberGold
-import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
 
@@ -132,23 +135,41 @@ fun NpcPortrait(
                 }
         )
 
-        // Avatar circle
-        Box(
-            modifier = Modifier
-                .size(size * 0.82f)
-                .clip(CircleShape)
-                .background(avatarGradient),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = npcName.firstOrNull { it.isLetter() }?.uppercase() ?: "?",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = fontSize,
-                    fontWeight = FontWeight.Bold
-                ),
-                color = Color.White.copy(alpha = 0.9f),
-                textAlign = TextAlign.Center
+        // Avatar circle — Coil AsyncImage when portraitResName is set, letter-gradient fallback otherwise
+        if (portraitResName != null) {
+            val context = LocalContext.current
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(portraitResName)
+                    .crossfade(300)
+                    .build(),
+                contentDescription = npcName,
+                contentScale = ContentScale.Crop,
+                filterQuality = FilterQuality.Medium,
+                placeholder = null, // letter-avatar rendered below as fallback slot
+                error = null,
+                modifier = Modifier
+                    .size(size * 0.82f)
+                    .clip(CircleShape)
             )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(size * 0.82f)
+                    .clip(CircleShape)
+                    .background(avatarGradient),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = npcName.firstOrNull { it.isLetter() }?.uppercase() ?: "?",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = fontSize,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = Color.White.copy(alpha = 0.9f),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
 
         // Archetype badge dot (bottom-right)

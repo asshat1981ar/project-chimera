@@ -20,6 +20,7 @@ import com.chimera.data.ChimeraPreferences
 import com.chimera.ui.screens.onboarding.OnboardingScreen
 import com.chimera.ui.screens.saveslot.SaveSlotSelectScreen
 import com.chimera.feature.settings.SettingsScreen
+import com.chimera.ui.screens.acttransition.ActTransitionScreen
 import com.chimera.ui.screens.splash.SplashScreen
 
 @Composable
@@ -84,6 +85,9 @@ fun ChimeraNavHost(
                     },
                     onNavigateToSettings = {
                         navController.navigate(ChimeraRoutes.SETTINGS)
+                    },
+                    onActTransition = { actTag ->
+                        navController.navigate(ChimeraRoutes.actTransition(actTag))
                     }
                 )
             }
@@ -138,6 +142,23 @@ fun ChimeraNavHost(
             ) { backStackEntry ->
                 DuelScreen(
                     onDuelComplete = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = ChimeraRoutes.ACT_TRANSITION,
+                arguments = listOf(
+                    navArgument("actTag") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val actTag = backStackEntry.arguments?.getString("actTag") ?: "act1"
+                ActTransitionScreen(
+                    actTag = actTag,
+                    onContinue = {
+                        navController.navigate(ChimeraRoutes.HOME) {
+                            popUpTo(ChimeraRoutes.ACT_TRANSITION) { inclusive = true }
+                        }
+                    }
                 )
             }
         }
