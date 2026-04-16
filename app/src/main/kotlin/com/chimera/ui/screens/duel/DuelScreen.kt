@@ -1,10 +1,15 @@
 package com.chimera.ui.screens.duel
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,21 +17,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,6 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.core.engine.CombatEngine
+import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
@@ -48,212 +55,302 @@ fun DuelScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    if (uiState.isLoading) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = EmberGold)
+        }
+        return
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-        // Header
+        // ── Header ────────────────────────────────────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onDuelComplete) {
-                Icon(Icons.Default.ArrowBack, "Leave duel", tint = FadedBone)
+                Icon(Icons.Default.ArrowBack, "Leave", tint = FadedBone)
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                "Ritual Duel",
-                style = MaterialTheme.typography.headlineMedium,
-                color = EmberGold
-            )
+            Spacer(Modifier.width(6.dp))
+            Column {
+                Text("COMBAT", style = MaterialTheme.typography.labelSmall, color = EmberGold)
+                Text(uiState.opponentName,
+                    style = MaterialTheme.typography.titleLarge, color = FadedBone)
+            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-        // Resource bars
+        // ── Resolve bars ──────────────────────────────────────────────────────
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            border = BorderStroke(0.5.dp, DimAsh.copy(alpha = 0.3f))
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                // Player omens
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Your Omens", style = MaterialTheme.typography.titleSmall)
-                    Text("${uiState.playerOmens}/4", style = MaterialTheme.typography.labelMedium, color = EmberGold)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                LinearProgressIndicator(
-                    progress = uiState.playerOmens / 4f,
-                    modifier = Modifier.fillMaxWidth(),
-                    color = EmberGold,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+            Column(modifier = Modifier.padding(14.dp)) {
+                ResolveRow(
+                    label       = "${uiState.opponentName}'s Resolve",
+                    current     = uiState.opponentResolve,
+                    max         = CombatEngine.MAX_RESOLVE,
+                    activeColor = HollowCrimson
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Opponent resolve
-                Row(
+                Spacer(Modifier.height(10.dp))
+                ResolveRow(
+                    label       = "Your Resolve",
+                    current     = uiState.playerResolve,
+                    max         = CombatEngine.MAX_RESOLVE,
+                    activeColor = VoidGreen
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Exchange ${uiState.rollCount} / ${CombatEngine.MAX_ROLLS}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = DimAsh,
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("${uiState.opponentName}'s Resolve", style = MaterialTheme.typography.titleSmall)
-                    Text("${uiState.opponentResolve}/3", style = MaterialTheme.typography.labelMedium, color = HollowCrimson)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                LinearProgressIndicator(
-                    progress = uiState.opponentResolve / 3f,
-                    modifier = Modifier.fillMaxWidth(),
-                    color = HollowCrimson,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    textAlign = TextAlign.Center
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(20.dp))
 
-        // Last result narrative
-        uiState.lastResult?.let { result ->
-            AnimatedVisibility(visible = true, enter = slideInVertically() + fadeIn()) {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = when (result.outcome) {
-                            DuelEngine.RoundOutcome.WIN -> VoidGreen.copy(alpha = 0.1f)
-                            DuelEngine.RoundOutcome.LOSE -> HollowCrimson.copy(alpha = 0.1f)
-                            DuelEngine.RoundOutcome.DRAW -> MaterialTheme.colorScheme.surfaceVariant
-                        }
-                    ),
-                    border = BorderStroke(
-                        1.dp, when (result.outcome) {
-                            DuelEngine.RoundOutcome.WIN -> VoidGreen.copy(alpha = 0.4f)
-                            DuelEngine.RoundOutcome.LOSE -> HollowCrimson.copy(alpha = 0.4f)
-                            DuelEngine.RoundOutcome.DRAW -> FadedBone.copy(alpha = 0.2f)
-                        }
-                    )
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            "Round ${result.round}",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = FadedBone
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            result.narrative,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            "${result.playerStance.label} vs ${result.opponentStance.label}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = FadedBone
-                        )
-                    }
-                }
+        // ── Phase content (animated transitions) ─────────────────────────────
+        AnimatedContent(
+            targetState = uiState.phase,
+            transitionSpec = {
+                (slideInVertically { it / 3 } + fadeIn()) togetherWith
+                (slideOutVertically { -it / 3 } + fadeOut())
+            },
+            label = "combat_phase"
+        ) { phase ->
+            when (phase) {
+                CombatPhase.INTENT    -> IntentPhase(uiState, viewModel::executeIntent)
+                CombatPhase.RESOLVING -> ResolvingPhase(uiState, viewModel::acknowledgeResult)
+                CombatPhase.COMPLETE  -> CompletePhase(uiState, onDuelComplete)
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
+// ── Intent phase — pick a card ────────────────────────────────────────────────
 
-        // Stance selection or result
-        if (uiState.isComplete) {
-            // Duel outcome
-            Card(
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                border = BorderStroke(
-                    2.dp,
-                    if (uiState.playerWon == true) EmberGold else HollowCrimson
-                )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        if (uiState.playerWon == true) "Victory" else "Defeat",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = if (uiState.playerWon == true) EmberGold else HollowCrimson
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        if (uiState.playerWon == true) {
-                            "The ritual acknowledges your strength. ${uiState.opponentName} yields."
-                        } else {
-                            "The ritual has spoken. ${uiState.opponentName} prevails."
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = FadedBone
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = onDuelComplete,
-                        colors = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
-                    ) {
-                        Text("Continue")
-                    }
-                }
-            }
+@Composable
+private fun IntentPhase(
+    uiState: DuelUiState,
+    onIntentSelected: (CombatEngine.IntentCard) -> Unit
+) {
+    Column {
+        Text(
+            "Choose your intent:",
+            style = MaterialTheme.typography.titleMedium,
+            color = EmberGold
+        )
+        Spacer(Modifier.height(12.dp))
+
+        if (uiState.availableIntents.isEmpty()) {
+            Text("No intents available.", style = MaterialTheme.typography.bodyMedium, color = DimAsh)
         } else {
-            // Stance buttons
-            Text(
-                "Choose your stance:",
-                style = MaterialTheme.typography.titleMedium,
-                color = EmberGold,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+            uiState.availableIntents.forEach { intent ->
+                IntentCard(intent = intent, onClick = { onIntentSelected(intent) })
+                Spacer(Modifier.height(10.dp))
+            }
+        }
+    }
+}
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                DuelEngine.Stance.values().forEach { stance ->
-                    OutlinedButton(
-                        onClick = { viewModel.selectStance(stance) },
-                        modifier = Modifier.weight(1f),
-                        border = BorderStroke(1.dp, EmberGold.copy(alpha = 0.5f)),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(stance.label, style = MaterialTheme.typography.titleSmall)
-                            Text(
-                                "Beats ${stance.beats}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = FadedBone
-                            )
-                        }
-                    }
+@Composable
+private fun IntentCard(
+    intent: CombatEngine.IntentCard,
+    onClick: () -> Unit
+) {
+    val bonusColor = if (intent.statBonus >= 0) VoidGreen else HollowCrimson
+    val bonusText  = if (intent.statBonus >= 0) "+${intent.statBonus}" else "${intent.statBonus}"
+
+    OutlinedButton(
+        onClick    = onClick,
+        modifier   = Modifier.fillMaxWidth(),
+        border     = BorderStroke(1.dp, EmberGold.copy(alpha = 0.4f)),
+        colors     = ButtonDefaults.outlinedButtonColors(contentColor = FadedBone),
+        shape      = MaterialTheme.shapes.medium
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 6.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment     = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(intent.label, style = MaterialTheme.typography.titleSmall, color = EmberGold)
+                Text(intent.description, style = MaterialTheme.typography.bodySmall, color = DimAsh)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text(bonusText, style = MaterialTheme.typography.titleMedium, color = bonusColor)
+        }
+    }
+}
+
+// ── Resolving phase — show roll result ────────────────────────────────────────
+
+@Composable
+private fun ResolvingPhase(
+    uiState: DuelUiState,
+    onContinue: () -> Unit
+) {
+    val result = uiState.lastResult ?: return
+
+    val (bandColor, bandBg) = when (result.band) {
+        CombatEngine.ResultBand.CRITICAL_SUCCESS -> EmberGold to EmberGold.copy(alpha = 0.12f)
+        CombatEngine.ResultBand.SUCCESS          -> VoidGreen to VoidGreen.copy(alpha = 0.10f)
+        CombatEngine.ResultBand.PARTIAL          -> FadedBone to FadedBone.copy(alpha = 0.08f)
+        CombatEngine.ResultBand.FAILURE          -> HollowCrimson to HollowCrimson.copy(alpha = 0.10f)
+        CombatEngine.ResultBand.CRITICAL_FAILURE -> HollowCrimson to HollowCrimson.copy(alpha = 0.18f)
+    }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        // Die face
+        Card(
+            modifier = Modifier.size(100.dp),
+            colors   = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border   = BorderStroke(1.dp, EmberGold.copy(alpha = 0.6f))
+        ) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("${result.roll}", style = MaterialTheme.typography.displaySmall, color = EmberGold)
+                    Text(
+                        if (result.modifier >= 0) "+${result.modifier} mod = ${result.total}"
+                        else "${result.modifier} mod = ${result.total}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = DimAsh
+                    )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-        // Combat log
-        if (uiState.log.isNotEmpty()) {
-            Text("Combat Log", style = MaterialTheme.typography.titleSmall, color = FadedBone)
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items(uiState.log.reversed()) { entry ->
-                    Text(
-                        "R${entry.round}: ${entry.playerStance.label} vs ${entry.opponentStance.label} -- ${entry.outcome.name}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = when (entry.outcome) {
-                            DuelEngine.RoundOutcome.WIN -> VoidGreen
-                            DuelEngine.RoundOutcome.LOSE -> HollowCrimson
-                            DuelEngine.RoundOutcome.DRAW -> FadedBone
-                        }
-                    )
-                }
+        // Band label
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(bandBg, shape = MaterialTheme.shapes.medium)
+                .padding(vertical = 10.dp, horizontal = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                result.band.label.uppercase(),
+                style = MaterialTheme.typography.titleMedium,
+                color = bandColor
+            )
+        }
+
+        Spacer(Modifier.height(14.dp))
+
+        // Narrative
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(0.5.dp, DimAsh.copy(alpha = 0.25f))
+        ) {
+            Text(
+                text = result.narrative,
+                style = MaterialTheme.typography.bodyLarge,
+                color = FadedBone,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick  = onContinue,
+            modifier = Modifier.fillMaxWidth(),
+            colors   = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
+        ) {
+            Text(if (uiState.isComplete) "See outcome" else "Continue")
+        }
+    }
+}
+
+// ── Complete phase — victory or defeat ───────────────────────────────────────
+
+@Composable
+private fun CompletePhase(
+    uiState: DuelUiState,
+    onReturn: () -> Unit
+) {
+    val won         = uiState.playerWon == true
+    val accentColor = if (won) EmberGold else HollowCrimson
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Spacer(Modifier.height(8.dp))
+        Text(
+            if (won) "Victory" else "Defeat",
+            style = MaterialTheme.typography.displaySmall,
+            color = accentColor
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            if (won) "${uiState.opponentName} yields. The encounter is over."
+            else "You were overcome. ${uiState.opponentName} prevails.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = FadedBone,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        uiState.log.lastOrNull()?.let { last ->
+            Text(last.narrative, style = MaterialTheme.typography.bodyMedium,
+                color = DimAsh, textAlign = TextAlign.Center)
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick  = onReturn,
+            modifier = Modifier.fillMaxWidth(),
+            colors   = ButtonDefaults.buttonColors(containerColor = accentColor)
+        ) {
+            Text("Return to scene")
+        }
+    }
+}
+
+// ── Resolve bar ───────────────────────────────────────────────────────────────
+
+@Composable
+private fun ResolveRow(
+    label: String,
+    current: Int,
+    max: Int,
+    activeColor: androidx.compose.ui.graphics.Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, style = MaterialTheme.typography.labelMedium, color = DimAsh,
+            modifier = Modifier.weight(1f))
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            for (i in 1..max) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 28.dp, height = 12.dp)
+                        .background(
+                            color = if (i <= current) activeColor else DimAsh.copy(alpha = 0.2f),
+                            shape = MaterialTheme.shapes.extraSmall
+                        )
+                )
             }
         }
     }
