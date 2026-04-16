@@ -21,20 +21,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-data class MapNode(
-    val id: String,
-    val name: String,
-    val description: String,
-    val isUnlocked: Boolean = false,
-    val isCompleted: Boolean = false,
-    val isRevealed: Boolean = false,  // fog-of-war: false = hidden (not shown on map)
-    val rumorCount: Int = 0,
-    val faction: String? = null,
-    val connectedTo: List<String> = emptyList(),
-    val sceneId: String? = null,
-    val xFraction: Float = 0.5f,
-    val yFraction: Float = 0.5f
-)
+import com.chimera.model.MapNode
 
 data class MapUiState(
     val nodes: List<MapNode> = emptyList(),

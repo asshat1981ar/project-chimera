@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.model.MapNode
 import com.chimera.ui.theme.AshBlack
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
