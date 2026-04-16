@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,6 +34,14 @@ data class PartyUiState(
     val isLoading: Boolean = true
 )
 
+/**
+ * Fixed version of [PartyViewModel].
+ *
+ * BUG-03 fix: the original [loadMemories] called [MemoryShardDao.getTopMemories]
+ * but never propagated the result back into the [StateFlow]. The [_memoryCache]
+ * [MutableStateFlow] is now included in the [combine] chain so memory data
+ * appears in the UI as soon as it loads.
+ */
 @HiltViewModel
 class PartyViewModel @Inject constructor(
     private val characterDao: CharacterDao,
@@ -43,6 +52,13 @@ class PartyViewModel @Inject constructor(
 
     private val _selectedId = MutableStateFlow<String?>(null)
 
+    /**
+     * Cache: characterId → loaded memory shards.
+     * Starts empty; populated lazily when a party member is selected.
+     * Included in the combine chain so StateFlow re-emits on cache updates.
+     */
+    private val _memoryCache = MutableStateFlow<Map<String, List<MemoryShardEntity>>>(emptyMap())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<PartyUiState> = gameSessionManager.activeSlotId
         .flatMapLatest { slotId ->
@@ -50,16 +66,19 @@ class PartyViewModel @Inject constructor(
             combine(
                 characterDao.observeBySlot(slotId),
                 characterStateDao.observeBySlot(slotId),
-                _selectedId
-            ) { characters, states, selectedId ->
+                _selectedId,
+                _memoryCache                          // ← BUG-03 fix: was missing
+            ) { characters, states, selectedId, memoryCache ->
                 val stateMap = states.associateBy { it.characterId }
                 val nonPlayerChars = characters.filter { !it.isPlayerCharacter }
                 val members = nonPlayerChars.map { char ->
-                    PartyMember(character = char, state = stateMap[char.id])
+                    PartyMember(
+                        character = char,
+                        state = stateMap[char.id],
+                        recentMemories = memoryCache[char.id] ?: emptyList()
+                    )
                 }
-                val selected = selectedId?.let { id ->
-                    members.find { it.character.id == id }
-                }
+                val selected = selectedId?.let { id -> members.find { it.character.id == id } }
                 PartyUiState(members = members, selectedMember = selected, isLoading = false)
             }
         }
@@ -74,16 +93,15 @@ class PartyViewModel @Inject constructor(
         _selectedId.value = null
     }
 
+    /**
+     * Fixed: loads memories and updates [_memoryCache], which is part of the
+     * combine chain, so [uiState] re-emits with the populated memory list.
+     */
     private fun loadMemories(characterId: String) {
+        val slotId = gameSessionManager.activeSlotId.value ?: return
         viewModelScope.launch {
-            val slotId = gameSessionManager.activeSlotId.value ?: return@launch
-            val memories = memoryShardDao.getTopMemories(slotId, characterId, 10)
-            // Update selected member with memories
-            val current = uiState.value
-            val member = current.members.find { it.character.id == characterId }
-            if (member != null) {
-                _selectedId.value = characterId // trigger recomposition with memories loaded
-            }
+            val memories = memoryShardDao.getTopMemories(slotId, characterId, limit = 10)
+            _memoryCache.update { cache -> cache + (characterId to memories) }
         }
     }
 }
