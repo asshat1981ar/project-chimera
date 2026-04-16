@@ -15,8 +15,8 @@ android {
         applicationId = "com.chimera.ashes"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0-alpha"
+        versionCode = (project.findProperty("VERSION_CODE") as? String)?.toIntOrNull() ?: 1
+        versionName = (project.findProperty("VERSION_NAME") as? String) ?: "1.0.0-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -49,13 +49,30 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = project.findProperty("KEYSTORE_PATH") as? String
+            if (keystorePath != null) {
+                storeFile = file(keystorePath)
+                storePassword = project.findProperty("KEYSTORE_PASSWORD") as? String ?: ""
+                keyAlias = project.findProperty("KEY_ALIAS") as? String ?: ""
+                keyPassword = project.findProperty("KEY_PASSWORD") as? String ?: ""
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            val releaseSigningConfig = signingConfigs.findByName("release")
+            if (releaseSigningConfig?.storeFile != null) {
+                signingConfig = releaseSigningConfig
+            }
         }
         debug {
             isDebuggable = true
@@ -93,6 +110,18 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
         }
     }
 }

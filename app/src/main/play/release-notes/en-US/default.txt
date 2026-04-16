@@ -1,0 +1,10 @@
+Beta Release v1.0.0-beta
+
+- Complete Act 1 and Act 2 story content
+- AI-powered dialogue with free-tier providers (Gemini, Groq, OpenRouter)
+- Save system with 3 slots
+- Companion recruitment and loyalty system
+- Ritual duel combat
+- Camp with duty assignments and night events
+- Journal with story, rumor, vow, and companion tracking
+- Node-based world map with faction markers and rumor heat
