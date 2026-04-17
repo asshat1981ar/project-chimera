@@ -13,6 +13,10 @@ export async function POST(req: Request) {
 
   const body = await req.json() as { runId: string } & ApprovePayload;
 
+  if (body.decision !== 'approved' && body.decision !== 'rejected') {
+    return Response.json({ error: 'Invalid decision value' }, { status: 400 });
+  }
+
   await implementApprovalHook.resume(body.runId, {
     decision: body.decision,
     notes: body.notes,

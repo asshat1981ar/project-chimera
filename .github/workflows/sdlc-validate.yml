@@ -53,18 +53,17 @@ jobs:
         env:
           SDLC_WEBHOOK_SECRET: ${{ secrets.SDLC_WEBHOOK_SECRET }}
           SDLC_API_URL: ${{ secrets.SDLC_API_URL }}
+          TEST_OUTPUT: ${{ steps.tests.outputs.output }}
+          RUN_ID: ${{ inputs.run_id }}
         run: |
           TESTS_PASSED=$([[ "${{ steps.tests.outputs.exit_code }}" == "0" ]] && echo true || echo false)
           DETEKT_CLEAN=$([[ "${{ steps.detekt.outputs.errors }}" == "0" ]] && echo true || echo false)
           curl -s -X POST "$SDLC_API_URL/api/chimera-sdlc/event" \
             -H "Content-Type: application/json" \
             -H "x-sdlc-secret: $SDLC_WEBHOOK_SECRET" \
-            -d '{
-              "runId": "${{ inputs.run_id }}",
-              "phase": "validate",
-              "payload": {
-                "testsPassed": '"$TESTS_PASSED"',
-                "testOutput": "${{ steps.tests.outputs.output }}",
-                "detektClean": '"$DETEKT_CLEAN"'
-              }
-            }'
+            -d "$(jq -nc \
+              --arg runId "$RUN_ID" \
+              --arg testOutput "$TEST_OUTPUT" \
+              --argjson testsPassed "$TESTS_PASSED" \
+              --argjson detektClean "$DETEKT_CLEAN" \
+              '{runId: $runId, phase: "validate", payload: {testsPassed: $testsPassed, testOutput: $testOutput, detektClean: $detektClean}}')"
