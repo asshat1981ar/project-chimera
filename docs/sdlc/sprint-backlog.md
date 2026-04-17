@@ -115,13 +115,26 @@
 
 ---
 
+## Sprint 7 — Persistence + Combat Tests [PLANNED]
+
+**Goal:** Wire journal entry persistence end-to-end through Room, wire settings persistence via DataStore, and build a deterministic CombatEngine integration test suite.
+
+**Scope:**
+- ⏳ PRO-66 (M): `feature-journal` entry persistence — implement `SaveJournalEntryUseCase`, wire `JournalViewModel.saveEntry()` → use-case → `JournalEntryDao.insert()`, write 6 domain + 4 ViewModel tests
+- ⏳ PRO-67 (M): `feature-settings` persistence via DataStore — `SettingsRepository` backed by `DataStore<Preferences>`, wire `SettingsViewModel` reads/writes, write 5 repository + 3 ViewModel tests
+- ⏳ PRO-68 (M): CombatEngine integration test suite — `chimera-core` + `feature-camp` e2e: full 3-phase combat flow (stance → feint/ward → resolve), omen depletion, surrender threshold, 8 deterministic tests using injectable `Random`
+
+**Exit Criteria:**
+- `./gradlew testMockDebugUnitTest` passes with new test coverage
+- Journal entries written to Room survive process death (confirmed by DAO insert test)
+- Settings written via DataStore survive process death (confirmed by SettingsRepository test)
+- CombatEngine integration tests cover all 3 outcome paths (WIN, DRAW, SURRENDER)
+
+---
+
 ## Later Backlog
 
-- PRO-61 (L): buildSrc convention plugin to eliminate build.gradle.kts duplication across 14 modules
-- `feature-journal`: Full journal entry persistence — write entries to Room via domain use-case
 - `feature-party`: Party member stats, relationship delta visualization
-- `feature-settings`: Settings persistence via Room/DataStore; cloud sync toggle
-- CombatEngine integration test suite (chimera-core + feature-camp end-to-end)
 - `core-ai` production wiring audit — verify mock → prod swap works cleanly
 - Missing Room migrations — add fallback migration strategy if DB version has changed
 - Accessibility audit on all Compose screens (a11y)
