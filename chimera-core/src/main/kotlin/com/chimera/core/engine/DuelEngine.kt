@@ -87,7 +87,7 @@ class DuelEngine(
 
     private fun resolveStances(player: Stance, opponent: Stance): RoundOutcome {
         if (player == opponent) return RoundOutcome.DRAW
-        return if (player.beats == opponent.name) RoundOutcome.WIN else RoundOutcome.LOSE
+        return if (player.beats == opponent.label) RoundOutcome.WIN else RoundOutcome.LOSE
     }
 
     private fun chooseOpponentStance(): Stance {

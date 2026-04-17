@@ -1,6 +1,7 @@
 package com.chimera.database
 
 import android.content.Context
+import com.chimera.database.BuildConfig
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -75,15 +76,15 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
         const val DATABASE_NAME = "chimera_game.db"
 
         fun buildDatabase(context: Context): ChimeraGameDatabase {
-            return Room.databaseBuilder(
+            val builder = Room.databaseBuilder(
                 context.applicationContext,
                 ChimeraGameDatabase::class.java,
                 DATABASE_NAME
             )
                 .addCallback(PrepopulateCallback())
                 .addMigrations(MIGRATION_7_8)
-                .fallbackToDestructiveMigration()
-                .build()
+            if (BuildConfig.DEBUG) builder.fallbackToDestructiveMigration()
+            return builder.build()
         }
 
         /**
