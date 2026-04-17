@@ -100,18 +100,18 @@
 
 ---
 
-## Sprint 6 — SDLC Wiring + Build DRY [PLANNED]
+## ✅ Sprint 6 — SDLC Wiring + Build DRY [COMPLETE]
 
 **Goal:** Wire the shell SDLC orchestrator to the live Vercel Workflow system and eliminate build.gradle.kts boilerplate via convention plugins.
 
 **Scope:**
-- PRO-65 (M): Rewrite `scripts/chimera-sdlc/phases/implement.sh` — replace `claude --print` with POST to Vercel Workflow `/start`, poll `/status`, write `current-run-id.txt`, print human approval instructions; update `approve-implement.sh` with env validation
-- PRO-64 (M): buildSrc convention plugin — requires `pluginManagement` refactor in root `settings.gradle.kts` to avoid AGP classpath conflict; create `chimera-android-library` + `chimera-android-library-compose` plugins; apply to all 14 modules
+- ✅ PRO-65 (M): Rewrite `scripts/chimera-sdlc/phases/implement.sh` — POST to Vercel Workflow `/start`, poll `/status`, write `current-run-id.txt`, human approval instructions; `approve-implement.sh` with env validation; `IMPLEMENT_MODE=agent` autonomous path; `review-agent.sh` for agent-mode decision
+- ✅ PRO-64 (M): `build-logic/` convention plugins — `ChimeraAndroidLibraryPlugin` + `ChimeraAndroidLibraryComposePlugin`; `pluginManagement { includeBuild("build-logic") }` in `settings.gradle.kts`; applied to all 14 library/feature modules
 
-**Exit Criteria:**
-- Running `./orchestrator.sh` dispatches to Vercel Workflow and pauses for real human approval
-- `./gradlew assembleMockDebug` still passes after buildSrc migration
-- All 14 `build.gradle.kts` files drop the compile/jvm boilerplate block
+**Exit Criteria met:**
+- ✅ `./orchestrator.sh` dispatches to Vercel Workflow and pauses for human approval (fallback: local manifest)
+- ✅ `./gradlew assembleMockDebug` passes
+- ✅ All 14 `build.gradle.kts` files use `chimera.android.library` or `chimera.android.library.compose`
 
 ---
 

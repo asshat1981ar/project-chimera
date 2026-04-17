@@ -1,23 +1,24 @@
 {
-  "sprint_version": "",
-  "branch": "",
+  "sprint_version": "v1.10.0",
+  "branch": "feat/chimera-v1.10.0-sprint6",
   "tasks": [
     {
-      "id": "PRO-62",
-      "title": "Scaffold test infrastructure (src/test + deps + smoke tests) for feature-home, feature-dialogue, feature-map, feature-party, feature-journal, feature-settings",
+      "id": "PRO-65",
+      "title": "Rewrite implement.sh \u2014 replace claude --print with POST to Vercel Workflow /start, poll /status, write current-run-id.txt, print human approval instructions; update approve-implement.sh with env validation",
       "status": "done",
-      "technique": "CoT+ContextAware",
+      "technique": "MoT",
       "pipeline": [
-        "analyze-surface",
-        "strategy",
-        "generate",
-        "coverage-gap"
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
       ]
     },
     {
-      "id": "PRO-63",
-      "title": "Rewrite implement.sh \u2014 replace `claude --print` with structured task-manifest output + `implement-ready` phase state",
-      "status": "todo",
+      "id": "PRO-64",
+      "title": "buildSrc convention plugin \u2014 pluginManagement refactor in root settings.gradle.kts; create chimera-android-library + chimera-android-library-compose plugins; apply to all 14 modules",
+      "status": "done",
       "technique": "MoT",
       "pipeline": [
         "interface-design",
@@ -29,23 +30,22 @@
     }
   ],
   "completed_tasks": [
-    "PRO-58",
-    "PRO-62"
+    "PRO-64",
+    "PRO-65"
   ],
-  "failed_tasks": [
-    "PRO-58"
-  ],
+  "failed_tasks": [],
   "correction_attempts": {},
   "linear_issues": [],
   "test_baseline": {
     "chimera_core": "",
-    "domain": "Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.",
+    "domain": "",
     "all": null
   },
   "arch_violations": [],
   "phase_history": [
+    "sense",
+    "plan",
     "gate",
-    "gate",
-    "gate"
+    "validate"
   ]
 }
