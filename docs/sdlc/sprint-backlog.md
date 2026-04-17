@@ -21,23 +21,26 @@
 
 ---
 
-## Sprint 2 — Room Schema Export + Core Data Wiring
+## Sprint 2 — Room Schema Export + Core Data Wiring [IN PROGRESS]
 
 **Goal:** Enable Room schema export for the `chimera-schema` MCP server, verify `core-data` repository wiring, and run a full Detekt pass to surface debt.
 
 **Scope:**
-- Configure Room schema export in `core-database/build.gradle.kts` (core-database, type: wiring)
-- Run `./gradlew :core-database:kaptMockDebugKotlin` and verify schemas written to `core-database/schemas/` (core-database, type: wiring)
-- Verify `chimera-schema` MCP server returns entity list (tooling, type: wiring)
-- Audit `core-data` repositories — confirm all domain use-cases can get data via repository interfaces without direct Room/Retrofit imports (core-data/domain, type: wiring)
-- Run `./gradlew detekt` — capture violation count and fix high-severity violations (type: cleanup)
-- Verify `core-network` module is wired or mark as intentionally unused (core-network, type: cleanup)
+- ✅ Configure Room schema export: `kapt { arguments { arg("room.schemaLocation", ...) } }` added to `core-database/build.gradle.kts` (room.schemaLocation was already in `javaCompileOptions` but kapt arg ensures reliable pickup)
+- ⏳ Run `./gradlew :core-database:kaptMockDebugKotlin` and verify schemas written — needs Android SDK
+- ⏳ Verify `chimera-schema` MCP server returns entity list — blocked on schemas
+- ✅ Audit `core-data` repositories — all repositories correctly inject DAOs via constructor (expected pattern). Zero Retrofit/Ktor leaks in repositories. 3 bugs fixed: SaveRepository.updateChapterTag() orphaned outside class, ApplyRelationshipDeltaUseCase injecting JournalEntryDao directly instead of JournalRepository, ResolveCampNightUseCase holding unused CampRepository.
+- ⏳ Run `./gradlew detekt` — needs Android SDK (Android modules require SDK for compilation)
+- ✅ Verify `core-network` module — fully implemented Ktor client with retry, wired via `app/di/NetworkModule.kt` using `@Named` Hilt bindings. BuildConfig provides URL/token from local.properties.
+- ✅ Fix `chimera-core` JDK toolchain: jvmToolchain 8→17, Java source/target 8→17, invalid `import kotlin.math.maxOf` removed
+- ✅ Fix DuelEngineTest "7 rounds maximum" non-determinism: DuelEngine now accepts injectable `Random`; test uses deterministic `drawRng`
+- ✅ `./gradlew :chimera-core:test` — 17 tests, all pass
 
 **Exit Criteria:**
-- `core-database/schemas/` contains at least one JSON file
-- `mcp__chimera-schema__list_entities` returns real entity names
-- `./gradlew detekt` produces no `error`-level violations
-- `core-network` status documented in health report
+- `core-database/schemas/` contains at least one JSON file — ⏳ needs Android SDK
+- `mcp__chimera-schema__list_entities` returns real entity names — ⏳ blocked
+- `./gradlew detekt` produces no `error`-level violations — ⏳ needs Android SDK
+- `core-network` status documented — ✅ fully wired
 
 ---
 
