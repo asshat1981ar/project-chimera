@@ -7,7 +7,7 @@ STATE="$REPO_ROOT/scripts/chimera-sdlc/state"
 echo "[VALIDATE] Running post-implementation checks..."
 
 CURRENT_CORE=$(./gradlew :chimera-core:test --quiet 2>&1 | tail -3)
-CURRENT_DOMAIN=$(./gradlew :domain:testMockDebugUnitTest --quiet 2>&1 | tail -3)
+CURRENT_DOMAIN=$(./gradlew :domain:testDebugUnitTest --quiet 2>&1 | tail -3)
 
 REGRESSION=false
 if echo "$CURRENT_CORE$CURRENT_DOMAIN" | grep -q "BUILD FAILED"; then

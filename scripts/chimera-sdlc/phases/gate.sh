@@ -45,7 +45,7 @@ fi
 echo "[GATE] Arch check PASSED. Running test baseline..."
 
 BASELINE_CORE=$(./gradlew :chimera-core:test --quiet 2>&1 | tail -3)
-BASELINE_DOMAIN=$(./gradlew :domain:testMockDebugUnitTest --quiet 2>&1 | tail -3)
+BASELINE_DOMAIN=$(./gradlew :domain:testDebugUnitTest --quiet 2>&1 | tail -3)
 
 if echo "$BASELINE_CORE$BASELINE_DOMAIN" | grep -q "BUILD FAILED"; then
   echo "[GATE] TEST BASELINE FAILED:"
