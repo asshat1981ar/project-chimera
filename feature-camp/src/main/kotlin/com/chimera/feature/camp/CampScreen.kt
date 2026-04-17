@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -22,7 +21,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -314,19 +312,14 @@ private fun CompanionCard(data: CompanionCardData) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Avatar
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp)
-            ) {
-                Text(
-                    text = data.character.name.first().toString(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(top = 8.dp),
-                    textAlign = TextAlign.Center,
-                    color = EmberGold
-                )
-            }
+            com.chimera.ui.components.NpcPortrait(
+                npcId = data.character.id,
+                npcName = data.character.name,
+                disposition = data.state?.dispositionToPlayer ?: 0f,
+                archetype = data.state?.activeArchetype,
+                portraitResName = data.character.portraitResName,
+                size = 48.dp
+            )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(data.character.name, style = MaterialTheme.typography.titleSmall)

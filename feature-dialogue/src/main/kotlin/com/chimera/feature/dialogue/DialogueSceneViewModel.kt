@@ -55,6 +55,7 @@ data class DialogueUiState(
     val npcMood: String = "neutral",
     val npcDisposition: Float = 0f,
     val npcArchetype: String? = null,
+    val npcPortraitResName: String? = null,
     val transcript: List<DialogueLine> = emptyList(),
     val quickIntents: List<String> = emptyList(),
     val isLoading: Boolean = false,
@@ -157,6 +158,7 @@ class DialogueSceneViewModel @Inject constructor(
                 )
 
                 val charState = loadCharacterState(slotId)
+                val portraitResName = characterDao.getById(contract.npcId)?.portraitResName
                 recentMemories = memoryShardDao.getTopMemories(slotId, contract.npcId, 5)
                     .map { it.toModel() }
                     .toMutableList()
@@ -186,6 +188,7 @@ class DialogueSceneViewModel @Inject constructor(
                     npcArchetype = charState.activeArchetype,
                     quickIntents = intents,
                     isFallbackMode = orchestrator.isFallbackActive,
+                    npcPortraitResName = portraitResName,
                     isLoading = false
                 )
             } catch (e: Exception) {
