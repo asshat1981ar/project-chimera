@@ -40,7 +40,7 @@ $RELEVANT_FILES
 Constraints:
 - TDD: write failing test first, then implement
 - Commit: git add <files> && git commit -m 'feat(<module>): $TASK_TITLE'
-- After commit verify: ./gradlew :chimera-core:test OR :domain:testMockDebugUnitTest
+- After commit verify: ./gradlew :chimera-core:test OR :domain:testDebugUnitTest
 - Do NOT modify files outside task scope"
 
     if claude --print "$PROMPT" 2>&1 | grep -q "BUILD SUCCESSFUL\|committed\|tests.*passed"; then
