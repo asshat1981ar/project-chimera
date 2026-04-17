@@ -42,19 +42,16 @@ if [ -n "$NON_INJECT" ]; then
   echo "$NON_INJECT"
 fi
 
-# Rule 5: Android app boilerplate resources must exist
+# Rule 5: Android app boilerplate resources must exist (mipmap + xml only — string/style live in values/)
 MANIFEST="app/src/main/AndroidManifest.xml"
 if [ -f "$MANIFEST" ]; then
-  MISSING_RES=""
-  grep -o '@[a-z]*/[a-z_]*' "$MANIFEST" | while read -r ref; do
+  grep -o '@mipmap/[a-z_]*\|@xml/[a-z_]*' "$MANIFEST" | while read -r ref; do
     TYPE="${ref%%/*}"; NAME="${ref##*/}"; TYPE="${TYPE#@}"
     FOUND=$(find "app/src/main/res/$TYPE"* -name "${NAME}*" 2>/dev/null | head -1)
-    if [ -z "$FOUND" ] && [ "$TYPE" != "android:color" ]; then
-      echo "$ref"
-    fi
+    [ -z "$FOUND" ] && echo "$ref"
   done | grep -v "^$" > /tmp/gate_missing_res.txt || true
   if [ -s /tmp/gate_missing_res.txt ]; then
-    echo "[GATE] VIOLATION: app manifest references missing resources:"
+    echo "[GATE] VIOLATION: app manifest references missing mipmap/xml resources:"
     cat /tmp/gate_missing_res.txt
     echo "Fix: create the missing files in app/src/main/res/ before assembleMockDebug will pass"
     echo "gate-failed-resources" > "$STATE/current-phase.txt"
