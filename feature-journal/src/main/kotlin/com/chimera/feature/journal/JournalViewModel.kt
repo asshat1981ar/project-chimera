@@ -35,8 +35,7 @@ data class JournalUiState(
     val entries: List<JournalEntryEntity> = emptyList(),
     val vows: List<VowEntity> = emptyList(),
     val unreadCount: Int = 0,
-    val searchQuery: String = "",
-    val errorMessage: String? = null
+    val searchQuery: String = ""
 )
 
 /** Escapes FTS5 special characters in a query string. */
