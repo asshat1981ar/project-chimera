@@ -11,8 +11,9 @@ interface OrchestratorInput {
 }
 
 async function saveRun(run: SprintRun): Promise<void> {
-  const { kv } = await import('@vercel/kv');
-  await kv.set(`sdlc:run:${run.runId}`, JSON.stringify(run), { ex: 86400 });
+  const { Redis } = await import('@upstash/redis');
+  const redis = new Redis({ url: process.env.KV_REST_API_URL!, token: process.env.KV_REST_API_TOKEN! });
+  await redis.set(`sdlc:run:${run.runId}`, JSON.stringify(run), { ex: 86400 });
 }
 
 export async function chimeraSprintWorkflow(input: OrchestratorInput): Promise<SprintRun> {

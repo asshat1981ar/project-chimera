@@ -17,10 +17,9 @@ export async function POST(req: Request) {
   };
 
   // Validate phase results are stored in KV for the orchestrator to pick up
-  const { kv } = await import('@vercel/kv');
-  await kv.set(`sdlc:${body.runId}:${body.phase}`, JSON.stringify(body.payload), {
-    ex: 86400, // 24h TTL
-  });
+  const { Redis } = await import('@upstash/redis');
+  const redis = new Redis({ url: process.env.KV_REST_API_URL!, token: process.env.KV_REST_API_TOKEN! });
+  await redis.set(`sdlc:${body.runId}:${body.phase}`, JSON.stringify(body.payload), { ex: 86400 });
 
   return Response.json({ received: true });
 }
