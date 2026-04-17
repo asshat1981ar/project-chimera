@@ -55,3 +55,9 @@ export interface SprintInput {
 export interface OrchestratorInput extends SprintInput {
   sprintQueue?: SprintInput[];
 }
+
+export interface ReviewPayload {
+  decision: 'approved' | 'rejected';
+  notes?: string;
+  agentSummary?: string;
+}
