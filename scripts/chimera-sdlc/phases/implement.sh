@@ -9,7 +9,7 @@ export SDLC_API_URL="${SDLC_API_URL:-}"
 export SDLC_WEBHOOK_SECRET="${SDLC_WEBHOOK_SECRET:-}"
 
 python3 - <<'PYEOF'
-import json, os, sys, time, urllib.request, urllib.error
+import json, os, subprocess, sys, time, urllib.request, urllib.error
 from pathlib import Path
 
 STATE = Path("scripts/chimera-sdlc/state")
@@ -63,13 +63,17 @@ gate_payload = {
 }
 
 sprint_version = ctx.get("sprint_version") or "dev"
+branch = ctx.get("branch") or subprocess.check_output(
+    ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+).strip()
 
 # --- POST /start ---
-print(f"[IMPLEMENT] Dispatching sprint {sprint_version} to Vercel Workflow...")
+print(f"[IMPLEMENT] Dispatching sprint {sprint_version} (branch: {branch}) to Vercel Workflow...")
 payload = json.dumps({
     "sprintVersion": sprint_version,
     "taskManifest":  task_manifest,
     "gatePayload":   gate_payload,
+    "branch":        branch,
 }).encode()
 
 req = urllib.request.Request(
@@ -135,8 +139,27 @@ else:
     (STATE / "current-phase.txt").write_text("implement-partial")
     sys.exit(1)
 
+implement_mode = os.environ.get("IMPLEMENT_MODE", "manual")
 (STATE / "current-phase.txt").write_text("implement-ready")
-print(f"""
+
+if implement_mode == "agent":
+    print(f"""
+{'='*60}
+ IMPLEMENT — autonomous agent running
+{'='*60}
+ Run ID : {run_id}
+ Tasks  : {len(pending)}
+
+ Agent is implementing tasks autonomously via GitHub API.
+ Monitor: {api_url}/api/chimera-sdlc/status/{run_id}
+
+ When agent completes, review commits on GitHub, then:
+   DECISION=approved bash scripts/chimera-sdlc/review-agent.sh
+   DECISION=rejected bash scripts/chimera-sdlc/review-agent.sh
+{'='*60}
+""")
+else:
+    print(f"""
 {'='*60}
  IMPLEMENT — awaiting agent dispatch + human approval
 {'='*60}

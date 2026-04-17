@@ -43,3 +43,21 @@ export interface ApprovePayload {
   notes?: string;
   agentDispatchedAt?: string;
 }
+
+export interface SprintInput {
+  runId: string;
+  sprintVersion: string;
+  taskManifest: string;
+  gatePayload: GatePayload;
+  branch: string;
+}
+
+export interface OrchestratorInput extends SprintInput {
+  sprintQueue?: SprintInput[];
+}
+
+export interface ReviewPayload {
+  decision: 'approved' | 'rejected';
+  notes?: string;
+  agentSummary?: string;
+}

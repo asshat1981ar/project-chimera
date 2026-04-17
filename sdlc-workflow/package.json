@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@upstash/redis": "^1.37.0",
+    "@workflow/ai": "^4.1.2",
+    "ai": "^6.0.168",
     "next": "^16.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -17,6 +19,7 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vitest": "^4.1.4"
   }
 }
