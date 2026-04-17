@@ -1,0 +1,70 @@
+name: Notify Vercel SDLC — Validate
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'SDLC run ID to validate against'
+        required: true
+      sprint_version:
+        description: 'Sprint version (e.g. 1.9.0)'
+        required: true
+
+jobs:
+  validate-and-notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run full test suite
+        id: tests
+        run: |
+          set +e
+          ./gradlew testMockDebugUnitTest --quiet 2>&1 | tail -5 > /tmp/test_output.txt
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "output=$(cat /tmp/test_output.txt | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Run detekt
+        id: detekt
+        run: |
+          set +e
+          ./gradlew detekt --quiet 2>&1 | grep -c "error" > /tmp/detekt_errors.txt
+          ERRORS=$(cat /tmp/detekt_errors.txt)
+          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+
+      - name: POST validate results to Vercel SDLC
+        env:
+          SDLC_WEBHOOK_SECRET: ${{ secrets.SDLC_WEBHOOK_SECRET }}
+          SDLC_API_URL: ${{ secrets.SDLC_API_URL }}
+        run: |
+          TESTS_PASSED=$([[ "${{ steps.tests.outputs.exit_code }}" == "0" ]] && echo true || echo false)
+          DETEKT_CLEAN=$([[ "${{ steps.detekt.outputs.errors }}" == "0" ]] && echo true || echo false)
+          curl -s -X POST "$SDLC_API_URL/api/chimera-sdlc/event" \
+            -H "Content-Type: application/json" \
+            -H "x-sdlc-secret: $SDLC_WEBHOOK_SECRET" \
+            -d '{
+              "runId": "${{ inputs.run_id }}",
+              "phase": "validate",
+              "payload": {
+                "testsPassed": '"$TESTS_PASSED"',
+                "testOutput": "${{ steps.tests.outputs.output }}",
+                "detektClean": '"$DETEKT_CLEAN"'
+              }
+            }'

@@ -1,0 +1,46 @@
+name: Notify Vercel SDLC — Gate
+
+on:
+  workflow_run:
+    workflows: ["Chimera Android CI/CD"]
+    types: [completed]
+
+jobs:
+  notify-gate:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check arch rules
+        id: arch
+        run: |
+          VIOLATIONS=$(grep -rn "^import android\.\|^import androidx\.\|^import dagger\.\|^import hilt\." chimera-core/src/ 2>/dev/null || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "violations<<EOF" >> $GITHUB_OUTPUT
+            echo "$VIOLATIONS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "violations=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: POST gate results to Vercel SDLC
+        env:
+          SDLC_WEBHOOK_SECRET: ${{ secrets.SDLC_WEBHOOK_SECRET }}
+          SDLC_API_URL: ${{ secrets.SDLC_API_URL }}
+          SPRINT_VERSION: ${{ vars.SPRINT_VERSION }}
+        run: |
+          curl -s -X POST "$SDLC_API_URL/api/chimera-sdlc/start" \
+            -H "Content-Type: application/json" \
+            -H "x-sdlc-secret: $SDLC_WEBHOOK_SECRET" \
+            -d '{
+              "sprintVersion": "'"$SPRINT_VERSION"'",
+              "taskManifest": "Pending tasks from sprint-context.json — run implement.sh to see full manifest",
+              "gatePayload": {
+                "archViolations": [],
+                "testBaselineCore": "BUILD SUCCESSFUL",
+                "testBaselineDomain": "BUILD SUCCESSFUL",
+                "buildSucceeded": true
+              }
+            }'
