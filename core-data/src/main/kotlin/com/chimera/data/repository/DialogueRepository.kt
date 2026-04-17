@@ -58,4 +58,14 @@ class DialogueRepository @Inject constructor(
             .filter { it.status == "completed" }
             .map { it.sceneId }
             .toSet()
+
+    /**
+     * Returns the scene ID of the most recently started active (incomplete) scene for [slotId],
+     * or null if none exists. [SceneInstanceDao.getBySlot] returns rows ordered by started_at DESC,
+     * so the first active row is the last-started one.
+     */
+    suspend fun getLastIncompleteSceneId(slotId: Long): String? =
+        sceneInstanceDao.getBySlot(slotId)
+            .firstOrNull { it.status == "active" }
+            ?.sceneId
 }

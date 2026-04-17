@@ -4,17 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
 import com.chimera.data.SceneLoader
+import com.chimera.data.repository.DialogueRepository
 import com.chimera.database.dao.SaveSlotDao
-import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.dao.VowDao
 import com.chimera.database.mapper.toModel
 import com.chimera.ui.util.ChapterDisplayStrings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -38,7 +36,7 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val saveSlotDao: SaveSlotDao,
-    private val sceneInstanceDao: SceneInstanceDao,
+    private val dialogueRepository: DialogueRepository,
     private val vowDao: VowDao,
     private val sceneLoader: SceneLoader,
     gameSessionManager: GameSessionManager
@@ -54,17 +52,15 @@ class HomeViewModel @Inject constructor(
             combine(
                 saveSlotDao.observeAll(),
                 vowDao.observeActive(slotId),
-                flow { emit(sceneInstanceDao.getBySlot(slotId)) }
-            ) { slots, vows, sceneInstances ->
+                flow {
+                    emit(
+                        dialogueRepository.getLastIncompleteSceneId(slotId) to
+                            dialogueRepository.getCompletedSceneIds(slotId)
+                    )
+                }
+            ) { slots, vows, (lastActiveSceneId, completedIds) ->
                 val slot = slots.find { it.id == slotId }?.toModel()
                     ?: return@combine HomeUiState(isLoading = false)
-
-                val completed = sceneInstances.filter { it.status == "completed" }
-                val completedIds = completed.map { it.sceneId }.toSet()
-
-                val lastActiveSceneId = sceneInstances
-                    .filter { it.status == "active" }
-                    .maxByOrNull { it.startedAt }?.sceneId
 
                 val fallbackSceneId = lastActiveSceneId
                     ?: if (completedIds.isEmpty()) "prologue_scene_1"
@@ -91,7 +87,7 @@ class HomeViewModel @Inject constructor(
                     continueSceneId = fallbackSceneId,
                     continueSceneTitle = continueTitle,
                     activeVowCount = vows.size,
-                    completedSceneCount = completed.size,
+                    completedSceneCount = completedIds.size,
                     isLoading = false,
                     pendingActTransition = pending
                 )
