@@ -67,6 +67,22 @@
 
 ---
 
+## Sprint 4 — Test Coverage + Orchestrator Hardening [PLANNED]
+
+**Goal:** Close the ViewModel test gap across 6 untested feature modules and fix the implement.sh dispatch to be honest about human-in-the-loop.
+
+**Scope:**
+- ⏳ PRO-62 (M): Scaffold test infrastructure (src/test + deps + smoke tests) for feature-home, feature-dialogue, feature-map, feature-party, feature-journal, feature-settings
+- ⏳ PRO-63 (M): Rewrite implement.sh — replace `claude --print` with structured task-manifest output + `implement-ready` phase state
+- ⏳ Merge PR #85 (Sprint 3) to main before starting Sprint 4 work
+
+**Exit Criteria:**
+- All 6 feature module VMs have ≥1 unit test
+- `./gradlew testMockDebugUnitTest` passes across all modules
+- Orchestrator IMPLEMENT phase writes `implement-ready` and exits cleanly
+
+---
+
 ## Later Backlog
 
 - PRO-61 (L): buildSrc convention plugin to eliminate build.gradle.kts duplication across 14 modules
