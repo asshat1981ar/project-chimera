@@ -85,7 +85,7 @@ fun MemoryShardEntity.toModel() = MemoryShard(
     sceneId = sceneId,
     characterId = characterId,
     summary = summary,
-    tags = emptyList(), // TODO: add string list converter when needed
+    tags = converters.toStringList(tagsJson),
     importanceScore = importanceScore,
     createdAt = createdAt
 )
@@ -96,6 +96,7 @@ fun MemoryShard.toEntity() = MemoryShardEntity(
     sceneId = sceneId,
     characterId = characterId,
     summary = summary,
+    tagsJson = converters.fromStringList(tags),
     importanceScore = importanceScore,
     createdAt = createdAt
 )

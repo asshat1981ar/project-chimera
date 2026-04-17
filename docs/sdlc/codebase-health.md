@@ -12,37 +12,23 @@
 | `:core-data` | ⚠️ Partial | Repository impls exist. Integration between data layer and domain is partially wired. |
 | `:core-network` | ❌ Skeleton | Not directly verified in this scan. |
 | `:core-ui` | ✅ Complete | Shared Compose components used across feature modules. |
-| `:domain` | ⚠️ Partial | 8 use-cases. Only 1 test file (DomainUseCaseTest) covering StartScene + SubmitDialogueTurn. 6 use-cases have no dedicated test. |
+| `:domain` | ✅ Complete | 8 use-cases. All covered: DomainUseCaseTest + 5 dedicated test files added in Sprint 1. |
 | `:feature-home` | ✅ Complete | HiltViewModel present (2 injections). Routed via ChimeraRoutes.HOME. |
 | `:feature-map` | ✅ Complete | HiltViewModel present (2 injections). Routed via ChimeraRoutes.MAP. |
 | `:feature-dialogue` | ✅ Complete | HiltViewModel present (2 injections). Routed via ChimeraRoutes.DIALOGUE. |
 | `:feature-camp` | ✅ Complete | Most injections (6). DuelViewModel + DuelScreen added in v1.8.0. Routed via ChimeraRoutes.CAMP. |
-| `:feature-journal` | ❌ Skeleton | Only 2 Kotlin files. Routed via ChimeraRoutes.JOURNAL but content is empty-state stub. |
-| `:feature-party` | ❌ Skeleton | Only 3 Kotlin files. Routed via ChimeraRoutes.PARTY but content is placeholder. |
-| `:feature-settings` | ❌ Skeleton | Only 2 Kotlin files. Routed via ChimeraRoutes.SETTINGS but content is minimal. |
+| `:feature-journal` | ✅ Complete | JournalViewModel (tabs, FTS search, debounce) + JournalScreen (ScrollableTabRow, LazyColumn, VowCard, JournalEntryCard). Previously mis-assessed as skeleton. |
+| `:feature-party` | ✅ Complete | PartyViewModel (flatMapLatest over slot, member+faction state) + PartyScreen (LazyColumn, member cards, FactionStandingRow). Previously mis-assessed as skeleton. |
+| `:feature-settings` | ✅ Complete | SettingsViewModel (text scale, reduce motion, AI mode, analytics, voice, cloud sync) + SettingsScreen (sliders, switches). Previously mis-assessed as skeleton. |
 | `:app` | ✅ Complete | Nav graph wires all features. Splash, Onboarding, SaveSlotSelect, GameGraph all routed. |
 
 Status values: ✅ Complete | ⚠️ Partial | ❌ Skeleton | 🔧 Has open TODOs
 
 ## Integration Wiring Gaps
 
-1. **Domain use-case coverage** — 6 of 8 use-cases lack dedicated test files:
-   - `ApplyRelationshipDeltaUseCase` — no test
-   - `ChapterProgressionUseCase` — no test
-   - `CreateSaveSlotUseCase` — no test
-   - `GenerateSceneSummaryUseCase` — no test
-   - `LoadHomeStateUseCase` — no test
-   - `ResolveCampNightUseCase` — no test
+1. **Room schema export** — No `core-database/schemas/` directory found. Schema export not yet configured (blocks `chimera-schema` MCP server). Tracked in Sprint 2.
 
-2. **feature-journal** — routed but content is empty-state stub only. No ViewModel, no real UI.
-
-3. **feature-party** — routed but content is minimal placeholder. No real party management UI.
-
-4. **feature-settings** — routed but only skeleton UI. No settings persistence logic.
-
-5. **core-database EntityMappers.kt:88** — `tags = emptyList()` with TODO for string list converter. Minor but tracked.
-
-6. **Room schema export** — No `core-database/schemas/` directory found. Schema export not yet configured (blocks `chimera-schema` MCP server).
+2. **core-database EntityMappers.kt** — `tags` string list converter added in Sprint 1; round-trip now correct.
 
 ## Test Coverage Gaps
 
@@ -50,14 +36,12 @@ Status values: ✅ Complete | ⚠️ Partial | ❌ Skeleton | 🔧 Has open TODO
 |----------|--------------|
 | StartSceneUseCase | ✅ Covered (DomainUseCaseTest) |
 | SubmitDialogueTurnUseCase | ✅ Covered (DomainUseCaseTest) |
-| ApplyRelationshipDeltaUseCase | ❌ No test |
-| ChapterProgressionUseCase | ❌ No test |
-| CreateSaveSlotUseCase | ❌ No test |
-| GenerateSceneSummaryUseCase | ❌ No test |
-| LoadHomeStateUseCase | ❌ No test |
-| ResolveCampNightUseCase | ❌ No test |
-
-Modules with 0 test files: `feature-journal`, `feature-party`, `feature-settings`
+| ChapterProgressionUseCase | ✅ Covered (DomainUseCaseTest lines 268–327) |
+| ApplyRelationshipDeltaUseCase | ✅ Covered (Sprint 1) |
+| CreateSaveSlotUseCase | ✅ Covered (Sprint 1) |
+| GenerateSceneSummaryUseCase | ✅ Covered (Sprint 1) |
+| LoadHomeStateUseCase | ✅ Covered (Sprint 1) |
+| ResolveCampNightUseCase | ✅ Covered (Sprint 1) |
 
 ## Architecture Debt
 
