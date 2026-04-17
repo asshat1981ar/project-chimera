@@ -34,7 +34,7 @@ jobs:
         with:
           cache-read-only: true
 
-      - name: Grant execute permission
+      - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Run Detekt
