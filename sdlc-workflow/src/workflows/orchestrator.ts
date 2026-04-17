@@ -1,6 +1,7 @@
 import { start } from 'workflow/api';
 import { runGatePhase } from './phases/gate';
 import { runImplementPhase } from './phases/implement';
+import { runImplementAgentPhase } from './phases/implement-agent';
 import { runValidatePhase } from './phases/validate';
 import { runReleasePhase } from './phases/release';
 import { runReflectPhase } from './phases/reflect';
@@ -41,11 +42,14 @@ export async function chimeraSprintWorkflow(input: OrchestratorInput): Promise<S
     return run;
   }
 
-  // ── Phase 2: Implement (pauses until POST /approve) ────────────
+  // ── Phase 2: Implement ────────────────────────────────────────
   run.currentPhase = 'implement';
   await saveRun(run);
 
-  const implementResult = await runImplementPhase(input.runId, input.taskManifest, input.sprintVersion, input.branch);
+  const useAgent = process.env.IMPLEMENT_MODE === 'agent';
+  const implementResult = useAgent
+    ? await runImplementAgentPhase(input.runId, input.taskManifest, input.sprintVersion, input.branch)
+    : await runImplementPhase(input.runId, input.taskManifest, input.sprintVersion, input.branch);
   run.phases.implement = implementResult;
 
   if (implementResult.status === 'failed') {
