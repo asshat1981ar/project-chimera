@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "promptforge": {
+      "command": "python3",
+      "args": ["/home/westonaaron675/Chimera/project-chimera/scripts/mcp-promptforge/server.py"],
+      "description": "Research-backed prompting technique selector and pipeline advisor"
+    },
+    "chimera-schema": {
+      "command": "python3",
+      "args": ["/home/westonaaron675/Chimera/project-chimera/scripts/mcp-schema-server/server.py"],
+      "description": "Chimera Room database schema inspector"
+    }
+  }
+}
