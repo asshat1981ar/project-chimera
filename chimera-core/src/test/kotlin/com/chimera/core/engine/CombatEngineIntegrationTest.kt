@@ -64,7 +64,7 @@ class CombatEngineIntegrationTest {
      * fixedRng(4) → CRITICAL_FAILURE → player 3→1→0 after round 2.
      */
     @Test
-    fun `fullSequence_threeCriticalFailures_playerDefeated`() {
+    fun `fullSequence_twoCriticalFailures_playerDefeated`() {
         val e = engine(rng = fixedRng(4))
 
         e.executeRound(intent())
@@ -85,7 +85,7 @@ class CombatEngineIntegrationTest {
      * playerWon=false.
      */
     @Test
-    fun `fullSequence_mixedResults_drawAtMaxRolls`() {
+    fun `fullSequence_threePartials_playerDefeated`() {
         val e = engine(rng = fixedRng(10))
 
         e.executeRound(intent())
@@ -104,7 +104,7 @@ class CombatEngineIntegrationTest {
      * sequenceRng(20, 15): roll=20 → CRITICAL_SUCCESS (opp-2), roll=15 → SUCCESS (opp-1).
      */
     @Test
-    fun `fullSequence_critSuccessThenPartial_playerWins`() {
+    fun `fullSequence_critSuccessThenSuccess_playerWins`() {
         val e = engine(rng = sequenceRng(20, 15))
 
         e.executeRound(intent())
