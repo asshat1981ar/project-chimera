@@ -1,9 +1,4 @@
 # Self-Correction Log
 
-Each entry records: phase, what failed, correction applied, outcome.
-Used by REFLECT phase to detect recurring correction patterns.
-
 | Date | Phase | Task | Failure Type | Correction | Outcome |
 |------|-------|------|-------------|------------|---------|
-| 2026-04-17T03:57:03Z | implement | PRO-62 | attempt-1 | retry | success |
-| 2026-04-17T12:20:00Z | implement | PRO-53/DuelEngine | enum-name-vs-label | fix resolveStances + 7 tests | success |

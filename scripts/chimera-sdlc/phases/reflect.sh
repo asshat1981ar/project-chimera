@@ -6,7 +6,7 @@ STATE="$REPO_ROOT/scripts/chimera-sdlc/state"
 
 echo "[REFLECT] Diff-first retrospective scan..."
 git log --oneline -10
-git diff HEAD~5 --stat 2>/dev/null | head -20
+git diff HEAD~5 --stat 2>/dev/null | head -20 || true
 
 # Detect recurring correction patterns
 PATTERNS=$(python3 - <<'PYEOF'
