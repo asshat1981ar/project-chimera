@@ -1,3 +1,5 @@
+import { tool } from 'ai';
+import { z } from 'zod';
 import { ghHeaders } from './gh-headers';
 
 const REPO = 'asshat1981ar/project-chimera';
@@ -83,3 +85,20 @@ export async function bumpAndroidVersionStep(
 
   return { newVersionName, newVersionCode, oldVersionName, oldVersionCode };
 }
+
+export const androidVersionTool = tool({
+  description:
+    'Bumps VERSION_NAME and VERSION_CODE in gradle.properties on the sprint branch. ' +
+    'Use after implementation is approved to prepare the release version before tagging.',
+  inputSchema: z.object({
+    branch: z.string().describe('Sprint branch name, e.g. feat/chimera-v1.10.0-sprint5'),
+    bumpType: z
+      .enum(['patch', 'minor', 'major'])
+      .optional()
+      .describe('SemVer bump type. Defaults to patch.'),
+  }),
+  execute: async ({ branch, bumpType }) => {
+    const result = await bumpAndroidVersionStep(branch, bumpType ?? 'patch');
+    return `Version bumped: ${result.oldVersionName} (${result.oldVersionCode}) → ${result.newVersionName} (${result.newVersionCode})`;
+  },
+});
