@@ -1,0 +1,16 @@
+{
+  "sprint_version": "",
+  "branch": "",
+  "tasks": [],
+  "completed_tasks": [],
+  "failed_tasks": [],
+  "correction_attempts": {},
+  "linear_issues": [],
+  "test_baseline": {
+    "chimera_core": null,
+    "domain": null,
+    "all": null
+  },
+  "arch_violations": [],
+  "phase_history": []
+}
