@@ -1,6 +1,8 @@
 import { runGatePhase } from './phases/gate';
 import { runImplementPhase } from './phases/implement';
+import { runValidatePhase } from './phases/validate';
 import { runReleasePhase } from './phases/release';
+import { runReflectPhase } from './phases/reflect';
 import type { GatePayload, SprintRun } from '@/lib/types';
 
 interface OrchestratorInput {
@@ -27,10 +29,9 @@ export async function chimeraSprintWorkflow(input: OrchestratorInput): Promise<S
     currentPhase: 'gate',
     phases: {},
   };
-
   await saveRun(run);
 
-  // Phase 1: Gate
+  // ── Phase 1: Gate ──────────────────────────────────────────────
   const gateResult = await runGatePhase(input.gatePayload);
   run.phases.gate = gateResult;
 
@@ -40,9 +41,10 @@ export async function chimeraSprintWorkflow(input: OrchestratorInput): Promise<S
     return run;
   }
 
-  // Phase 2: Implement (pauses for human/agent approval)
+  // ── Phase 2: Implement (pauses until POST /approve) ────────────
   run.currentPhase = 'implement';
   await saveRun(run);
+
   const implementResult = await runImplementPhase(input.runId, input.taskManifest);
   run.phases.implement = implementResult;
 
@@ -52,20 +54,42 @@ export async function chimeraSprintWorkflow(input: OrchestratorInput): Promise<S
     return run;
   }
 
-  // Phase 3: Validate — payload arrives asynchronously via /api/chimera-sdlc/event
+  // ── Phase 3: Validate (pauses until POST /validate) ───────────
   run.currentPhase = 'validate';
   await saveRun(run);
 
-  // Phase 4: Release
+  const validateResult = await runValidatePhase(input.runId);
+  run.phases.validate = validateResult;
+
+  if (validateResult.status === 'failed') {
+    run.currentPhase = 'validate';
+    await saveRun(run);
+    return run;
+  }
+
+  // ── Phase 4: Release ──────────────────────────────────────────
   run.currentPhase = 'release';
   await saveRun(run);
+
   const releaseResult = await runReleasePhase(
     input.sprintVersion,
     `Sprint ${input.sprintVersion} — automated release from Chimera SDLC`,
   );
   run.phases.release = releaseResult;
 
-  run.currentPhase = releaseResult.status === 'passed' ? 'reflect' : 'release';
+  if (releaseResult.status === 'failed') {
+    run.currentPhase = 'release';
+    await saveRun(run);
+    return run;
+  }
+
+  // ── Phase 5: Reflect ──────────────────────────────────────────
+  run.currentPhase = 'reflect';
+  await saveRun(run);
+
+  const reflectResult = await runReflectPhase(run);
+  run.phases.reflect = reflectResult;
+
   await saveRun(run);
   return run;
 }
