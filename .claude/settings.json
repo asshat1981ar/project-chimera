@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew testMockDebugUnitTest *)",
+      "Bash(./gradlew :feature-camp:testMockDebugUnitTest *)",
+      "Bash(./gradlew :domain:testMockDebugUnitTest *)",
+      "Bash(./gradlew :chimera-core:testMockDebugUnitTest *)",
+      "Bash(./gradlew :feature-duel:testMockDebugUnitTest *)",
+      "Bash(./gradlew :feature-dialogue:testMockDebugUnitTest *)",
+      "Bash(./gradlew :feature-map:testMockDebugUnitTest *)",
+      "Bash(./gradlew detekt *)",
+      "Bash(./gradlew assembleMockDebug *)",
+      "Bash(./gradlew assembleProdRelease *)",
+      "Bash(./gradlew clean build *)",
+      "Bash(./gradlew :chimera-core:test *)",
+      "Bash(export ANDROID_HOME=* && export JAVA_HOME=* && ./gradlew testMockDebugUnitTest *)",
+      "Bash(export ANDROID_HOME=* && export JAVA_HOME=* && ./gradlew :domain:testMockDebugUnitTest *)",
+      "Bash(export ANDROID_HOME=* && export JAVA_HOME=* && ./gradlew assembleMockDebug *)",
+      "Bash(export ANDROID_HOME=* && export JAVA_HOME=* && ./gradlew detekt *)",
+      "Bash(export ANDROID_HOME=* && export JAVA_HOME=* && ./gradlew :chimera-core:test *)",
+      "Bash(mkdir -p *)"
+    ]
+  }
+}
