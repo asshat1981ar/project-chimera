@@ -20,7 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalAccessibilityManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -33,8 +33,8 @@ import kotlinx.coroutines.delay
 fun SplashScreen(
     onFinished: () -> Unit
 ) {
-    val accessibilityManager = LocalAccessibilityManager.current
-    val reduceMotion = accessibilityManager?.isEnabled == true
+    val ctx = LocalContext.current
+    val reduceMotion = (ctx.getSystemService(android.view.accessibility.AccessibilityManager::class.java))?.isEnabled == true
 
     var visible by remember { mutableStateOf(reduceMotion) }
     val alpha by animateFloatAsState(

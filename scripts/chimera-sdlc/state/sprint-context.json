@@ -1,0 +1,62 @@
+{
+  "sprint_version": "",
+  "branch": "",
+  "tasks": [
+    {
+      "id": "PRO-58",
+      "title": "Wire NPC letter-avatar portrait fallback in dialogue, party, camp screens",
+      "status": "done",
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ]
+    },
+    {
+      "id": "PRO-59",
+      "title": "ViewModel unit tests for `feature-camp` (InventoryViewModel + CampViewModel)",
+      "status": "todo",
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ]
+    },
+    {
+      "id": "PRO-60",
+      "title": "Wire HomeScreen continue-game to last incomplete SceneInstance",
+      "status": "todo",
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ]
+    }
+  ],
+  "completed_tasks": [
+    "PRO-58"
+  ],
+  "failed_tasks": [
+    "PRO-58"
+  ],
+  "correction_attempts": {},
+  "linear_issues": [],
+  "test_baseline": {
+    "chimera_core": "",
+    "domain": "",
+    "all": null
+  },
+  "arch_violations": [],
+  "phase_history": [
+    "gate"
+  ]
+}

@@ -185,6 +185,7 @@ private fun CompanionCard(
                 npcName = member.character.name,
                 disposition = member.state?.dispositionToPlayer ?: 0f,
                 archetype = member.state?.activeArchetype,
+                portraitResName = member.character.portraitResName,
                 size = 52.dp
             )
             Spacer(modifier = Modifier.width(16.dp))

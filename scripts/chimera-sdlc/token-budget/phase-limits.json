@@ -1,0 +1,10 @@
+{
+  "sense":     { "technique": "RAG+Agentic",      "max_agent_tokens": 40000, "cache_ttl_s": 270 },
+  "plan":      { "technique": "SCoT",              "max_tokens_per_task": 3000, "batch_independent": true },
+  "gate":      { "technique": "Self-Debugging",    "max_tokens": 8000, "stop_on_first_violation": true },
+  "implement": { "technique": "MoT",               "max_tokens_per_subagent": 35000, "parallel_max": 3 },
+  "validate":  { "technique": "CoT+ContextAware",  "max_tokens": 12000 },
+  "sync":      { "technique": "SCoT",              "max_tokens": 5000 },
+  "release":   { "technique": "Self-Debugging",    "max_tokens": 10000 },
+  "reflect":   { "technique": "RAG+Agentic",       "max_tokens": 30000, "outputs_next_sense": true }
+}

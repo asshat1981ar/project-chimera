@@ -1,0 +1,41 @@
+{
+  "cache_version": 1,
+  "entries": {
+    "wire-npc-letter-avatar-portrait-fallback": {
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ],
+      "cached_at": "2026-04-17T03:12:16.757009+00:00",
+      "ttl_hours": 72
+    },
+    "viewmodel-unit-tests-for-`feature-camp`-": {
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ],
+      "cached_at": "2026-04-17T03:12:16.757009+00:00",
+      "ttl_hours": 72
+    },
+    "wire-homescreen-continue-game-to-last-in": {
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ],
+      "cached_at": "2026-04-17T03:12:16.757009+00:00",
+      "ttl_hours": 72
+    }
+  }
+}

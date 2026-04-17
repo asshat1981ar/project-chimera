@@ -1,5 +1,5 @@
 # Sprint Backlog
-> Source: codebase scan, 2026-04-16 | Version: post-v1.8.0
+> Source: codebase scan, 2026-04-17 | Version: post-v1.9.0
 
 ## ✅ Sprint 1 — Domain Test Coverage + Skeleton Feature Completion [COMPLETE]
 
@@ -47,8 +47,45 @@
 
 ---
 
+## ✅ Sprint 3 — Build Green + Feature Wiring [COMPLETE]
+
+**Goal:** Achieve a clean `assembleMockDebug` APK build and wire the two highest-value player-facing gaps surfaced by the v1.9.0 retrospective.
+
+**Scope:**
+- ✅ Fix `feature-map`: add kotlinx-serialization dep + BoxWithConstraints layout scope (post-sprint hotfix, committed)
+- ✅ AUTO-IMPROVE-1: Lift all 12 remaining modules to JVM 17 (committed)
+- ✅ PRO-58 (S): Wire NPC letter-avatar portrait fallback in dialogue, party, camp screens
+- ✅ PRO-59 (M): ViewModel unit tests for `feature-camp` (InventoryViewModel + CampViewModel) — 31 tests
+- ✅ PRO-60 (M): Wire HomeScreen continue-game to last incomplete SceneInstance
+- ✅ `./gradlew assembleMockDebug` → BUILD SUCCESSFUL (fixed theme, icons, 4 compile errors)
+
+**Exit Criteria:**
+- `./gradlew assembleMockDebug` → BUILD SUCCESSFUL
+- `./gradlew testMockDebugUnitTest` → all pass
+- NPC portrait never shows blank (letter-avatar fallback in place)
+- HomeScreen navigates to last incomplete scene (not hardcoded prologue_scene_1)
+
+---
+
+## Sprint 4 — Test Coverage + Orchestrator Hardening [PLANNED]
+
+**Goal:** Close the ViewModel test gap across 6 untested feature modules and fix the implement.sh dispatch to be honest about human-in-the-loop.
+
+**Scope:**
+- ⏳ PRO-62 (M): Scaffold test infrastructure (src/test + deps + smoke tests) for feature-home, feature-dialogue, feature-map, feature-party, feature-journal, feature-settings
+- ⏳ PRO-63 (M): Rewrite implement.sh — replace `claude --print` with structured task-manifest output + `implement-ready` phase state
+- ⏳ Merge PR #85 (Sprint 3) to main before starting Sprint 4 work
+
+**Exit Criteria:**
+- All 6 feature module VMs have ≥1 unit test
+- `./gradlew testMockDebugUnitTest` passes across all modules
+- Orchestrator IMPLEMENT phase writes `implement-ready` and exits cleanly
+
+---
+
 ## Later Backlog
 
+- PRO-61 (L): buildSrc convention plugin to eliminate build.gradle.kts duplication across 14 modules
 - `feature-journal`: Full journal entry persistence — write entries to Room via domain use-case
 - `feature-party`: Party member stats, relationship delta visualization
 - `feature-settings`: Settings persistence via Room/DataStore; cloud sync toggle
