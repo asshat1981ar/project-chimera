@@ -1,27 +1,23 @@
 # Sprint Backlog
 > Source: codebase scan, 2026-04-16 | Version: post-v1.8.0
 
-## Sprint 1 — Domain Test Coverage + Skeleton Feature Completion
+## ✅ Sprint 1 — Domain Test Coverage + Skeleton Feature Completion [COMPLETE]
 
 **Goal:** Close the 6-use-case test gap in the domain layer and bring the three skeleton feature modules (journal, party, settings) to a shippable minimum.
 
 **Scope:**
-- Write `ApplyRelationshipDeltaUseCaseTest.kt` (domain, type: test)
-- Write `ChapterProgressionUseCaseTest.kt` (domain, type: test)
-- Write `CreateSaveSlotUseCaseTest.kt` (domain, type: test)
-- Write `GenerateSceneSummaryUseCaseTest.kt` (domain, type: test)
-- Write `LoadHomeStateUseCaseTest.kt` (domain, type: test)
-- Write `ResolveCampNightUseCaseTest.kt` (domain, type: test)
-- Implement `feature-journal` minimum viable UI: JournalViewModel + JournalScreen with entry list (feature, type: feature)
-- Implement `feature-party` minimum viable UI: PartyViewModel + PartyScreen with character roster (feature, type: feature)
-- Implement `feature-settings` minimum viable UI: SettingsViewModel + SettingsScreen with basic toggles (feature, type: feature)
-- Add string list converter for `tags` in `core-database/EntityMappers.kt:88` (core-database, type: cleanup)
+- ✅ Write `ApplyRelationshipDeltaUseCaseTest.kt` — 6 tests (domain, type: test)
+- ✅ `ChapterProgressionUseCase` covered in existing `DomainUseCaseTest.kt` — no new file needed
+- ✅ Write `CreateSaveSlotUseCaseTest.kt` — 4 tests (domain, type: test)
+- ✅ Write `GenerateSceneSummaryUseCaseTest.kt` — 5 tests (domain, type: test)
+- ✅ Write `LoadHomeStateUseCaseTest.kt` — 5 tests (domain, type: test)
+- ✅ Write `ResolveCampNightUseCaseTest.kt` — 5 tests (domain, type: test)
+- ✅ `feature-journal` already fully implemented (JournalViewModel + JournalScreen w/ tabs, FTS search)
+- ✅ `feature-party` already fully implemented (PartyViewModel + PartyScreen w/ member+faction UI)
+- ✅ `feature-settings` already fully implemented (SettingsViewModel + SettingsScreen w/ 6 settings)
+- ✅ Add string list converter for `tags` in `core-database/EntityMappers.kt` (core-database, type: cleanup)
 
-**Exit Criteria:**
-- `./gradlew :domain:testMockDebugUnitTest` passes with all 8 use-cases covered
-- `./gradlew testMockDebugUnitTest` passes (full suite green)
-- `feature-journal`, `feature-party`, `feature-settings` each have a ViewModel + at least one Composable screen with visible content
-- No TODOs remain in `EntityMappers.kt`
+**Outcome:** All 8 domain use-cases now have test coverage. All 3 "skeleton" features were discovered to already be fully implemented. EntityMappers.kt TODO resolved. Commits: ac95740 (tests), bbec269 (converter + health report).
 
 ---
 
