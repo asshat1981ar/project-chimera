@@ -3,34 +3,20 @@
   "branch": "",
   "tasks": [
     {
-      "id": "PRO-58",
-      "title": "Wire NPC letter-avatar portrait fallback in dialogue, party, camp screens",
+      "id": "PRO-62",
+      "title": "Scaffold test infrastructure (src/test + deps + smoke tests) for feature-home, feature-dialogue, feature-map, feature-party, feature-journal, feature-settings",
       "status": "done",
-      "technique": "MoT",
+      "technique": "CoT+ContextAware",
       "pipeline": [
-        "interface-design",
-        "modular-decomp",
-        "impl-module",
-        "integration",
-        "harden"
+        "analyze-surface",
+        "strategy",
+        "generate",
+        "coverage-gap"
       ]
     },
     {
-      "id": "PRO-59",
-      "title": "ViewModel unit tests for `feature-camp` (InventoryViewModel + CampViewModel)",
-      "status": "todo",
-      "technique": "MoT",
-      "pipeline": [
-        "interface-design",
-        "modular-decomp",
-        "impl-module",
-        "integration",
-        "harden"
-      ]
-    },
-    {
-      "id": "PRO-60",
-      "title": "Wire HomeScreen continue-game to last incomplete SceneInstance",
+      "id": "PRO-63",
+      "title": "Rewrite implement.sh \u2014 replace `claude --print` with structured task-manifest output + `implement-ready` phase state",
       "status": "todo",
       "technique": "MoT",
       "pipeline": [
@@ -43,7 +29,8 @@
     }
   ],
   "completed_tasks": [
-    "PRO-58"
+    "PRO-58",
+    "PRO-62"
   ],
   "failed_tasks": [
     "PRO-58"
@@ -52,11 +39,13 @@
   "linear_issues": [],
   "test_baseline": {
     "chimera_core": "",
-    "domain": "",
+    "domain": "Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.",
     "all": null
   },
   "arch_violations": [],
   "phase_history": [
+    "gate",
+    "gate",
     "gate"
   ]
 }

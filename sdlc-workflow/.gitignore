@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Environment files — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel/.env*
+
+# OS/editor
+.DS_Store
+*.swp
+.turbopack
+.vercel
+.env*.local
