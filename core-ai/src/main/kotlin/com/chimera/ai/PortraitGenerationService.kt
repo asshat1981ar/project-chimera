@@ -38,7 +38,7 @@ class PortraitGenerationService(
         install(HttpRequestRetry) {
             maxRetries = 2
             retryOnServerErrors()
-            exponentialDelay(base = 2.0, initialDelayMs = 3_000L, maxDelayMs = 15_000L)
+            exponentialDelay(base = 2.0, maxDelayMs = 15_000L)
         }
         engine {
             connectTimeout = 20_000

@@ -20,6 +20,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -122,9 +123,9 @@ class DomainUseCaseTest {
 
         // Opening turn must be persisted
         verify(dialogueRepository).persistTurn(
-            slotId = testSlotId,
-            sceneId = "test_scene",
-            speakerId = "warden",
+            slotId = eq(testSlotId),
+            sceneId = eq("test_scene"),
+            speakerId = eq("warden"),
             text = any(),
             emotion = any()
         )
@@ -176,8 +177,8 @@ class DomainUseCaseTest {
             speakerId = "player", text = "What do you guard?", emotion = ""
         )
         verify(dialogueRepository).persistTurn(
-            slotId = testSlotId, sceneId = "test_scene",
-            speakerId = "warden", text = any(), emotion = any()
+            slotId = eq(testSlotId), sceneId = eq("test_scene"),
+            speakerId = eq("warden"), text = any(), emotion = any()
         )
     }
 
