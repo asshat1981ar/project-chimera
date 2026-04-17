@@ -7,7 +7,7 @@ function verifySecret(req: Request): boolean {
   return secret === process.env.SDLC_WEBHOOK_SECRET;
 }
 
-type QueueItem = { sprintVersion: string; taskManifest: string; gatePayload: GatePayload; branch: string };
+type QueueItem = { sprintVersion: string; taskManifest: string; gatePayload: GatePayload; branch?: string };
 
 export async function POST(req: Request) {
   if (!verifySecret(req)) {
@@ -24,8 +24,8 @@ export async function POST(req: Request) {
 
   const runId = `${body.sprintVersion}-${Date.now()}`;
 
-  const sprintQueue: SprintInput[] | undefined = body.sprintQueue?.map((item) => ({
-    runId: `${item.sprintVersion}-${Date.now()}`,
+  const sprintQueue: SprintInput[] | undefined = body.sprintQueue?.map((item, i) => ({
+    runId: `${item.sprintVersion}-${Date.now()}-${i}`,
     sprintVersion: item.sprintVersion,
     taskManifest: item.taskManifest,
     gatePayload: item.gatePayload,
