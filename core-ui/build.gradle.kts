@@ -41,5 +41,4 @@ dependencies {
 
     // Coil — async image loading (portrait system)
     implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 }

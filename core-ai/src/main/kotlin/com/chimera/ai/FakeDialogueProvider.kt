@@ -14,7 +14,7 @@ import javax.inject.Singleton
  * Returns authored NPC responses with disposition-aware branching.
  */
 @Singleton
-class FakeDialogueProvider @Inject constructor() : DialogueProvider {
+open class FakeDialogueProvider @Inject constructor() : DialogueProvider {
 
     override suspend fun generateTurn(
         contract: SceneContract,

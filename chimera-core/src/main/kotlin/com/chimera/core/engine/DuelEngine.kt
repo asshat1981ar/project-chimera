@@ -10,7 +10,8 @@ class DuelEngine(
     val playerName: String,
     val opponentName: String,
     opponentResolve: Int = 3,
-    playerModifier: Float = 0f // from prior dialogue choices
+    playerModifier: Float = 0f, // from prior dialogue choices
+    private val rng: Random = Random.Default
 ) {
     enum class Stance(val label: String, val beats: String) {
         STRIKE("Strike", "Feint"),
@@ -91,7 +92,7 @@ class DuelEngine(
 
     private fun chooseOpponentStance(): Stance {
         // Simple AI with slight bias adjustment from dialogue modifier
-        val roll = Random.nextFloat() + modifier
+        val roll = rng.nextFloat() + modifier
         return when {
             roll < 0.33f -> Stance.STRIKE
             roll < 0.66f -> Stance.WARD

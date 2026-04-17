@@ -20,7 +20,8 @@ class CombatEngine(
     val opponentName: String,
     val opponentArchetype: String,
     availableIntents: List<IntentCard>,
-    private val opponentModifier: Float = 0f   // derived from NPC disposition: negative = opponent weaker
+    private val opponentModifier: Float = 0f,  // derived from NPC disposition: negative = opponent weaker
+    private val rng: Random = Random.Default
 ) {
     companion object {
         const val MAX_ROLLS      = 3
@@ -79,7 +80,7 @@ class CombatEngine(
     fun executeRound(intent: IntentCard): RollResult {
         check(!state.isComplete) { "Combat is already over" }
 
-        val roll    = Random.nextInt(1, 21)
+        val roll    = rng.nextInt(1, 21)
         val modVal  = intent.statBonus
         val total   = (roll + modVal + (opponentModifier * 5).toInt()).coerceIn(1, 25)
         val band    = resolveBand(total)

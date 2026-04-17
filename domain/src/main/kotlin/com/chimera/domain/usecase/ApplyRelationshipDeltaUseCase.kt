@@ -1,14 +1,14 @@
 package com.chimera.domain.usecase
 
 import com.chimera.data.repository.CharacterRepository
-import com.chimera.database.dao.JournalEntryDao
+import com.chimera.data.repository.JournalRepository
 import com.chimera.database.entity.JournalEntryEntity
 import javax.inject.Inject
 import kotlin.math.abs
 
 class ApplyRelationshipDeltaUseCase @Inject constructor(
     private val characterRepository: CharacterRepository,
-    private val journalEntryDao: JournalEntryDao
+    private val journalRepository: JournalRepository
 ) {
     /**
      * Apply a relationship delta and optionally create a journal entry
@@ -25,7 +25,7 @@ class ApplyRelationshipDeltaUseCase @Inject constructor(
 
         if (abs(delta) >= JOURNAL_THRESHOLD) {
             val direction = if (delta > 0) "warmed to" else "grown colder toward"
-            journalEntryDao.insert(
+            journalRepository.insertEntry(
                 JournalEntryEntity(
                     saveSlotId = slotId,
                     title = "$characterName's Regard",

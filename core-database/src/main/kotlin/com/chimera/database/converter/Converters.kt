@@ -21,4 +21,17 @@ class Converters {
             Log.w("Converters", "Malformed JSON for float map: '$value'", e)
             emptyMap()
         }
+
+    @TypeConverter
+    fun fromStringList(value: List<String>): String =
+        json.encodeToString(value)
+
+    @TypeConverter
+    fun toStringList(value: String): List<String> =
+        try {
+            json.decodeFromString(value)
+        } catch (e: Exception) {
+            Log.w("Converters", "Malformed JSON for string list: '$value'", e)
+            emptyList()
+        }
 }

@@ -10,6 +10,7 @@ import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.entity.FactionStateEntity
+import com.chimera.model.MapNode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-import com.chimera.model.MapNode
 
 data class MapUiState(
     val nodes: List<MapNode> = emptyList(),

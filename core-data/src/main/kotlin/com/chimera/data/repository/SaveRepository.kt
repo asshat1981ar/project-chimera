@@ -71,9 +71,9 @@ class SaveRepository @Inject constructor(
             )
         )
     }
-}
 
     suspend fun updateChapterTag(slotId: Long, tag: String) {
         val slot = saveSlotDao.getById(slotId) ?: return
         saveSlotDao.upsert(slot.copy(chapterTag = tag))
     }
+}
