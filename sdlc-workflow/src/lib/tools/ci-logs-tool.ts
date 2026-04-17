@@ -1,18 +1,9 @@
 import { tool } from 'ai';
 import { z } from 'zod';
+import { ghHeaders } from './gh-headers';
 
 const REPO = 'asshat1981ar/project-chimera';
 const GH_API = 'https://api.github.com';
-
-function ghHeaders(): Record<string, string> {
-  const token = process.env.GH_DISPATCH_TOKEN;
-  if (!token) throw new Error('GH_DISPATCH_TOKEN environment variable is not set');
-  return {
-    Authorization: `Bearer ${token}`,
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-  };
-}
 
 function redactPii(text: string): string {
   return text
@@ -84,6 +75,7 @@ export const ciLogsTool = tool({
       .describe('Optional filter: only return logs from jobs whose name includes this string'),
     lineCount: z
       .number()
+      .min(1)
       .optional()
       .default(200)
       .describe('Max lines to return per job (default 200, max 1000)'),

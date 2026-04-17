@@ -126,4 +126,18 @@ describe('fetchCILogsStep', () => {
     vi.unstubAllEnvs();
     await expect(fetchCILogsStep('999')).rejects.toThrow('GH_DISPATCH_TOKEN');
   });
+
+  it('returns partial results when one job log fetch fails', async () => {
+    const fetchMock = vi.fn();
+    global.fetch = fetchMock;
+
+    fetchMock
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ jobs: [makeJob(1, 'build'), makeJob(2, 'test')] }) })
+      .mockResolvedValueOnce({ ok: false, status: 403, text: async () => 'Forbidden' })
+      .mockResolvedValueOnce({ ok: true, text: async () => 'test log output' });
+
+    const result = await fetchCILogsStep('800');
+    expect(result).toContain('"build" logs unavailable: 403');
+    expect(result).toContain('test log output');
+  });
 });
