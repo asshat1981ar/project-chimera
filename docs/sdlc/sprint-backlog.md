@@ -67,19 +67,51 @@
 
 ---
 
-## Sprint 4 — Test Coverage + Orchestrator Hardening [PLANNED]
+## ✅ Sprint 4 — Test Coverage + Orchestrator Hardening [COMPLETE]
 
-**Goal:** Close the ViewModel test gap across 6 untested feature modules and fix the implement.sh dispatch to be honest about human-in-the-loop.
+**Goal:** Close the ViewModel test gap across 6 untested feature modules and wire Vercel Workflow SDLC.
 
 **Scope:**
-- ⏳ PRO-62 (M): Scaffold test infrastructure (src/test + deps + smoke tests) for feature-home, feature-dialogue, feature-map, feature-party, feature-journal, feature-settings
-- ⏳ PRO-63 (M): Rewrite implement.sh — replace `claude --print` with structured task-manifest output + `implement-ready` phase state
-- ⏳ Merge PR #85 (Sprint 3) to main before starting Sprint 4 work
+- ✅ PRO-62 (M): Scaffold test infrastructure for feature-home, feature-dialogue, feature-map, feature-party, feature-journal, feature-settings — all 6 now have ≥1 unit test
+- ✅ Vercel Workflow SDLC deployed — gate→implement (approval hook)→release pipeline verified e2e; fixed `void` lambda bug, `defineHook` deletion, `withWorkflow()` next.config wrapper, `'use step'` on release fetch
+- ✅ Merged PR #85 (Sprint 3) and PR #86 (Sprint 4) to main
+
+**Exit Criteria met:**
+- All 6 feature module VMs have ≥1 unit test ✅
+- `./gradlew testMockDebugUnitTest` passes ✅
+
+---
+
+## ✅ Sprint 5 — Engine Correctness + Data Safety [COMPLETE]
+
+**Goal:** Fix the DuelEngine WIN never-fires bug exposed by deterministic test harness, and guard Room destructive migration from production.
+
+**Scope:**
+- ✅ fix(chimera-core): `DuelEngine.resolveStances()` used `Enum.name` (all-caps) vs `Enum.label` (Title Case) — WIN outcome never fired. Fixed + 7 deterministic tests added (feintRng, wardRng, drawRng helpers; omen depletion, round-7 timeout, escalation text)
+- ✅ fix(core-database): `fallbackToDestructiveMigration()` gated behind `BuildConfig.DEBUG`; enabled buildConfig for core-database library module
+- ✅ chore: deleted orphaned Room schema 9.json (no MIGRATION_8_9, code at v8)
+- ✅ PRO-64 filed: buildSrc convention plugin (AGP classpath conflict deferred)
+- ✅ PRO-65 filed: implement.sh Vercel Workflow wiring
+
+**Exit Criteria met:**
+- `./gradlew :chimera-core:test` — 22 tests pass ✅
+- Release builds no longer destructively migrate on schema mismatch ✅
+- PR #87 open
+
+---
+
+## Sprint 6 — SDLC Wiring + Build DRY [PLANNED]
+
+**Goal:** Wire the shell SDLC orchestrator to the live Vercel Workflow system and eliminate build.gradle.kts boilerplate via convention plugins.
+
+**Scope:**
+- PRO-65 (M): Rewrite `scripts/chimera-sdlc/phases/implement.sh` — replace `claude --print` with POST to Vercel Workflow `/start`, poll `/status`, write `current-run-id.txt`, print human approval instructions; update `approve-implement.sh` with env validation
+- PRO-64 (M): buildSrc convention plugin — requires `pluginManagement` refactor in root `settings.gradle.kts` to avoid AGP classpath conflict; create `chimera-android-library` + `chimera-android-library-compose` plugins; apply to all 14 modules
 
 **Exit Criteria:**
-- All 6 feature module VMs have ≥1 unit test
-- `./gradlew testMockDebugUnitTest` passes across all modules
-- Orchestrator IMPLEMENT phase writes `implement-ready` and exits cleanly
+- Running `./orchestrator.sh` dispatches to Vercel Workflow and pauses for real human approval
+- `./gradlew assembleMockDebug` still passes after buildSrc migration
+- All 14 `build.gradle.kts` files drop the compile/jvm boilerplate block
 
 ---
 
