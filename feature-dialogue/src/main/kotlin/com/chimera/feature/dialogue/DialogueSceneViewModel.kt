@@ -28,6 +28,7 @@ import com.chimera.model.MemoryShard
 import com.chimera.model.PlayerInput
 import com.chimera.model.SceneContract
 import com.chimera.data.ChimeraPreferences
+import com.chimera.domain.usecase.ChapterProgressionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -89,7 +90,8 @@ class DialogueSceneViewModel @Inject constructor(
     private val saveSlotDao: SaveSlotDao,
     private val vowDao: VowDao,
     private val audioProvider: AudioProvider,
-    private val preferences: ChimeraPreferences
+    private val preferences: ChimeraPreferences,
+    private val chapterProgressionUseCase: ChapterProgressionUseCase
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
@@ -304,6 +306,7 @@ class DialogueSceneViewModel @Inject constructor(
                     )
                     generateJournalEntry(slotId)
                     generateVows(slotId)
+                    chapterProgressionUseCase()
                     // Persist accumulated playtime
                     val sessionSeconds = gameSessionManager.getSessionPlaytimeSeconds()
                     val slot = saveSlotDao.getById(slotId)
