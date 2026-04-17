@@ -1,6 +1,10 @@
 const REPO = 'asshat1981ar/project-chimera';
 const GH_API = 'https://api.github.com';
 
+function encodePath(path: string): string {
+  return path.split('/').map(encodeURIComponent).join('/');
+}
+
 function ghHeaders(): Record<string, string> {
   const token = process.env.GH_DISPATCH_TOKEN;
   if (!token) throw new Error('GH_DISPATCH_TOKEN environment variable is not set');
@@ -15,7 +19,7 @@ function ghHeaders(): Record<string, string> {
 export async function readFile(path: string, branch: string): Promise<string> {
   'use step';
   const resp = await fetch(
-    `${GH_API}/repos/${REPO}/contents/${path}?ref=${encodeURIComponent(branch)}`,
+    `${GH_API}/repos/${REPO}/contents/${encodePath(path)}?ref=${encodeURIComponent(branch)}`,
     { headers: ghHeaders() },
   );
   if (!resp.ok) {
@@ -30,7 +34,7 @@ export async function readFile(path: string, branch: string): Promise<string> {
 export async function listDirectory(path: string, branch: string): Promise<string[]> {
   'use step';
   const resp = await fetch(
-    `${GH_API}/repos/${REPO}/contents/${path}?ref=${encodeURIComponent(branch)}`,
+    `${GH_API}/repos/${REPO}/contents/${encodePath(path)}?ref=${encodeURIComponent(branch)}`,
     { headers: ghHeaders() },
   );
   if (!resp.ok) {
@@ -54,7 +58,7 @@ export async function writeFile(
   'use step';
   let sha: string | undefined;
   const existing = await fetch(
-    `${GH_API}/repos/${REPO}/contents/${path}?ref=${encodeURIComponent(branch)}`,
+    `${GH_API}/repos/${REPO}/contents/${encodePath(path)}?ref=${encodeURIComponent(branch)}`,
     { headers: ghHeaders() },
   );
   if (existing.ok) {
@@ -71,7 +75,7 @@ export async function writeFile(
   };
   if (sha) body.sha = sha;
 
-  const resp = await fetch(`${GH_API}/repos/${REPO}/contents/${path}`, {
+  const resp = await fetch(`${GH_API}/repos/${REPO}/contents/${encodePath(path)}`, {
     method: 'PUT',
     headers: ghHeaders(),
     body: JSON.stringify(body),

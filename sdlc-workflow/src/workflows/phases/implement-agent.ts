@@ -84,9 +84,13 @@ async function runAgent(taskManifest: string, branch: string): Promise<string> {
   });
 
   const lastMessage = result.messages.at(-1);
-  return lastMessage?.role === 'assistant'
-    ? (lastMessage.content as string)
-    : 'Agent completed without a final message.';
+  if (lastMessage?.role !== 'assistant') return 'Agent completed without a final message.';
+  const content = lastMessage.content;
+  if (typeof content === 'string') return content;
+  return (content as Array<{ type: string; text?: string }>)
+    .filter(p => p.type === 'text')
+    .map(p => p.text ?? '')
+    .join('');
 }
 
 export async function runImplementAgentPhase(
