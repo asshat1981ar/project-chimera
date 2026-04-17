@@ -1,20 +1,21 @@
 package com.chimera.feature.settings
 
+import com.chimera.data.AiMode
 import com.chimera.data.AppSettings
 import com.chimera.data.ChimeraPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -42,9 +43,12 @@ class SettingsViewModelTest {
     )
 
     @Test
-    fun initialState_isNotNull() {
+    fun initialState_hasDefaultValues() = runTest(testDispatcher) {
         val viewModel = buildViewModel()
-        assertNotNull(viewModel.settings)
+        val job = launch { viewModel.settings.collect {} }
+        advanceUntilIdle()
+        job.cancel()
+        assertEquals(AppSettings(), viewModel.settings.value)
     }
 
     @Test
@@ -60,7 +64,7 @@ class SettingsViewModelTest {
         val viewModel = buildViewModel()
         viewModel.toggleAiMode()
         advanceUntilIdle()
-        verify(preferences).setAiMode(any())
+        verify(preferences).setAiMode(AiMode.OFFLINE_ONLY)
     }
 
     @Test

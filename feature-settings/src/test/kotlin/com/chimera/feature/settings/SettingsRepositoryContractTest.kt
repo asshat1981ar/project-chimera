@@ -40,7 +40,9 @@ class SettingsRepositoryContractTest {
     fun settings_defaultTextScale_isOne() = runTest(testDispatcher) {
         whenever(preferences.settings).thenReturn(flowOf(AppSettings(textScale = 1.0f)))
         val viewModel = SettingsViewModel(preferences)
+        val job = launch { viewModel.settings.collect {} }
         advanceUntilIdle()
+        job.cancel()
         assertEquals(1.0f, viewModel.settings.value.textScale)
     }
 
@@ -48,7 +50,9 @@ class SettingsRepositoryContractTest {
     fun settings_defaultAiMode_isAuto() = runTest(testDispatcher) {
         whenever(preferences.settings).thenReturn(flowOf(AppSettings(aiMode = AiMode.AUTO)))
         val viewModel = SettingsViewModel(preferences)
+        val job = launch { viewModel.settings.collect {} }
         advanceUntilIdle()
+        job.cancel()
         assertEquals(AiMode.AUTO, viewModel.settings.value.aiMode)
     }
 
