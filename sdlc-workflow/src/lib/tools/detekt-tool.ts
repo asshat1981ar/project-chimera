@@ -44,6 +44,7 @@ export async function runDetektStep(branch: string, opts: PollOptions = {}): Pro
     throw new Error(`Detekt dispatch failed: ${dispatchResp.status} — ${text}`);
   }
 
+  let consecutiveErrors = 0;
   for (let attempt = 0; attempt < maxPolls; attempt++) {
     if (pollIntervalMs > 0) await new Promise(r => setTimeout(r, pollIntervalMs));
 
@@ -51,11 +52,19 @@ export async function runDetektStep(branch: string, opts: PollOptions = {}): Pro
       `${GH_API}/repos/${REPO}/actions/workflows/detekt-check.yml/runs?branch=${encodeURIComponent(branch)}&per_page=10`,
       { headers: ghHeaders() },
     );
-    if (!listResp.ok) continue;
+    if (!listResp.ok) {
+      consecutiveErrors++;
+      if (consecutiveErrors >= 3) {
+        throw new Error(`Detekt poll failed repeatedly: ${listResp.status}`);
+      }
+      continue;
+    }
+    consecutiveErrors = 0;
 
     const data = await listResp.json() as {
       workflow_runs: Array<{ id: number; status: string; conclusion: string | null; head_branch: string; created_at: string; html_url: string }>;
     };
+    if (!Array.isArray(data.workflow_runs)) continue;
 
     const run = data.workflow_runs.find(
       r => r.head_branch === branch && r.created_at >= dispatchedAt,
@@ -83,8 +92,8 @@ export const detektTool = tool({
   }),
   execute: async ({ branch }) => {
     const result = await runDetektStep(branch, { maxPolls: 90, pollIntervalMs: 4000 });
-    return result.passed
-      ? `Detekt passed. Run: ${result.runUrl}`
-      : `Detekt FAILED (${result.conclusion}). See: ${result.runUrl}`;
+    if (result.passed) return `Detekt passed. Run: ${result.runUrl}`;
+    if (result.conclusion === 'timed_out') return 'Detekt timed out waiting for run. Check GitHub Actions manually.';
+    return `Detekt FAILED (${result.conclusion}). See: ${result.runUrl}`;
   },
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { runDetektStep } from './detekt-tool';
 
 const REPO = 'asshat1981ar/project-chimera';
@@ -13,8 +13,12 @@ function makeRun(id: number, status: string, conclusion: string | null, branch: 
 }
 
 beforeEach(() => {
-  process.env.GH_DISPATCH_TOKEN = 'test-token';
+  vi.stubEnv('GH_DISPATCH_TOKEN', 'test-token');
   vi.resetAllMocks();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe('runDetektStep', () => {
@@ -35,6 +39,9 @@ describe('runDetektStep', () => {
       `${GH_API}/repos/${REPO}/actions/workflows/detekt-check.yml/dispatches`,
       expect.objectContaining({ method: 'POST' }),
     );
+    const dispatchCall = fetchMock.mock.calls[0];
+    const dispatchBody = JSON.parse(dispatchCall[1].body);
+    expect(dispatchBody).toEqual({ ref: 'feat/my-branch', inputs: { branch: 'feat/my-branch' } });
     expect(result.passed).toBe(true);
     expect(result.conclusion).toBe('success');
   });
@@ -89,7 +96,7 @@ describe('runDetektStep', () => {
   });
 
   it('throws if GH_DISPATCH_TOKEN is not set', async () => {
-    delete process.env.GH_DISPATCH_TOKEN;
+    vi.unstubAllEnvs();
     await expect(runDetektStep('main')).rejects.toThrow('GH_DISPATCH_TOKEN');
   });
 
@@ -142,5 +149,19 @@ describe('runDetektStep', () => {
 
     const result = await runDetektStep('feat/my-branch');
     expect(result.runUrl).toBe('https://github.com/run/77');
+  });
+
+  it('detektTool.execute returns timed_out message when conclusion is timed_out', async () => {
+    const fetchMock = vi.fn();
+    global.fetch = fetchMock;
+
+    const pending = makeRun(99, 'queued', null, 'feat/my-branch', new Date(Date.now() + 1000).toISOString());
+    fetchMock
+      .mockResolvedValueOnce({ ok: true, text: async () => '' })
+      .mockResolvedValue({ ok: true, json: async () => makeRunsResp([pending]) });
+
+    const result = await runDetektStep('feat/my-branch', { maxPolls: 2, pollIntervalMs: 0 });
+    expect(result.conclusion).toBe('timed_out');
+    expect(result.runUrl).toBe('');
   });
 });
