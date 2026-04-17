@@ -1,82 +1,63 @@
 #!/usr/bin/env bash
-# IMPLEMENT phase: dispatch subagent per task with PromptForge technique
+# IMPLEMENT phase: emit task manifest for human/agent dispatch
+# This phase does NOT run tasks — it prints what needs to be done and halts.
+# After implementing, advance manually: echo "validate" > state/current-phase.txt
 set -euo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 STATE="$REPO_ROOT/scripts/chimera-sdlc/state"
-MAX_RETRIES=2
 
-echo "[IMPLEMENT] Loading sprint tasks..."
+echo "[IMPLEMENT] Generating task manifest for agent dispatch..."
+echo ""
 
-TASKS=$(python3 -c "
+python3 - <<'PYEOF'
 import json
 from pathlib import Path
-ctx = json.loads(Path('scripts/chimera-sdlc/state/sprint-context.json').read_text())
-for t in ctx['tasks']:
-    if t['status'] == 'todo':
-        print(t['id'] + '|||' + t['title'] + '|||' + t.get('technique','SCoT') + '|||' + ','.join(t.get('pipeline',[])))
-")
+import subprocess
 
-while IFS= read -r task_line; do
-  [ -z "$task_line" ] && continue
-  IFS='|||' read -r TASK_ID TASK_TITLE TECHNIQUE PIPELINE_STR <<< "$task_line"
-  echo "[IMPLEMENT] Task: $TASK_ID — $TASK_TITLE (technique: $TECHNIQUE)"
+ctx = json.loads(Path("scripts/chimera-sdlc/state/sprint-context.json").read_text())
+pending = [t for t in ctx["tasks"] if t["status"] == "todo"]
 
-  ATTEMPT=0; SUCCESS=false
-  while [ $ATTEMPT -lt $MAX_RETRIES ] && [ "$SUCCESS" = "false" ]; do
-    ATTEMPT=$((ATTEMPT + 1))
-    echo "  [attempt $ATTEMPT/$MAX_RETRIES]"
+state_file = Path("scripts/chimera-sdlc/state/current-phase.txt")
 
-    RELEVANT_FILES=$(grep -rn "${TASK_TITLE:0:20}" --include="*.kt" -l . 2>/dev/null | head -5 || true)
+if not pending:
+    print("[IMPLEMENT] No pending tasks — all done.")
+    state_file.write_text("validate")
+    exit(0)
 
-    PROMPT="Task $TASK_ID for Chimera Android at $REPO_ROOT.
+print("=" * 60)
+print(f" SPRINT TASK MANIFEST — {len(pending)} task(s) pending")
+print("=" * 60)
 
-### Task: $TASK_TITLE
-### PromptForge Technique: $TECHNIQUE
-Pipeline: $PIPELINE_STR
+for t in pending:
+    print(f"\n## {t['id']}: {t['title']}")
+    print(f"   Technique : {t.get('technique', 'SCoT')}")
+    print(f"   Pipeline  : {' → '.join(t.get('pipeline', []))}")
 
-### SeCoT pre-scan — relevant files (grep-confirmed):
-$RELEVANT_FILES
+    # SeCoT pre-scan: grep for relevant files
+    words = t["title"].split()[:3]
+    try:
+        result = subprocess.run(
+            ["grep", "-rn", "--include=*.kt", "-l", words[0] if words else ""],
+            capture_output=True, text=True, timeout=5
+        )
+        files = [f for f in result.stdout.strip().split("\n") if f and "build/" not in f and ".git/" not in f][:4]
+        if files:
+            print(f"   Relevant  : {', '.join(files)}")
+    except Exception:
+        pass
 
-Constraints:
-- TDD: write failing test first, then implement
-- Commit: git add <files> && git commit -m 'feat(<module>): $TASK_TITLE'
-- After commit verify: ./gradlew :chimera-core:test OR :domain:testDebugUnitTest
-- Do NOT modify files outside task scope"
+    print(f"\n   Dispatch via: Agent tool with task description above")
 
-    if claude --print "$PROMPT" 2>&1 | grep -q "BUILD SUCCESSFUL\|committed\|tests.*passed"; then
-      SUCCESS=true
-      python3 -c "
-import json; from pathlib import Path
-ctx_path = Path('scripts/chimera-sdlc/state/sprint-context.json')
-ctx = json.loads(ctx_path.read_text())
-for t in ctx['tasks']:
-    if t['id'] == '$TASK_ID': t['status'] = 'done'
-ctx['completed_tasks'].append('$TASK_ID')
-ctx_path.write_text(json.dumps(ctx, indent=2))"
-      echo "  [SUCCESS] $TASK_ID complete"
-    else
-      DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-      echo "| $DATE | implement | $TASK_ID | attempt-$ATTEMPT | retry | pending |" >> "$STATE/correction-log.md"
-      if [ $ATTEMPT -ge $MAX_RETRIES ]; then
-        python3 -c "
-import json; from pathlib import Path
-ctx_path = Path('scripts/chimera-sdlc/state/sprint-context.json')
-ctx = json.loads(ctx_path.read_text())
-for t in ctx['tasks']:
-    if t['id'] == '$TASK_ID': t['status'] = 'failed'
-ctx['failed_tasks'].append('$TASK_ID')
-ctx_path.write_text(json.dumps(ctx, indent=2))"
-        echo "  [ESCALATE] $TASK_ID failed after $MAX_RETRIES attempts"
-      fi
-    fi
-  done
-done <<< "$TASKS"
+print("\n" + "=" * 60)
+print("NEXT STEP: Implement tasks above using Agent tool in your")
+print("           Claude Code session, then run:")
+print("  echo validate > scripts/chimera-sdlc/state/current-phase.txt")
+print("  bash scripts/chimera-sdlc/orchestrator.sh")
+print("=" * 60)
 
-FAILED_COUNT=$(python3 -c "import json; ctx=json.load(open('scripts/chimera-sdlc/state/sprint-context.json')); print(len(ctx.get('failed_tasks',[])))")
-if [ "$FAILED_COUNT" -gt "0" ]; then
-  echo "[IMPLEMENT] $FAILED_COUNT task(s) need human review"
-  echo "implement-partial" > "$STATE/current-phase.txt"
-else
-  echo "validate" > "$STATE/current-phase.txt"
-  echo "[IMPLEMENT] All tasks complete → VALIDATE"
-fi
+state_file.write_text("implement-ready")
+PYEOF
+
+echo ""
+echo "[IMPLEMENT] Phase paused — waiting for agent dispatch."
+echo "[IMPLEMENT] current-phase.txt = implement-ready (orchestrator will not auto-advance)"
