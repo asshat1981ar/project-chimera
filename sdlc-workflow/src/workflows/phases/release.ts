@@ -4,6 +4,7 @@ export async function runReleasePhase(
   sprintVersion: string,
   releaseNotes: string,
 ): Promise<PhaseResult> {
+  'use step';
   const timestamp = new Date().toISOString();
 
   const githubPat = process.env.GITHUB_PAT;
