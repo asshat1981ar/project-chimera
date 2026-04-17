@@ -1,5 +1,6 @@
 package com.chimera.core.engine
 
+import kotlin.random.Random
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -11,8 +12,16 @@ class DuelEngineTest {
 
     private fun createEngine(
         opponentResolve: Int = 3,
-        playerModifier: Float = 0f
-    ) = DuelEngine("Player", "Opponent", opponentResolve, playerModifier)
+        playerModifier: Float = 0f,
+        rng: Random = Random.Default
+    ) = DuelEngine("Player", "Opponent", opponentResolve, playerModifier, rng)
+
+    // Always returns 0f so opponent roll (0f + modifier) < 0.33f → STRIKE → DRAW against player STRIKE
+    private val drawRng = Random(seed = 0L).let { _ ->
+        object : Random() {
+            override fun nextBits(bitCount: Int) = 0
+        }
+    }
 
     @Test
     fun `initial state has correct defaults`() {
@@ -129,7 +138,8 @@ class DuelEngineTest {
 
     @Test
     fun `duel ends after 7 rounds maximum`() {
-        val engine = createEngine(opponentResolve = 100) // high resolve so it doesn't end early
+        // drawRng always returns 0f: opponent picks STRIKE, player STRIKE → DRAW, no omen loss
+        val engine = createEngine(opponentResolve = 100, rng = drawRng)
         repeat(7) {
             if (!engine.getState().isComplete) {
                 engine.executeRound(DuelEngine.Stance.STRIKE)
