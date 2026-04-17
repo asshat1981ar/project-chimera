@@ -11,6 +11,7 @@ interface OrchestratorInput {
 }
 
 async function saveRun(run: SprintRun): Promise<void> {
+  'use step';
   const { Redis } = await import('@upstash/redis');
   const redis = new Redis({ url: process.env.KV_REST_API_URL!, token: process.env.KV_REST_API_TOKEN! });
   await redis.set(`sdlc:run:${run.runId}`, JSON.stringify(run), { ex: 86400 });

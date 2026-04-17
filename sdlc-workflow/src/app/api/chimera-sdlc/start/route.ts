@@ -1,3 +1,4 @@
+import { start } from 'workflow/api';
 import { chimeraSprintWorkflow } from '@/workflows/orchestrator';
 import type { GatePayload } from '@/lib/types';
 
@@ -19,13 +20,12 @@ export async function POST(req: Request) {
 
   const runId = `${body.sprintVersion}-${Date.now()}`;
 
-  // Fire and forget — workflow runs asynchronously on Vercel
-  void chimeraSprintWorkflow({
+  await start(chimeraSprintWorkflow, [{
     runId,
     sprintVersion: body.sprintVersion,
     taskManifest: body.taskManifest,
     gatePayload: body.gatePayload,
-  });
+  }]);
 
   return Response.json({ runId, status: 'started' });
 }

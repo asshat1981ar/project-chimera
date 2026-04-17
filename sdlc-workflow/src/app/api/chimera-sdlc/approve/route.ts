@@ -1,4 +1,4 @@
-import { implementApprovalHook } from '@/lib/hooks';
+import { resumeHook } from 'workflow/api';
 import type { ApprovePayload } from '@/lib/types';
 
 function verifySecret(req: Request): boolean {
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Invalid decision value' }, { status: 400 });
   }
 
-  await implementApprovalHook.resume(body.runId, {
+  await resumeHook(body.runId, {
     decision: body.decision,
     notes: body.notes,
     agentDispatchedAt: body.agentDispatchedAt ?? new Date().toISOString(),

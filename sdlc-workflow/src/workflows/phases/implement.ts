@@ -1,5 +1,5 @@
-import { implementApprovalHook } from '@/lib/hooks';
-import type { PhaseResult } from '@/lib/types';
+import { createHook } from 'workflow';
+import type { PhaseResult, ApprovePayload } from '@/lib/types';
 
 export async function runImplementPhase(
   runId: string,
@@ -13,9 +13,9 @@ export async function runImplementPhase(
   console.log(`[IMPLEMENT] Task manifest for run ${runId}:\n${taskManifest}`);
 
   // Pause here until POST /api/chimera-sdlc/approve sends the hook event
-  const events = implementApprovalHook.create({ token: runId });
+  const hook = createHook<ApprovePayload>({ token: runId });
 
-  for await (const event of events) {
+  for await (const event of hook) {
     if (event.decision === 'approved') {
       return {
         phase: 'implement',
