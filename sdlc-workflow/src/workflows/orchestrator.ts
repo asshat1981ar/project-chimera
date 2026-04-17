@@ -5,6 +5,7 @@ import { runImplementAgentPhase } from './phases/implement-agent';
 import { runValidatePhase } from './phases/validate';
 import { runReleasePhase } from './phases/release';
 import { runReflectPhase } from './phases/reflect';
+import { bumpAndroidVersionStep } from '@/lib/tools/android-version-tool';
 import type { SprintRun, OrchestratorInput, SprintInput } from '@/lib/types';
 
 async function startNextSprint(next: SprintInput, rest: SprintInput[]): Promise<void> {
@@ -74,6 +75,8 @@ export async function chimeraSprintWorkflow(input: OrchestratorInput): Promise<S
   // ── Phase 4: Release ──────────────────────────────────────────
   run.currentPhase = 'release';
   await saveRun(run);
+
+  await bumpAndroidVersionStep(input.branch);
 
   const releaseResult = await runReleasePhase(
     input.sprintVersion,
