@@ -1,6 +1,5 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    id("chimera.android.library")
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     id("kotlin-kapt")
@@ -8,41 +7,22 @@ plugins {
 
 android {
     namespace = "com.chimera.data"
-    compileSdk = 34
-
-    defaultConfig {
-        minSdk = 24
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
     implementation(project(":core-model"))
     implementation(project(":core-database"))
 
-    // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
-    // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Serialization (for SceneLoader, MapNodeLoader)
     implementation(libs.kotlinx.serialization.json)
 
-    // DataStore (for ChimeraPreferences)
     implementation(libs.datastore.preferences)
 
-    // Room (for entity types in repository signatures)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
 }
