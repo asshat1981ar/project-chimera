@@ -139,8 +139,27 @@ else:
     (STATE / "current-phase.txt").write_text("implement-partial")
     sys.exit(1)
 
+implement_mode = os.environ.get("IMPLEMENT_MODE", "manual")
 (STATE / "current-phase.txt").write_text("implement-ready")
-print(f"""
+
+if implement_mode == "agent":
+    print(f"""
+{'='*60}
+ IMPLEMENT — autonomous agent running
+{'='*60}
+ Run ID : {run_id}
+ Tasks  : {len(pending)}
+
+ Agent is implementing tasks autonomously via GitHub API.
+ Monitor: {api_url}/api/chimera-sdlc/status/{run_id}
+
+ When agent completes, review commits on GitHub, then:
+   DECISION=approved bash scripts/chimera-sdlc/review-agent.sh
+   DECISION=rejected bash scripts/chimera-sdlc/review-agent.sh
+{'='*60}
+""")
+else:
+    print(f"""
 {'='*60}
  IMPLEMENT — awaiting agent dispatch + human approval
 {'='*60}
