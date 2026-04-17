@@ -134,39 +134,47 @@ fun NpcPortrait(
                 }
         )
 
-        // Avatar circle — Coil AsyncImage when portraitResName is set, letter-gradient fallback otherwise
-        if (portraitResName != null) {
-            val context = LocalContext.current
-            AsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(portraitResName)
-                    .crossfade(300)
-                    .build(),
-                contentDescription = npcName,
-                contentScale = ContentScale.Crop,
-                filterQuality = FilterQuality.Medium,
-                placeholder = null, // letter-avatar rendered below as fallback slot
-                error = null,
-                modifier = Modifier
-                    .size(size * 0.82f)
-                    .clip(CircleShape)
-            )
-        } else {
+        // Avatar circle — letter-avatar always rendered as the base layer.
+        // When portraitResName is set, an AsyncImage overlays it; if Coil fails to
+        // load the image (null result, network error, missing resource), the AsyncImage
+        // renders nothing and the letter-avatar shows through automatically.
+        Box(
+            modifier = Modifier
+                .size(size * 0.82f)
+                .clip(CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            // Base layer — always visible (fallback when portrait missing or fails to load)
             Box(
                 modifier = Modifier
-                    .size(size * 0.82f)
-                    .clip(CircleShape)
+                    .matchParentSize()
                     .background(avatarGradient),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = npcName.firstOrNull { it.isLetter() }?.uppercase() ?: "?",
+                    text = npcInitial(npcName),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontSize = fontSize,
                         fontWeight = FontWeight.Bold
                     ),
                     color = Color.White.copy(alpha = 0.9f),
                     textAlign = TextAlign.Center
+                )
+            }
+
+            // Portrait image overlay — renders on top when available.
+            // On Coil error the slot is empty and the letter-avatar base shows through.
+            if (portraitResName != null) {
+                val context = LocalContext.current
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(portraitResName)
+                        .crossfade(300)
+                        .build(),
+                    contentDescription = npcName,
+                    contentScale = ContentScale.Crop,
+                    filterQuality = FilterQuality.Medium,
+                    modifier = Modifier.matchParentSize()
                 )
             }
         }
@@ -214,3 +222,9 @@ private fun archetypeColor(archetype: String): Color = when (archetype) {
     "FIXES_THAT_FAIL"          -> Color(0xFFF39C12)  // amber — warning
     else                       -> Color(0xFF95A5A6)  // gray — unknown
 }
+
+// ── Package-internal helpers (visible to tests) ───────────────────────────────
+
+/** Returns the first letter character of [name] in uppercase, or "?" if none exists. */
+internal fun npcInitial(name: String): String =
+    name.firstOrNull { it.isLetter() }?.uppercase() ?: "?"
