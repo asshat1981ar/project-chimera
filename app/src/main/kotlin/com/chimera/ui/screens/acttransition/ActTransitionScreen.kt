@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Divider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -107,7 +107,7 @@ fun ActTransitionScreen(
 
             // Divider above title
             AnimatedVisibility(visible = showTitle, enter = fadeIn(tween(600))) {
-                HorizontalDivider(
+                Divider(
                     modifier = Modifier.width(56.dp),
                     color = DividerColor,
                     thickness = 1.dp
@@ -137,7 +137,7 @@ fun ActTransitionScreen(
 
             // Divider below title
             AnimatedVisibility(visible = showTitle, enter = fadeIn(tween(600))) {
-                HorizontalDivider(
+                Divider(
                     modifier = Modifier.width(56.dp),
                     color = DividerColor,
                     thickness = 1.dp

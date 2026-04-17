@@ -16,6 +16,7 @@ import com.chimera.feature.journal.JournalScreen
 import com.chimera.feature.map.MapScreen
 import com.chimera.feature.party.PartyScreen
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.chimera.data.ChimeraPreferences
 import com.chimera.ui.screens.onboarding.OnboardingScreen
 import com.chimera.ui.screens.saveslot.SaveSlotSelectScreen
