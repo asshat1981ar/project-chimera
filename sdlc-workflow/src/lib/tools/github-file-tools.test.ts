@@ -27,6 +27,13 @@ describe('readFile', () => {
     const result = await readFile('missing.kt', 'main');
     expect(result).toBe('[FILE NOT FOUND: missing.kt]');
   });
+
+  it('throws if GH_DISPATCH_TOKEN is missing', async () => {
+    const saved = process.env.GH_DISPATCH_TOKEN;
+    delete process.env.GH_DISPATCH_TOKEN;
+    await expect(readFile('any.kt', 'main')).rejects.toThrow('GH_DISPATCH_TOKEN');
+    process.env.GH_DISPATCH_TOKEN = saved;
+  });
 });
 
 describe('writeFile', () => {
@@ -57,6 +64,11 @@ describe('writeFile', () => {
     const body = JSON.parse(putCall[1].body as string);
     expect(body.sha).toBe('abc123');
   });
+
+  it('throws on non-404 pre-flight error', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 403 });
+    await expect(writeFile('file.kt', 'content', 'main', 'msg')).rejects.toThrow('pre-flight GET');
+  });
 });
 
 describe('listDirectory', () => {
@@ -80,6 +92,14 @@ describe('listDirectory', () => {
     mockFetch.mockResolvedValueOnce({ ok: false, status: 404 });
     const result = await listDirectory('missing/', 'main');
     expect(result).toEqual([]);
+  });
+
+  it('throws when path points to a file, not directory', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ name: 'Foo.kt', type: 'file', path: 'src/Foo.kt' }),
+    });
+    await expect(listDirectory('src/Foo.kt', 'main')).rejects.toThrow('returned a file');
   });
 });
 
@@ -111,5 +131,10 @@ describe('searchCode', () => {
 
     const result = await searchCode('NonExistentClass', 'kt');
     expect(result).toBe('[No results]');
+  });
+
+  it('throws on HTTP error', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 429 });
+    await expect(searchCode('query', 'kt')).rejects.toThrow('searchCode failed: 429');
   });
 });

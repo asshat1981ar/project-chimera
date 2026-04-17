@@ -2,8 +2,10 @@ const REPO = 'asshat1981ar/project-chimera';
 const GH_API = 'https://api.github.com';
 
 function ghHeaders(): Record<string, string> {
+  const token = process.env.GH_DISPATCH_TOKEN;
+  if (!token) throw new Error('GH_DISPATCH_TOKEN environment variable is not set');
   return {
-    Authorization: `Bearer ${process.env.GH_DISPATCH_TOKEN!}`,
+    Authorization: `Bearer ${token}`,
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
     'Content-Type': 'application/json',
@@ -35,7 +37,11 @@ export async function listDirectory(path: string, branch: string): Promise<strin
     if (resp.status === 404) return [];
     throw new Error(`listDirectory(${path}) failed: ${resp.status}`);
   }
-  const items = await resp.json() as Array<{ name: string; type: string; path: string }>;
+  const body = await resp.json();
+  if (!Array.isArray(body)) {
+    throw new Error(`listDirectory(${path}) returned a file, not a directory`);
+  }
+  const items = body as Array<{ name: string; type: string; path: string }>;
   return items.map(i => `${i.type === 'dir' ? '[dir]' : '[file]'} ${i.path}`);
 }
 
@@ -54,6 +60,8 @@ export async function writeFile(
   if (existing.ok) {
     const data = await existing.json() as { sha: string };
     sha = data.sha;
+  } else if (existing.status !== 404) {
+    throw new Error(`writeFile pre-flight GET(${path}) failed: ${existing.status}`);
   }
 
   const body: Record<string, unknown> = {
@@ -80,7 +88,7 @@ export async function searchCode(query: string, extension: string): Promise<stri
   const resp = await fetch(`${GH_API}/search/code?q=${q}&per_page=10`, {
     headers: ghHeaders(),
   });
-  if (!resp.ok) return `[Search failed: ${resp.status}]`;
+  if (!resp.ok) throw new Error(`searchCode failed: ${resp.status}`);
   const data = await resp.json() as {
     total_count: number;
     items: Array<{ path: string; html_url: string }>;
