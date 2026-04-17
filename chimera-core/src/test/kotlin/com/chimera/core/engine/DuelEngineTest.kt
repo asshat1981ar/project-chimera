@@ -16,11 +16,19 @@ class DuelEngineTest {
         rng: Random = Random.Default
     ) = DuelEngine("Player", "Opponent", opponentResolve, playerModifier, rng)
 
-    // Always returns 0f so opponent roll (0f + modifier) < 0.33f → STRIKE → DRAW against player STRIKE
-    private val drawRng = Random(seed = 0L).let { _ ->
-        object : Random() {
-            override fun nextBits(bitCount: Int) = 0
-        }
+    // nextBits=0 → nextFloat()=0f → roll < 0.33f → opponent picks STRIKE; DRAW vs player STRIKE
+    private val drawRng = object : Random() {
+        override fun nextBits(bitCount: Int) = 0
+    }
+
+    // nextBits all-ones → nextFloat()≈1f → roll ≥ 0.66f → opponent picks FEINT
+    private val feintRng = object : Random() {
+        override fun nextBits(bitCount: Int) = (1 shl bitCount) - 1
+    }
+
+    // nextBits high-bit → nextFloat()=0.5f → roll ∈ [0.33f,0.66f) → opponent picks WARD
+    private val wardRng = object : Random() {
+        override fun nextBits(bitCount: Int) = 1 shl (bitCount - 1)
     }
 
     @Test
@@ -205,5 +213,81 @@ class DuelEngineTest {
         val result = engine.executeRound(DuelEngine.Stance.STRIKE)
         // Should not crash -- modifier is clamped to -0.3..0.3
         assertNotNull(result)
+    }
+
+    // --- Deterministic outcome tests ---
+
+    @Test
+    fun `ward beats strike deterministically`() {
+        val engine = createEngine(opponentResolve = 3, rng = drawRng) // opponent always STRIKE
+        val result = engine.executeRound(DuelEngine.Stance.WARD)
+        assertEquals(DuelEngine.Stance.STRIKE, result.opponentStance)
+        assertEquals(DuelEngine.RoundOutcome.WIN, result.outcome)
+        assertEquals(2, engine.getState().opponentResolve)
+        assertEquals(3, engine.getState().playerOmens) // 2 + 1
+    }
+
+    @Test
+    fun `strike beats feint deterministically`() {
+        val engine = createEngine(opponentResolve = 3, rng = feintRng) // opponent always FEINT
+        val result = engine.executeRound(DuelEngine.Stance.STRIKE)
+        assertEquals(DuelEngine.Stance.FEINT, result.opponentStance)
+        assertEquals(DuelEngine.RoundOutcome.WIN, result.outcome)
+        assertEquals(2, engine.getState().opponentResolve)
+        assertEquals(3, engine.getState().playerOmens)
+    }
+
+    @Test
+    fun `feint beats ward deterministically`() {
+        val engine = createEngine(opponentResolve = 3, rng = wardRng) // opponent always WARD
+        val result = engine.executeRound(DuelEngine.Stance.FEINT)
+        assertEquals(DuelEngine.Stance.WARD, result.opponentStance)
+        assertEquals(DuelEngine.RoundOutcome.WIN, result.outcome)
+        assertEquals(2, engine.getState().opponentResolve)
+        assertEquals(3, engine.getState().playerOmens)
+    }
+
+    @Test
+    fun `omen depletion ends duel with player loss`() {
+        // feintRng opponent FEINT, player WARD → LOSE every round, omens 2→1→0
+        val engine = createEngine(opponentResolve = 3, rng = feintRng)
+        engine.executeRound(DuelEngine.Stance.WARD)
+        assertFalse(engine.getState().isComplete)
+        assertEquals(1, engine.getState().playerOmens)
+        engine.executeRound(DuelEngine.Stance.WARD)
+        assertTrue(engine.getState().isComplete)
+        assertEquals(0, engine.getState().playerOmens)
+        assertEquals(false, engine.getState().playerWon)
+    }
+
+    @Test
+    fun `round 7 timeout with all draws results in player loss`() {
+        // drawRng → DRAW every round; no resolve change → no partial progress at round 7
+        val engine = createEngine(opponentResolve = 5, rng = drawRng)
+        repeat(7) { engine.executeRound(DuelEngine.Stance.STRIKE) }
+        val state = engine.getState()
+        assertTrue(state.isComplete)
+        assertEquals(7, state.round)
+        assertEquals(false, state.playerWon)
+    }
+
+    @Test
+    fun `round 7 timeout with winning progress results in player win`() {
+        // drawRng opponent STRIKE, player WARD → WIN every round; opponentResolve=10 won't hit 0 in 7
+        val engine = createEngine(opponentResolve = 10, rng = drawRng)
+        repeat(7) { engine.executeRound(DuelEngine.Stance.WARD) }
+        val state = engine.getState()
+        assertTrue(state.isComplete)
+        assertEquals(7, state.round)
+        assertEquals(true, state.playerWon)
+    }
+
+    @Test
+    fun `escalation text appears from round 2 onwards`() {
+        val engine = createEngine(opponentResolve = 100, rng = drawRng)
+        val r1 = engine.executeRound(DuelEngine.Stance.STRIKE) // round 1: no prefix
+        assertFalse(r1.narrative.contains("You test each other"))
+        val r2 = engine.executeRound(DuelEngine.Stance.STRIKE) // round 2: has prefix
+        assertTrue(r2.narrative.startsWith("You test each other's measure."))
     }
 }
