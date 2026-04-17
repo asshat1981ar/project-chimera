@@ -41,4 +41,6 @@ dependencies {
 
     // Coil — async image loading (portrait system)
     implementation(libs.coil.compose)
+
+    testImplementation(libs.junit)
 }
