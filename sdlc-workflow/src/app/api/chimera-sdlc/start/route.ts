@@ -1,11 +1,13 @@
 import { start } from 'workflow/api';
 import { chimeraSprintWorkflow } from '@/workflows/orchestrator';
-import type { GatePayload } from '@/lib/types';
+import type { GatePayload, SprintInput } from '@/lib/types';
 
 function verifySecret(req: Request): boolean {
   const secret = req.headers.get('x-sdlc-secret');
   return secret === process.env.SDLC_WEBHOOK_SECRET;
 }
+
+type QueueItem = { sprintVersion: string; taskManifest: string; gatePayload: GatePayload; branch: string };
 
 export async function POST(req: Request) {
   if (!verifySecret(req)) {
@@ -17,10 +19,18 @@ export async function POST(req: Request) {
     taskManifest: string;
     gatePayload: GatePayload;
     branch: string;
-    sprintQueue?: Array<{ sprintVersion: string; taskManifest: string; gatePayload: GatePayload; branch: string }>;
+    sprintQueue?: QueueItem[];
   };
 
   const runId = `${body.sprintVersion}-${Date.now()}`;
+
+  const sprintQueue: SprintInput[] | undefined = body.sprintQueue?.map((item) => ({
+    runId: `${item.sprintVersion}-${Date.now()}`,
+    sprintVersion: item.sprintVersion,
+    taskManifest: item.taskManifest,
+    gatePayload: item.gatePayload,
+    branch: item.branch ?? 'main',
+  }));
 
   await start(chimeraSprintWorkflow, [{
     runId,
@@ -28,7 +38,7 @@ export async function POST(req: Request) {
     taskManifest: body.taskManifest,
     gatePayload: body.gatePayload,
     branch: body.branch ?? 'main',
-    sprintQueue: body.sprintQueue,
+    sprintQueue,
   }]);
 
   return Response.json({ runId, status: 'started' });
