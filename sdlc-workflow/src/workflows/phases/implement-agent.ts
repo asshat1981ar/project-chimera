@@ -3,6 +3,8 @@ import { DurableAgent } from '@workflow/ai/agent';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { readFile, writeFile, listDirectory, searchCode } from '@/lib/tools/github-file-tools';
+import { detektTool } from '@/lib/tools/detekt-tool';
+import { ciLogsTool } from '@/lib/tools/ci-logs-tool';
 import { buildImplementSystemPrompt } from '@/lib/prompts/implement-system-prompt';
 import type { PhaseResult, ReviewPayload } from '@/lib/types';
 
@@ -69,6 +71,8 @@ async function runAgent(taskManifest: string, branch: string): Promise<string> {
       }),
       execute: async ({ query, extension }) => searchCode(query, extension),
     }),
+    runDetekt: detektTool,
+    fetchCILogs: ciLogsTool,
   };
 
   const agent = new DurableAgent({
