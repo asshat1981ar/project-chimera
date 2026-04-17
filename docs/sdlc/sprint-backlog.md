@@ -115,20 +115,16 @@
 
 ---
 
-## Sprint 7 — Persistence + Combat Tests [PLANNED]
+## ✅ Sprint 7 — Persistence + Combat Tests [COMPLETE]
 
 **Goal:** Wire journal entry persistence end-to-end through Room, wire settings persistence via DataStore, and build a deterministic CombatEngine integration test suite.
 
 **Scope:**
-- ⏳ PRO-66 (M): `feature-journal` entry persistence — implement `SaveJournalEntryUseCase`, wire `JournalViewModel.saveEntry()` → use-case → `JournalEntryDao.insert()`, write 6 domain + 4 ViewModel tests
-- ⏳ PRO-67 (M): `feature-settings` persistence via DataStore — `SettingsRepository` backed by `DataStore<Preferences>`, wire `SettingsViewModel` reads/writes, write 5 repository + 3 ViewModel tests
-- ⏳ PRO-68 (M): CombatEngine integration test suite — `chimera-core` + `feature-camp` e2e: full 3-phase combat flow (stance → feint/ward → resolve), omen depletion, surrender threshold, 8 deterministic tests using injectable `Random`
+- ✅ PRO-66 (M): `SaveJournalEntryUseCase` created; `JournalViewModel.saveEntry()` wired with error handling; 6 domain tests + 4 ViewModel tests
+- ✅ PRO-67 (M): 3 SettingsViewModel tests (setTextScale, toggleAiMode, setAnalyticsOptIn) + 5 DataStore contract tests — 8 tests total
+- ✅ PRO-68 (M): `CombatEngineIntegrationTest` — 8 deterministic multi-round sequence tests using `fixedRng`/`sequenceRng`; existing 31 CombatEngineTest tests unchanged
 
-**Exit Criteria:**
-- `./gradlew testMockDebugUnitTest` passes with new test coverage
-- Journal entries written to Room survive process death (confirmed by DAO insert test)
-- Settings written via DataStore survive process death (confirmed by SettingsRepository test)
-- CombatEngine integration tests cover all 3 outcome paths (WIN, DRAW, SURRENDER)
+**Outcome:** `./gradlew testMockDebugUnitTest :chimera-core:test` — BUILD SUCCESSFUL. Journal save now persists via use-case layer with error state. Settings DataStore persistence verified. CombatEngine integration coverage added.
 
 ---
 

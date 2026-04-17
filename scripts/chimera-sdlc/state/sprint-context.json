@@ -1,8 +1,51 @@
 {
-  "sprint_version": "",
-  "branch": "",
-  "tasks": [],
-  "completed_tasks": [],
+  "sprint_version": "v1.10.0",
+  "branch": "feat/chimera-v1.10.0-sprint7",
+  "tasks": [
+    {
+      "id": "PRO-66",
+      "title": "`feature-journal` entry persistence \u2014 implement `SaveJournalEntryUseCase`, wire `JournalViewModel.saveEntry()` \u2192 use-case \u2192 `JournalEntryDao.insert()`, write 6 domain + 4 ViewModel tests",
+      "status": "done",
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ]
+    },
+    {
+      "id": "PRO-67",
+      "title": "`feature-settings` persistence via DataStore \u2014 `SettingsRepository` backed by `DataStore<Preferences>`, wire `SettingsViewModel` reads/writes, write 5 repository + 3 ViewModel tests",
+      "status": "done",
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ]
+    },
+    {
+      "id": "PRO-68",
+      "title": "CombatEngine integration test suite \u2014 `chimera-core` + `feature-camp` e2e: full 3-phase combat flow (stance \u2192 feint/ward \u2192 resolve), omen depletion, surrender threshold, 8 deterministic tests using injectable `Random`",
+      "status": "done",
+      "technique": "CoT+ContextAware",
+      "pipeline": [
+        "analyze-surface",
+        "strategy",
+        "generate",
+        "coverage-gap"
+      ]
+    }
+  ],
+  "completed_tasks": [
+    "PRO-66",
+    "PRO-67",
+    "PRO-68"
+  ],
   "failed_tasks": [],
   "correction_attempts": {},
   "linear_issues": [],
@@ -12,6 +55,8 @@
     "all": null
   },
   "arch_violations": [],
-  "phase_history": [],
+  "phase_history": [
+    "gate"
+  ],
   "previous_sprint": "v1.10.0"
 }
