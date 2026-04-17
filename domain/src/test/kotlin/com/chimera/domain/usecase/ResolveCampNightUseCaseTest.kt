@@ -4,7 +4,6 @@ import com.chimera.data.NightEvent
 import com.chimera.data.NightEventChoice
 import com.chimera.data.NightEventProvider
 import com.chimera.data.RumorService
-import com.chimera.data.repository.CampRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -16,10 +15,9 @@ import org.mockito.kotlin.whenever
 class ResolveCampNightUseCaseTest {
 
     private val nightEventProvider: NightEventProvider = mock()
-    private val campRepository: CampRepository = mock()
     private val rumorService: RumorService = mock()
 
-    private fun useCase() = ResolveCampNightUseCase(nightEventProvider, campRepository, rumorService)
+    private fun useCase() = ResolveCampNightUseCase(nightEventProvider, rumorService)
 
     private val testChoice = NightEventChoice(
         text = "Listen quietly",

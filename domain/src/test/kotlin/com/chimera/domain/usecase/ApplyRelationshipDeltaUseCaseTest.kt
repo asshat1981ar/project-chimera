@@ -1,7 +1,7 @@
 package com.chimera.domain.usecase
 
 import com.chimera.data.repository.CharacterRepository
-import com.chimera.database.dao.JournalEntryDao
+import com.chimera.data.repository.JournalRepository
 import com.chimera.database.entity.JournalEntryEntity
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -16,9 +16,9 @@ import org.junit.Assert.assertTrue
 class ApplyRelationshipDeltaUseCaseTest {
 
     private val characterRepository: CharacterRepository = mock()
-    private val journalEntryDao: JournalEntryDao = mock()
+    private val journalRepository: JournalRepository = mock()
 
-    private fun useCase() = ApplyRelationshipDeltaUseCase(characterRepository, journalEntryDao)
+    private fun useCase() = ApplyRelationshipDeltaUseCase(characterRepository, journalRepository)
 
     @Test
     fun `always adjusts disposition regardless of delta size`() = runTest {
@@ -31,7 +31,7 @@ class ApplyRelationshipDeltaUseCaseTest {
     fun `does not insert journal entry when delta is below threshold`() = runTest {
         useCase()(slotId = 1L, characterId = "elena", characterName = "Elena", delta = 0.05f)
 
-        verify(journalEntryDao, never()).insert(any())
+        verify(journalRepository, never()).insertEntry(any())
     }
 
     @Test
@@ -39,7 +39,7 @@ class ApplyRelationshipDeltaUseCaseTest {
         useCase()(slotId = 1L, characterId = "elena", characterName = "Elena", delta = 0.15f)
 
         val captor = argumentCaptor<JournalEntryEntity>()
-        verify(journalEntryDao).insert(captor.capture())
+        verify(journalRepository).insertEntry(captor.capture())
         val entry = captor.firstValue
         assertEquals(1L, entry.saveSlotId)
         assertEquals("companion", entry.category)
@@ -52,7 +52,7 @@ class ApplyRelationshipDeltaUseCaseTest {
         useCase()(slotId = 2L, characterId = "thorne", characterName = "Thorne", delta = -0.2f)
 
         val captor = argumentCaptor<JournalEntryEntity>()
-        verify(journalEntryDao).insert(captor.capture())
+        verify(journalRepository).insertEntry(captor.capture())
         assertTrue(captor.firstValue.body.contains("grown colder toward"))
     }
 
@@ -67,7 +67,7 @@ class ApplyRelationshipDeltaUseCaseTest {
         )
 
         val captor = argumentCaptor<JournalEntryEntity>()
-        verify(journalEntryDao).insert(captor.capture())
+        verify(journalRepository).insertEntry(captor.capture())
         assertTrue(captor.firstValue.body.contains("the shrine encounter"))
     }
 
@@ -76,6 +76,6 @@ class ApplyRelationshipDeltaUseCaseTest {
         useCase()(slotId = 1L, characterId = "warden", characterName = "Warden",
             delta = ApplyRelationshipDeltaUseCase.JOURNAL_THRESHOLD)
 
-        verify(journalEntryDao).insert(any())
+        verify(journalRepository).insertEntry(any())
     }
 }
