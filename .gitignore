@@ -33,3 +33,5 @@ google-services.json
 *.hprof
 chimera-saves/.wrangler/
 tasks/
+.vercel
+.env*.local

@@ -5,7 +5,7 @@
     {
       "id": "PRO-62",
       "title": "Scaffold test infrastructure (src/test + deps + smoke tests) for feature-home, feature-dialogue, feature-map, feature-party, feature-journal, feature-settings",
-      "status": "todo",
+      "status": "done",
       "technique": "CoT+ContextAware",
       "pipeline": [
         "analyze-surface",
@@ -29,7 +29,8 @@
     }
   ],
   "completed_tasks": [
-    "PRO-58"
+    "PRO-58",
+    "PRO-62"
   ],
   "failed_tasks": [
     "PRO-58"
