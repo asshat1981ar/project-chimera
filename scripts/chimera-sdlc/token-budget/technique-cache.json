@@ -36,6 +36,29 @@
       ],
       "cached_at": "2026-04-17T03:12:16.757009+00:00",
       "ttl_hours": 72
+    },
+    "scaffold-test-infrastructure-(src/test-+": {
+      "technique": "CoT+ContextAware",
+      "pipeline": [
+        "analyze-surface",
+        "strategy",
+        "generate",
+        "coverage-gap"
+      ],
+      "cached_at": "2026-04-17T03:41:36.448088+00:00",
+      "ttl_hours": 72
+    },
+    "rewrite-implement.sh-\u2014-replace-`claude--": {
+      "technique": "MoT",
+      "pipeline": [
+        "interface-design",
+        "modular-decomp",
+        "impl-module",
+        "integration",
+        "harden"
+      ],
+      "cached_at": "2026-04-17T03:41:36.448088+00:00",
+      "ttl_hours": 72
     }
   }
 }
