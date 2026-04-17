@@ -47,17 +47,17 @@
 
 ---
 
-## Sprint 3 — Build Green + Feature Wiring [PLANNED]
+## ✅ Sprint 3 — Build Green + Feature Wiring [COMPLETE]
 
 **Goal:** Achieve a clean `assembleMockDebug` APK build and wire the two highest-value player-facing gaps surfaced by the v1.9.0 retrospective.
 
 **Scope:**
 - ✅ Fix `feature-map`: add kotlinx-serialization dep + BoxWithConstraints layout scope (post-sprint hotfix, committed)
 - ✅ AUTO-IMPROVE-1: Lift all 12 remaining modules to JVM 17 (committed)
-- ⏳ PRO-58 (S): Wire NPC letter-avatar portrait fallback in dialogue, party, camp screens
-- ⏳ PRO-59 (M): ViewModel unit tests for `feature-camp` (InventoryViewModel + CampViewModel)
-- ⏳ PRO-60 (M): Wire HomeScreen continue-game to last incomplete SceneInstance
-- ⏳ `./gradlew assembleMockDebug` — verify full APK builds green after the serialization + JVM fixes
+- ✅ PRO-58 (S): Wire NPC letter-avatar portrait fallback in dialogue, party, camp screens
+- ✅ PRO-59 (M): ViewModel unit tests for `feature-camp` (InventoryViewModel + CampViewModel) — 31 tests
+- ✅ PRO-60 (M): Wire HomeScreen continue-game to last incomplete SceneInstance
+- ✅ `./gradlew assembleMockDebug` → BUILD SUCCESSFUL (fixed theme, icons, 4 compile errors)
 
 **Exit Criteria:**
 - `./gradlew assembleMockDebug` → BUILD SUCCESSFUL
