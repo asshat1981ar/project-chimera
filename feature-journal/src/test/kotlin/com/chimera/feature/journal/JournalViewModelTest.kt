@@ -64,7 +64,7 @@ class JournalViewModelTest {
     }
 
     @Test
-    fun saveEntry_invokesUseCase() = runTest {
+    fun saveEntry_invokesUseCase() = runTest(testDispatcher) {
         val viewModel = buildViewModel()
         val entry = fakeEntry()
 
@@ -75,7 +75,7 @@ class JournalViewModelTest {
     }
 
     @Test
-    fun saveEntry_passesEntryToUseCase() = runTest {
+    fun saveEntry_passesEntryToUseCase() = runTest(testDispatcher) {
         val viewModel = buildViewModel()
         val entry = fakeEntry()
 
@@ -86,7 +86,7 @@ class JournalViewModelTest {
     }
 
     @Test
-    fun saveEntry_withStoryCategory() = runTest {
+    fun saveEntry_withStoryCategory() = runTest(testDispatcher) {
         val viewModel = buildViewModel()
         val entry = fakeEntry(category = "story")
 
@@ -97,7 +97,7 @@ class JournalViewModelTest {
     }
 
     @Test
-    fun saveEntry_withVowCategory() = runTest {
+    fun saveEntry_withVowCategory() = runTest(testDispatcher) {
         val viewModel = buildViewModel()
         val entry = fakeEntry(category = "vow")
 

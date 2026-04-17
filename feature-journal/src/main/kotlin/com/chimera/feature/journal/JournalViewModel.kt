@@ -35,7 +35,8 @@ data class JournalUiState(
     val entries: List<JournalEntryEntity> = emptyList(),
     val vows: List<VowEntity> = emptyList(),
     val unreadCount: Int = 0,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val errorMessage: String? = null
 )
 
 /** Escapes FTS5 special characters in a query string. */
@@ -53,9 +54,12 @@ class JournalViewModel @Inject constructor(
 
     private val _selectedTab = MutableStateFlow(JournalTab.ALL)
     private val _searchQuery = MutableStateFlow("")
+    private val _errorMessage = MutableStateFlow<String?>(null)
 
     /** Exposed for the search bar composable. */
     val searchQuery: StateFlow<String> = _searchQuery
+
+    val errorMessage: StateFlow<String?> = _errorMessage
 
     val uiState: StateFlow<JournalUiState> = gameSessionManager.activeSlotId
         .flatMapLatest { slotId ->
@@ -122,7 +126,15 @@ class JournalViewModel @Inject constructor(
 
     fun saveEntry(entry: JournalEntryEntity) {
         viewModelScope.launch {
-            saveJournalEntryUseCase(entry)
+            try {
+                saveJournalEntryUseCase(entry)
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to save entry"
+            }
         }
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
     }
 }
