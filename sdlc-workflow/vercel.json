@@ -1,0 +1,15 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "regions": ["iad1"],
+  "env": {
+    "SDLC_WEBHOOK_SECRET": "@sdlc-webhook-secret",
+    "GITHUB_PAT": "@chimera-github-pat",
+    "KV_URL": "@kv-url",
+    "KV_REST_API_URL": "@kv-rest-api-url",
+    "KV_REST_API_TOKEN": "@kv-rest-api-token",
+    "KV_REST_API_READ_ONLY_TOKEN": "@kv-rest-api-read-only-token"
+  }
+}
