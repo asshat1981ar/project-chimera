@@ -9,7 +9,7 @@ export SDLC_API_URL="${SDLC_API_URL:-}"
 export SDLC_WEBHOOK_SECRET="${SDLC_WEBHOOK_SECRET:-}"
 
 python3 - <<'PYEOF'
-import json, os, sys, time, urllib.request, urllib.error
+import json, os, subprocess, sys, time, urllib.request, urllib.error
 from pathlib import Path
 
 STATE = Path("scripts/chimera-sdlc/state")
@@ -63,13 +63,17 @@ gate_payload = {
 }
 
 sprint_version = ctx.get("sprint_version") or "dev"
+branch = ctx.get("branch") or subprocess.check_output(
+    ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+).strip()
 
 # --- POST /start ---
-print(f"[IMPLEMENT] Dispatching sprint {sprint_version} to Vercel Workflow...")
+print(f"[IMPLEMENT] Dispatching sprint {sprint_version} (branch: {branch}) to Vercel Workflow...")
 payload = json.dumps({
     "sprintVersion": sprint_version,
     "taskManifest":  task_manifest,
     "gatePayload":   gate_payload,
+    "branch":        branch,
 }).encode()
 
 req = urllib.request.Request(

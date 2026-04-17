@@ -1,15 +1,15 @@
+import { start } from 'workflow/api';
 import { runGatePhase } from './phases/gate';
 import { runImplementPhase } from './phases/implement';
 import { runValidatePhase } from './phases/validate';
 import { runReleasePhase } from './phases/release';
 import { runReflectPhase } from './phases/reflect';
-import type { GatePayload, SprintRun } from '@/lib/types';
+import type { SprintRun, OrchestratorInput, SprintInput } from '@/lib/types';
 
-interface OrchestratorInput {
-  runId: string;
-  sprintVersion: string;
-  taskManifest: string;
-  gatePayload: GatePayload;
+async function startNextSprint(next: SprintInput, rest: SprintInput[]): Promise<void> {
+  'use step';
+  await start(chimeraSprintWorkflow, [{ ...next, sprintQueue: rest }]);
+  console.log(`[CHAIN] Queued sprint ${next.sprintVersion} (${rest.length} remaining in queue)`);
 }
 
 async function saveRun(run: SprintRun): Promise<void> {
@@ -45,7 +45,7 @@ export async function chimeraSprintWorkflow(input: OrchestratorInput): Promise<S
   run.currentPhase = 'implement';
   await saveRun(run);
 
-  const implementResult = await runImplementPhase(input.runId, input.taskManifest);
+  const implementResult = await runImplementPhase(input.runId, input.taskManifest, input.sprintVersion, input.branch);
   run.phases.implement = implementResult;
 
   if (implementResult.status === 'failed') {
@@ -91,5 +91,12 @@ export async function chimeraSprintWorkflow(input: OrchestratorInput): Promise<S
   run.phases.reflect = reflectResult;
 
   await saveRun(run);
+
+  // ── Chain next sprint if queue is non-empty ───────────────────
+  if (input.sprintQueue && input.sprintQueue.length > 0) {
+    const [next, ...rest] = input.sprintQueue;
+    await startNextSprint(next, rest);
+  }
+
   return run;
 }

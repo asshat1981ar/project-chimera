@@ -16,6 +16,8 @@ export async function POST(req: Request) {
     sprintVersion: string;
     taskManifest: string;
     gatePayload: GatePayload;
+    branch: string;
+    sprintQueue?: Array<{ sprintVersion: string; taskManifest: string; gatePayload: GatePayload; branch: string }>;
   };
 
   const runId = `${body.sprintVersion}-${Date.now()}`;
@@ -25,6 +27,8 @@ export async function POST(req: Request) {
     sprintVersion: body.sprintVersion,
     taskManifest: body.taskManifest,
     gatePayload: body.gatePayload,
+    branch: body.branch ?? 'main',
+    sprintQueue: body.sprintQueue,
   }]);
 
   return Response.json({ runId, status: 'started' });
