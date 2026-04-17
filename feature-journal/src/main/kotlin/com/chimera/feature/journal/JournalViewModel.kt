@@ -7,6 +7,7 @@ import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.VowDao
 import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.VowEntity
+import com.chimera.domain.usecase.SaveJournalEntryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -46,7 +47,8 @@ private fun escapeFtsQuery(raw: String): String =
 class JournalViewModel @Inject constructor(
     private val journalEntryDao: JournalEntryDao,
     private val vowDao: VowDao,
-    private val gameSessionManager: GameSessionManager
+    private val gameSessionManager: GameSessionManager,
+    private val saveJournalEntryUseCase: SaveJournalEntryUseCase
 ) : ViewModel() {
 
     private val _selectedTab = MutableStateFlow(JournalTab.ALL)
@@ -115,6 +117,12 @@ class JournalViewModel @Inject constructor(
     fun markRead(entryId: Long) {
         viewModelScope.launch {
             journalEntryDao.markRead(entryId)
+        }
+    }
+
+    fun saveEntry(entry: JournalEntryEntity) {
+        viewModelScope.launch {
+            saveJournalEntryUseCase(entry)
         }
     }
 }
