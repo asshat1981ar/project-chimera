@@ -225,6 +225,17 @@ private fun archetypeColor(archetype: String): Color = when (archetype) {
 
 // ── Package-internal helpers (visible to tests) ───────────────────────────────
 
-/** Returns the first letter character of [name] in uppercase, or "?" if none exists. */
-internal fun npcInitial(name: String): String =
-    name.firstOrNull { it.isLetter() }?.uppercase() ?: "?"
+/** Returns the first two letter-characters of [name] in uppercase.
+ *  For single-word names returns one letter ("Warden" → "WA", "X" → "X").
+ *  For empty/non-letter names returns "?" or "?X" as appropriate. */
+internal fun npcInitial(name: String): String {
+    val letters = name.trim()
+        .split(Regex("\\s+"))
+        .flatMap { word -> word.firstOrNull { it.isLetter() }?.uppercase()?.let { listOf(it) } ?: emptyList() }
+        .take(2)
+    return when {
+        letters.size >= 2 -> "${letters[0]}${letters[1]}"
+        letters.size == 1 -> letters[0]
+        else -> "?"
+    }
+}

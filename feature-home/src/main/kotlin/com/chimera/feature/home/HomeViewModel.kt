@@ -72,11 +72,13 @@ class HomeViewModel @Inject constructor(
 
                 // Detect act advance — emit interstitial flag when chapter tag changes
                 // and it's not the first load (lastKnownChapterTag != null).
+                // hollow_approach_complete is a bridge tag: skipping it avoids double interstitial.
                 val chapterTag = slot.chapterTag
                 val pending = if (
                     lastKnownChapterTag != null &&
                     lastKnownChapterTag != chapterTag &&
-                    chapterTag != "prologue"
+                    chapterTag != "prologue" &&
+                    chapterTag != "hollow_approach_complete"
                 ) chapterTag else null
                 lastKnownChapterTag = chapterTag
 
