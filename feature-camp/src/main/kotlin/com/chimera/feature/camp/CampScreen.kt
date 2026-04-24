@@ -314,6 +314,7 @@ private fun CompanionCard(data: CompanionCardData) {
     }
 
     Card(
+        modifier = Modifier.testTag("card_companion_${data.character.id}"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, moodColor.copy(alpha = 0.3f))
     ) {

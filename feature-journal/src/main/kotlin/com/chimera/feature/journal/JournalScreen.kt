@@ -284,6 +284,7 @@ private fun VowCard(vow: VowEntity) {
     }
 
     Card(
+        modifier = Modifier.testTag("card_vow_${vow.id}"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, statusColor.copy(alpha = 0.4f))
     ) {
