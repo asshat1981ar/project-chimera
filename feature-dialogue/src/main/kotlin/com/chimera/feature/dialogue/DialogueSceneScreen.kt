@@ -115,7 +115,8 @@ fun DialogueSceneScreen(
                     disposition = uiState.npcDisposition,
                     archetype = uiState.npcArchetype,
                     portraitResName = uiState.npcPortraitResName,
-                    size = 40.dp
+                    size = 40.dp,
+                    contentDescription = "${uiState.npcName} portrait"
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {

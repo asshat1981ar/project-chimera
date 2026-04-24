@@ -110,7 +110,7 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.AutoStories,
-                            contentDescription = null,
+                            contentDescription = "Auto stories",
                             tint = EmberGold,
                             modifier = Modifier.size(20.dp)
                         )

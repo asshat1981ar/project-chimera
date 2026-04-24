@@ -318,7 +318,8 @@ private fun CompanionCard(data: CompanionCardData) {
                 disposition = data.state?.dispositionToPlayer ?: 0f,
                 archetype = data.state?.activeArchetype,
                 portraitResName = data.character.portraitResName,
-                size = 48.dp
+                size = 48.dp,
+                contentDescription = "${data.character.name} portrait"
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
