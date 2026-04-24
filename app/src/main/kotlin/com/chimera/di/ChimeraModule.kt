@@ -1,5 +1,6 @@
 package com.chimera.di
 
+import com.chimera.core.engine.RelationshipArchetypeEngine
 import com.chimera.core.events.GameEventBus
 import com.chimera.core.simulation.GameStateMachine
 import dagger.Module
@@ -23,4 +24,8 @@ object ChimeraModule {
     @Provides
     @Singleton
     fun provideGameStateMachine(): GameStateMachine = GameStateMachine()
+
+    @Provides
+    @Singleton
+    fun provideRelationshipArchetypeEngine(): RelationshipArchetypeEngine = RelationshipArchetypeEngine()
 }

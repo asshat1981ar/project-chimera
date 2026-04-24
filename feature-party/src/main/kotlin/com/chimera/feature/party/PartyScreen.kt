@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.domain.usecase.RelationshipDynamics
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -248,6 +249,30 @@ private fun CompanionDetail(
             StatBar("Disposition", disposition, -1f..1f,
                 color = when { disposition > 0.2f -> VoidGreen; disposition > -0.2f -> FadedBone; else -> HollowCrimson })
             StatBar("Health", healthFraction, 0f..1f, color = VoidGreen)
+
+            // ADD: Relationship trend graph
+            if (member.dispositionHistory.size >= 2) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("Disposition Trend", style = MaterialTheme.typography.labelMedium, color = FadedBone)
+                RelationshipTrendGraph(
+                    snapshots = member.dispositionHistory,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+
+            // ADD: Archetype badge
+            member.relationshipDynamics?.let { dynamics ->
+                if (dynamics.activeArchetype != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ArchetypeBadge(dynamics = dynamics)
+                }
+
+                // ADD: Feedback loop summary
+                if (dynamics.feedbackLoops.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FeedbackLoopSummary(dynamics = dynamics)
+                }
+            }
 
             member.state?.activeArchetype?.let {
                 Spacer(modifier = Modifier.height(8.dp))

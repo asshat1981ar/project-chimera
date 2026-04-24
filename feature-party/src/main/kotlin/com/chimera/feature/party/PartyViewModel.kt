@@ -11,6 +11,9 @@ import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.CharacterStateEntity
 import com.chimera.database.entity.FactionStateEntity
 import com.chimera.database.entity.MemoryShardEntity
+import com.chimera.domain.usecase.GetRelationshipDynamicsUseCase
+import com.chimera.domain.usecase.RelationshipDynamics
+import com.chimera.feature.party.DispositionSnapshot
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +30,9 @@ import javax.inject.Inject
 data class PartyMember(
     val character: CharacterEntity,
     val state: CharacterStateEntity?,
-    val recentMemories: List<MemoryShardEntity> = emptyList()
+    val recentMemories: List<MemoryShardEntity> = emptyList(),
+    val dispositionHistory: List<DispositionSnapshot> = emptyList(),
+    val relationshipDynamics: RelationshipDynamics? = null
 )
 
 data class PartyUiState(
@@ -43,11 +48,13 @@ class PartyViewModel @Inject constructor(
     private val characterStateDao: CharacterStateDao,
     private val memoryShardDao: MemoryShardDao,
     private val factionStateDao: FactionStateDao,
-    private val gameSessionManager: GameSessionManager
+    private val gameSessionManager: GameSessionManager,
+    private val getRelationshipDynamics: GetRelationshipDynamicsUseCase
 ) : ViewModel() {
 
     private val _selectedId = MutableStateFlow<String?>(null)
     private val _memoryCache = MutableStateFlow<Map<String, List<MemoryShardEntity>>>(emptyMap())
+    private val _dispositionHistory = MutableStateFlow<Map<String, List<DispositionSnapshot>>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<PartyUiState> = gameSessionManager.activeSlotId
@@ -58,19 +65,29 @@ class PartyViewModel @Inject constructor(
                 characterStateDao.observeBySlot(slotId),
                 factionStateDao.observeAll(slotId),
                 _selectedId,
-                _memoryCache
-            ) { characters, states, factions, selectedId, memoryCache ->
+                _memoryCache,
+                _dispositionHistory
+            ) { args ->
+                val characters = args[0] as List<CharacterEntity>
+                val states = args[1] as List<CharacterStateEntity>
+                val factions = args[2] as List<FactionStateEntity>
+                val selectedId = args[3] as String?
+                val memoryCache = args[4] as Map<String, List<MemoryShardEntity>>
+                val dispositionHistory = args[5] as Map<String, List<DispositionSnapshot>>
+
                 val stateMap = states.associateBy { it.characterId }
                 val members = characters
-                    .filter { !it.isPlayerCharacter }
+                    .filter { character -> !character.isPlayerCharacter }
                     .map { char ->
                         PartyMember(
                             character = char,
                             state = stateMap[char.id],
-                            recentMemories = memoryCache[char.id] ?: emptyList()
+                            recentMemories = memoryCache[char.id] ?: emptyList(),
+                            dispositionHistory = dispositionHistory[char.id] ?: emptyList(),
+                            relationshipDynamics = getRelationshipDynamics(char.id)
                         )
                     }
-                val selected = selectedId?.let { id -> members.find { it.character.id == id } }
+                val selected = selectedId?.let { memberId -> members.find { member -> member.character.id == memberId } }
                 PartyUiState(
                     members = members,
                     factions = factions,
@@ -95,6 +112,24 @@ class PartyViewModel @Inject constructor(
         viewModelScope.launch {
             val memories = memoryShardDao.getTopMemories(slotId, characterId, limit = 10)
             _memoryCache.update { cache -> cache + (characterId to memories) }
+        }
+    }
+
+    fun recordDispositionSnapshot(characterId: String) {
+        viewModelScope.launch {
+            val slotId = gameSessionManager.activeSlotId.value ?: return@launch
+            val state = characterStateDao.getByCharacterId(characterId) ?: return@launch
+            val currentDisposition = state.dispositionToPlayer
+
+            _dispositionHistory.update { history ->
+                val existing = history[characterId] ?: emptyList()
+                val snapshot = DispositionSnapshot(
+                    disposition = currentDisposition,
+                    delta = if (existing.isNotEmpty()) currentDisposition - existing.last().disposition else 0f
+                )
+                val updated = (existing + snapshot).takeLast(10)
+                history + (characterId to updated)
+            }
         }
     }
 }

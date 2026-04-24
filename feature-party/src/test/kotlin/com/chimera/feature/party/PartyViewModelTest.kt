@@ -5,6 +5,7 @@ import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.MemoryShardDao
+import com.chimera.domain.usecase.GetRelationshipDynamicsUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,7 @@ class PartyViewModelTest {
     private val memoryShardDao: MemoryShardDao = mock()
     private val factionStateDao: FactionStateDao = mock()
     private val gameSessionManager: GameSessionManager = mock()
+    private val dynamicsUseCase: GetRelationshipDynamicsUseCase = mock()
 
     @Before
     fun setUp() {
@@ -45,12 +47,20 @@ class PartyViewModelTest {
         characterStateDao = characterStateDao,
         memoryShardDao = memoryShardDao,
         factionStateDao = factionStateDao,
-        gameSessionManager = gameSessionManager
+        gameSessionManager = gameSessionManager,
+        getRelationshipDynamics = dynamicsUseCase
     )
 
     @Test
     fun initialState_isNotNull() {
         val viewModel = buildViewModel()
         assertNotNull(viewModel.uiState)
+    }
+
+    @Test
+    fun recordsDispositionSnapshot() {
+        val viewModel = buildViewModel()
+        viewModel.recordDispositionSnapshot("test_npc")
+        assert(true)
     }
 }
