@@ -112,9 +112,9 @@ semantics {} blocks added to SpeakingWaveIcon, disposition bars, faction standin
 
 Recomposition analysis complete for HomeScreen and DialogueSceneScreen. Optimization recommendations documented.
 
-### P5 — Low (optimization fixes)
+### ✅ P5 — Complete (optimization fixes)
 
-Pending: Implement optimization recommendations from performance profiling.
+Performance optimizations applied: sendMessage memoized, borderColor remembered, Modifier constants extracted.
 
 ---
 

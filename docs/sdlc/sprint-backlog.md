@@ -178,6 +178,21 @@
 
 ---
 
+## ✅ Sprint 11 — Performance Optimizations [COMPLETE]
+
+**Goal:** Fix recomposition hotspots identified in profiling.
+
+**Scope:**
+- ✅ DialogueSceneScreen: sendMessage lambda memoized with rememberUpdatedState
+- ✅ DialogueSceneScreen: borderColor calculation wrapped in remember {}
+- ✅ HomeScreen: Modifier constants extracted for reuse
+- ✅ HomeScreen: Default lambda wrapped in file-level constant
+
+**Exit Criteria met:**
+- ✅ All recomposition hotspots addressed
+
+---
+
 ## Later Backlog
 
-- Performance optimization: Fix recomposition hotspots (task-010)
+All accessibility and performance items complete. New backlog items to be determined via codebase scan.
