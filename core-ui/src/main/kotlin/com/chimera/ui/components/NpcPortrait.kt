@@ -67,7 +67,8 @@ fun NpcPortrait(
     archetype: String? = null,
     portraitResName: String? = null, // reserved for future Coil integration
     size: Dp = 48.dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null
 ) {
     val clampedDisposition = disposition.coerceIn(-1f, 1f)
 
@@ -171,7 +172,7 @@ fun NpcPortrait(
                         .data(portraitResName)
                         .crossfade(300)
                         .build(),
-                    contentDescription = npcName,
+                    contentDescription = contentDescription ?: npcName,
                     contentScale = ContentScale.Crop,
                     filterQuality = FilterQuality.Medium,
                     modifier = Modifier.matchParentSize()

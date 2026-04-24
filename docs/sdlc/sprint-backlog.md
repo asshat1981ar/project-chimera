@@ -128,10 +128,28 @@
 
 ---
 
+## ✅ Sprint 8 — Party Relationship Dynamics + AI Production Wiring [COMPLETE]
+
+**Goal:** Ship party member relationship visualization and verify core-ai production swap procedure.
+
+**Scope:**
+- ✅ Party member stats: DispositionSnapshot model, disposition history tracking in PartyViewModel
+- ✅ RelationshipTrendGraph composable: Canvas sparkline with color-coded trends (POSITIVE/NEUTRAL/NEGATIVE thresholds)
+- ✅ ArchetypeBadge: Displays active archetype with stability-based color coding
+- ✅ FeedbackLoopSummary: Shows feedback loop patterns with trend icons (↑ VoidGreen, ↓ HollowCrimson)
+- ✅ GetRelationshipDynamicsUseCase: Fixed unsafe `!!`, magic strings, added Mockito mocks
+- ✅ core-ai production wiring audit: PRODUCTION_WIRING.md created — swap requires adding API keys to local.properties
+- ✅ Room migration verified: MIGRATION_7_8 exists with FTS5 virtual table for journal search
+- ✅ PR #173 merged to main
+
+**Exit Criteria met:**
+- ✅ PartyViewModel tracks disposition history, relationship dynamics wired to PartyScreen
+- ✅ PRODUCTION_WIRING.md documents Hilt binding, fallback behavior, API key swap procedure
+- ✅ MIGRATION_7_8 verified in ChimeraGameDatabase.kt (FTS5 index + population)
+
+---
+
 ## Later Backlog
 
-- `feature-party`: Party member stats, relationship delta visualization
-- `core-ai` production wiring audit — verify mock → prod swap works cleanly
-- Missing Room migrations — add fallback migration strategy if DB version has changed
-- Accessibility audit on all Compose screens (a11y)
+- Accessibility audit on all Compose screens (a11y) — **IN PROGRESS (task-006)**
 - Performance profiling: Recomposition counts on HomeScreen and DialogueScreen
