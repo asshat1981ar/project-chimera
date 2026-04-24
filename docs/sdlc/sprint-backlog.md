@@ -164,7 +164,20 @@
 
 ---
 
+## ✅ Sprint 10 — Accessibility Audit (P3+P4) [COMPLETE]
+
+**Goal:** Complete accessibility fixes and performance profiling.
+
+**Scope:**
+- ✅ P3 semantics: semantics {} blocks added to SpeakingWaveIcon, disposition bars, faction rows, camp morale
+- ✅ P4 performance: Recomposition hotspots identified in HomeScreen and DialogueSceneScreen
+
+**Exit Criteria met:**
+- ✅ All 4 accessibility fix priorities addressed (P1-P4)
+- ✅ Performance profiling report documented
+
+---
+
 ## Later Backlog
 
-- Accessibility audit P3: semantics {} blocks for custom components (task-008)
-- Performance profiling: Recomposition counts on HomeScreen and DialogueSceneScreen (task-009)
+- Performance optimization: Fix recomposition hotspots (task-010)

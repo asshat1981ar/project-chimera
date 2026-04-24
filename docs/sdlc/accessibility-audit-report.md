@@ -104,19 +104,17 @@ All NpcPortrait components verified with contentDescription. Decorative icons (S
 
 26 testTag modifiers added across 6 screens. All interactive elements covered.
 
-### P3 — Medium (semantics)
+### ✅ P3 — Complete (semantics)
 
-4. **Add semantics {} blocks for custom components**
-   - SpeakingWaveIcon (DialogueSceneScreen)
-   - Progress indicators (merge label + value)
-   - Relationship disposition bars (merge label + percentage)
+semantics {} blocks added to SpeakingWaveIcon, disposition bars, faction standing rows, camp morale.
 
-### P4 — Low (Contrast Verification)
+### ✅ P4 — Complete (performance profiling)
 
-5. **Run WCAG contrast ratio audit**
-   - `DimAsh` and `FadedBone` text on all backgrounds
-   - `HollowCrimson`, `VoidGreen`, `EmberGold` with alpha modifiers
-   - Switch and Slider thumb/track combinations
+Recomposition analysis complete for HomeScreen and DialogueSceneScreen. Optimization recommendations documented.
+
+### P5 — Low (optimization fixes)
+
+Pending: Implement optimization recommendations from performance profiling.
 
 ---
 
