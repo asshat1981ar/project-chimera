@@ -57,7 +57,7 @@ fun FactionStandingRow(
     }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.testTag("card_faction_${faction.factionId}").fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, standingColor.copy(alpha = 0.3f))
     ) {

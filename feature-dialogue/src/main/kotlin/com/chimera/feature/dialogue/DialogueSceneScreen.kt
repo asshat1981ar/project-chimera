@@ -12,6 +12,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -105,7 +106,10 @@ fun DialogueSceneScreen(
                     .padding(horizontal = 8.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onSceneComplete) {
+                IconButton(
+                    modifier = Modifier.testTag("btn_back_scene"),
+                    onClick = onSceneComplete
+                ) {
                     Icon(Icons.Default.ArrowBack, "Leave scene", tint = FadedBone)
                 }
                 // NPC portrait with live disposition ring
@@ -209,6 +213,7 @@ fun DialogueSceneScreen(
                 ) {
                     uiState.quickIntents.forEach { intent ->
                         AssistChip(
+                            modifier = Modifier.testTag("btn_intent_${intent.take(20).lowercase().replace(" ", "_")}"),
                             onClick = { viewModel.selectIntent(intent) },
                             label = { Text(intent, style = MaterialTheme.typography.bodySmall) },
                             colors = AssistChipDefaults.assistChipColors(
@@ -242,7 +247,9 @@ fun DialogueSceneScreen(
                     OutlinedTextField(
                         value = typedInput,
                         onValueChange = { typedInput = it },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("field_dialogue_input"),
                         placeholder = { Text("Speak your mind...") },
                         singleLine = true,
                         enabled = !uiState.isLoading,
@@ -255,6 +262,7 @@ fun DialogueSceneScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
+                        modifier = Modifier.testTag("btn_send_dialogue"),
                         onClick = { sendMessage() },
                         enabled = typedInput.isNotBlank() && !uiState.isLoading
                     ) {
