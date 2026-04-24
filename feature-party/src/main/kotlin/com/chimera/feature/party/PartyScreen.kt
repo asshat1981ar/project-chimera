@@ -4,6 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -208,7 +210,11 @@ private fun CompanionCard(
                 Spacer(modifier = Modifier.height(6.dp))
                 LinearProgressIndicator(
                     progress = ((disposition + 1f) / 2f).coerceIn(0f, 1f),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics(mergeDescendants = true) {
+                            contentDescription = "Disposition: ${((disposition + 1f) / 2f * 100).toInt()}%"
+                        },
                     color = moodColor,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
@@ -315,7 +321,10 @@ private fun StatBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = "$label: ${(value * 100).toInt()}%"
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(label, style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(80.dp))

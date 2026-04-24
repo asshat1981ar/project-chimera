@@ -14,6 +14,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.background
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -346,7 +348,11 @@ private fun SpeakingWaveIcon(modifier: Modifier = Modifier) {
         ), label = "bar3"
     )
 
-    Canvas(modifier = modifier) {
+    Canvas(
+        modifier = modifier.semantics(mergeDescendants = true) {
+            contentDescription = "Speaking indicator"
+        }
+    ) {
         val barW = size.width / 5f          // 3 bars + 2 gaps in 5 equal parts
         val gap  = barW                     // gap == bar width
         val maxH = size.height

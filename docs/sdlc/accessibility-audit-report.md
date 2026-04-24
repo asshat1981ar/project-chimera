@@ -100,14 +100,9 @@
 
 All NpcPortrait components verified with contentDescription. Decorative icons (Shield, KeyboardArrowRight) appropriately use null.
 
-### P2 — Medium (testTag)
+### ✅ P2 — Complete (testTag)
 
-3. **Add testTag to all interactive elements**
-   - Tab rows and tab items
-   - Cards with onClick handlers
-   - Buttons and IconButtons
-   - Text fields
-   - Switches and Sliders
+26 testTag modifiers added across 6 screens. All interactive elements covered.
 
 ### P3 — Medium (semantics)
 

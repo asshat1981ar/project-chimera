@@ -4,6 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import com.chimera.data.DutyType
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -104,7 +106,13 @@ fun CampScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .semantics(mergeDescendants = true) {
+                                contentDescription = "Camp Morale: ${(uiState.morale * 100).toInt()}%"
+                            }
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -359,7 +367,11 @@ private fun CompanionCard(data: CompanionCardData) {
                 Spacer(modifier = Modifier.height(4.dp))
                 LinearProgressIndicator(
                     progress = ((disposition + 1f) / 2f).coerceIn(0f, 1f),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics(mergeDescendants = true) {
+                            contentDescription = "Disposition: ${((disposition + 1f) / 2f * 100).toInt()}%"
+                        },
                     color = moodColor,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant
                 )
