@@ -149,7 +149,22 @@
 
 ---
 
+## ✅ Sprint 9 — Accessibility Audit (P1+P2) [COMPLETE]
+
+**Goal:** Fix critical accessibility gaps in Compose screens.
+
+**Scope:**
+- ✅ P1 contentDescription: NpcPortrait composable accepts contentDescription parameter
+- ✅ P2 testTag: 26 testTag modifiers added across 6 screens for UI automation testing
+
+**Exit Criteria met:**
+- ✅ accessibility-audit-report.md created with 6-screen audit
+- ✅ PR #174 merged (contentDescription fixes)
+- ✅ PR #175 merged (testTag modifiers)
+
+---
+
 ## Later Backlog
 
-- Accessibility audit on all Compose screens (a11y) — **IN PROGRESS (task-006)**
-- Performance profiling: Recomposition counts on HomeScreen and DialogueScreen
+- Accessibility audit P3: semantics {} blocks for custom components (task-008)
+- Performance profiling: Recomposition counts on HomeScreen and DialogueSceneScreen (task-009)
