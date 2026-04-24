@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":core-data"))
     implementation(project(":core-database"))
     implementation(project(":core-ai"))
+    implementation(project(":chimera-core"))
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
