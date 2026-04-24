@@ -28,19 +28,19 @@ fun RelationshipTrendGraph(
     if (snapshots.isEmpty()) return
 
     val trendColor = when {
-        snapshots.last().disposition > 0.2f -> VoidGreen
-        snapshots.last().disposition > -0.2f -> EmberGold
+        snapshots.last().disposition > RelationshipTrendGraphDefaults.POSITIVE_THRESHOLD -> VoidGreen
+        snapshots.last().disposition > RelationshipTrendGraphDefaults.NEUTRAL_THRESHOLD -> EmberGold
         else -> HollowCrimson
     }
 
     Canvas(
         modifier = modifier
-            .width(120.dp)
-            .height(40.dp)
+            .width(RelationshipTrendGraphDefaults.DEFAULT_WIDTH)
+            .height(RelationshipTrendGraphDefaults.DEFAULT_HEIGHT)
     ) {
         val width = size.width
         val height = size.height
-        val padding = 4.dp.toPx()
+        val padding = RelationshipTrendGraphDefaults.PADDING.toPx()
 
         val graphWidth = width - 2 * padding
         val graphHeight = height - 2 * padding
@@ -49,14 +49,14 @@ fun RelationshipTrendGraph(
             // Single point - draw dot
             drawCircle(
                 color = trendColor,
-                radius = 4.dp.toPx(),
+                radius = RelationshipTrendGraphDefaults.DOT_RADIUS.toPx(),
                 center = Offset(padding + graphWidth / 2, padding + graphHeight / 2)
             )
         } else {
             // Draw line connecting points
             val points = snapshots.mapIndexed { index, snapshot ->
                 val x = padding + (index.toFloat() / (snapshots.size - 1)) * graphWidth
-                val y = padding + (0.5f - (snapshot.disposition + 1f) / 4f) * graphHeight
+                val y = padding + (RelationshipTrendGraphDefaults.Y_OFFSET - (snapshot.disposition + RelationshipTrendGraphDefaults.Y_OFFSET) / RelationshipTrendGraphDefaults.Y_SCALE) * graphHeight
                 Offset(x, y)
             }
 
@@ -65,12 +65,26 @@ fun RelationshipTrendGraph(
                     color = trendColor,
                     start = points[i],
                     end = points[i + 1],
-                    strokeWidth = 2.dp.toPx(),
+                    strokeWidth = RelationshipTrendGraphDefaults.STROKE_WIDTH.toPx(),
                     cap = StrokeCap.Round
                 )
             }
         }
     }
+}
+
+private object RelationshipTrendGraphDefaults {
+    val DEFAULT_WIDTH = 120.dp
+    val DEFAULT_HEIGHT = 40.dp
+    val PADDING = 4.dp
+    val STROKE_WIDTH = 2.dp
+    val DOT_RADIUS = 4.dp
+
+    val POSITIVE_THRESHOLD = 0.2f
+    val NEUTRAL_THRESHOLD = -0.2f
+
+    const val Y_SCALE = 4f
+    const val Y_OFFSET = 0.5f
 }
 
 @Composable
