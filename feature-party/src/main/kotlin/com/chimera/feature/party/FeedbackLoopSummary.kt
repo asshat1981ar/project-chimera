@@ -22,6 +22,9 @@ import com.chimera.ui.theme.HollowCrimson
 
 /**
  * Displays feedback loop indicators as text with trend icons.
+ *
+ * @param dynamics The relationship dynamics containing feedback loop information.
+ * @param modifier Optional modifier for styling the summary.
  */
 @Composable
 fun FeedbackLoopSummary(
@@ -36,14 +39,15 @@ fun FeedbackLoopSummary(
             style = MaterialTheme.typography.labelMedium,
             color = DimAsh
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(FeedbackLoopSummaryDefaults.SPACER_HEIGHT))
         dynamics.feedbackLoops.forEach { loop: String ->
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // FIXED: ↑ (trending up) = VoidGreen (good), ↓ (trending down) = HollowCrimson (bad)
                 val (icon, color) = when {
-                    loop.contains("↑") -> Icons.Filled.TrendingUp to HollowCrimson
-                    loop.contains("↓") -> Icons.Filled.TrendingDown to VoidGreen
+                    loop.contains("↑") -> Icons.Filled.TrendingUp to VoidGreen
+                    loop.contains("↓") -> Icons.Filled.TrendingDown to HollowCrimson
                     else -> null to DimAsh
                 }
 
@@ -51,10 +55,10 @@ fun FeedbackLoopSummary(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        modifier = Modifier.size(12.dp),
+                        modifier = Modifier.size(FeedbackLoopSummaryDefaults.ICON_SIZE),
                         tint = color
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(FeedbackLoopSummaryDefaults.ICON_SPACER_HEIGHT))
                 }
 
                 Text(
@@ -65,4 +69,10 @@ fun FeedbackLoopSummary(
             }
         }
     }
+}
+
+private object FeedbackLoopSummaryDefaults {
+    val SPACER_HEIGHT = 4.dp
+    val ICON_SIZE = 12.dp
+    val ICON_SPACER_HEIGHT = 2.dp
 }
