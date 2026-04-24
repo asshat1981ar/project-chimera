@@ -42,11 +42,15 @@ import androidx.compose.runtime.LaunchedEffect
 import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
 
+// File-level Modifier constants for reusable chains
+private val FillMaxSizeWithPadding = Modifier.fillMaxSize().padding(horizontal = 24.dp)
+private val DefaultOnActTransition: (String) -> Unit = {}
+
 @Composable
 fun HomeScreen(
     onEnterScene: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
-    onActTransition: (String) -> Unit = {},
+    onActTransition: (String) -> Unit = DefaultOnActTransition,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,7 +73,7 @@ fun HomeScreen(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+        modifier = FillMaxSizeWithPadding,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item { Spacer(modifier = Modifier.height(32.dp)) }

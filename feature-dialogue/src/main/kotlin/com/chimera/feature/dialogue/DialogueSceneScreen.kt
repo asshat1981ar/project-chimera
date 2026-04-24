@@ -54,6 +54,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,6 +86,15 @@ fun DialogueSceneScreen(
     }
     val listState = rememberLazyListState()
     var typedInput by remember { mutableStateOf("") }
+    val typedInputState = rememberUpdatedState(typedInput)
+    val sendMessage = remember {
+        {
+            if (typedInputState.value.isNotBlank()) {
+                viewModel.submitTypedInput(typedInputState.value)
+                typedInput = ""
+            }
+        }
+    }
 
     LaunchedEffect(uiState.transcript.size) {
         if (uiState.transcript.isNotEmpty()) {
@@ -233,12 +243,6 @@ fun DialogueSceneScreen(
 
         // Text input composer
         if (!uiState.isSceneComplete) {
-            val sendMessage = {
-                if (typedInput.isNotBlank()) {
-                    viewModel.submitTypedInput(typedInput)
-                    typedInput = ""
-                }
-            }
             Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 4.dp) {
                 Row(
                     modifier = Modifier
@@ -279,7 +283,9 @@ fun DialogueSceneScreen(
 @Composable
 private fun DialogueBubble(line: DialogueLine) {
     val alignment = if (line.isPlayer) Alignment.End else Alignment.Start
-    val borderColor = if (line.isPlayer) EmberGold.copy(alpha = 0.4f) else VoidGreen.copy(alpha = 0.4f)
+    val borderColor = remember(line.isPlayer) {
+        if (line.isPlayer) EmberGold.copy(alpha = 0.4f) else VoidGreen.copy(alpha = 0.4f)
+    }
     val nameColor = if (line.isPlayer) EmberGold else HollowCrimson
 
     Column(
