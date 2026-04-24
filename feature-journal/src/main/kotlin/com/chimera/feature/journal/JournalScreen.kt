@@ -2,6 +2,7 @@ package com.chimera.feature.journal
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -69,7 +70,10 @@ fun JournalScreen(
             },
             trailingIcon = {
                 if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = viewModel::clearSearch) {
+                    IconButton(
+                        modifier = Modifier.testTag("btn_clear_search"),
+                        onClick = viewModel::clearSearch
+                    ) {
                         Icon(Icons.Default.Clear, contentDescription = "Clear search",
                             modifier = Modifier.size(18.dp), tint = DimAsh)
                     }
@@ -83,11 +87,13 @@ fun JournalScreen(
             ),
             modifier = Modifier
                 .fillMaxWidth()
+                .testTag("field_search_journal")
                 .padding(horizontal = 16.dp, vertical = 4.dp)
         )
 
         // Tabs
         ScrollableTabRow(
+            modifier = Modifier.testTag("tabRow_journal"),
             selectedTabIndex = JournalTab.values().indexOf(uiState.selectedTab),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = EmberGold,
@@ -95,6 +101,7 @@ fun JournalScreen(
         ) {
             JournalTab.values().forEach { tab ->
                 Tab(
+                    modifier = Modifier.testTag("tab_${tab.name.lowercase()}"),
                     selected = uiState.selectedTab == tab,
                     onClick = { viewModel.selectTab(tab) },
                     text = {
@@ -197,6 +204,7 @@ private fun JournalEntryCard(
 
     Card(
         onClick = onClick,
+        modifier = Modifier.testTag("card_journal_entry_${entry.id}"),
         colors = CardDefaults.cardColors(
             containerColor = if (entry.isRead) {
                 MaterialTheme.colorScheme.surface

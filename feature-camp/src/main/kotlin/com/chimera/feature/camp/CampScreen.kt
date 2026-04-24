@@ -3,6 +3,7 @@ package com.chimera.feature.camp
 import androidx.compose.foundation.BorderStroke
 import com.chimera.data.DutyType
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -78,14 +79,18 @@ fun CampScreen(
                 ) {
                     OutlinedButton(
                         onClick = onNavigateToInventory,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("btn_inventory"),
                         border = BorderStroke(1.dp, FadedBone.copy(alpha = 0.3f))
                     ) {
                         Text("Inventory", color = FadedBone)
                     }
                     OutlinedButton(
                         onClick = onNavigateToCrafting,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("btn_crafting"),
                         border = BorderStroke(1.dp, EmberGold.copy(alpha = 0.3f))
                     ) {
                         Text("Crafting", color = EmberGold)
@@ -181,7 +186,9 @@ fun CampScreen(
                                         1.dp,
                                         if (isSelected) EmberGold else FadedBone.copy(alpha = 0.3f)
                                     ),
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag("btn_duty_${duty.name.lowercase()}")
                                 ) {
                                     Text(
                                         duty.label,
@@ -225,7 +232,9 @@ fun CampScreen(
             if (uiState.nightEvent == null) {
                 Button(
                     onClick = { viewModel.triggerNightEvent() },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("btn_rest_night"),
                     colors = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
                 ) {
                     Text("Rest for the Night")
@@ -258,7 +267,9 @@ fun CampScreen(
                             Spacer(modifier = Modifier.height(12.dp))
                             OutlinedButton(
                                 onClick = { viewModel.dismissNightEvent() },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("btn_dawn_breaks")
                             ) {
                                 Text("Dawn Breaks")
                             }
@@ -268,7 +279,8 @@ fun CampScreen(
                                     onClick = { viewModel.resolveNightEvent(choice) },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 4.dp),
+                                        .padding(vertical = 4.dp)
+                                        .testTag("btn_night_event_choice"),
                                     border = BorderStroke(1.dp, FadedBone.copy(alpha = 0.3f))
                                 ) {
                                     Text(choice.text)

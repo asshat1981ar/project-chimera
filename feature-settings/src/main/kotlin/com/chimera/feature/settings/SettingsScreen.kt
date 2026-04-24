@@ -2,6 +2,7 @@ package com.chimera.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,7 +50,10 @@ fun SettingsScreen(
     ) {
         // Header
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) {
+            IconButton(
+                modifier = Modifier.testTag("btn_back_settings"),
+                onClick = onBack
+            ) {
                 Icon(Icons.Default.ArrowBack, "Back", tint = FadedBone)
             }
             Text("Settings", style = MaterialTheme.typography.headlineMedium, color = EmberGold)
@@ -167,6 +171,7 @@ private fun ToggleSetting(
             Text(description, style = MaterialTheme.typography.bodySmall, color = FadedBone)
         }
         Switch(
+            modifier = Modifier.testTag("switch_${label.lowercase().replace(" ", "_")}"),
             checked = checked,
             onCheckedChange = onToggle,
             colors = SwitchDefaults.colors(
@@ -194,6 +199,7 @@ private fun SliderSetting(
             Text(valueLabel, style = MaterialTheme.typography.labelMedium, color = EmberGold)
         }
         Slider(
+            modifier = Modifier.testTag("slider_${label.lowercase().replace(" ", "_")}"),
             value = value,
             onValueChange = onValueChange,
             valueRange = range,

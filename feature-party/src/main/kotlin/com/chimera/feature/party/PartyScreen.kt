@@ -3,6 +3,7 @@ package com.chimera.feature.party
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -63,6 +64,7 @@ fun PartyScreen(
         )
 
         ScrollableTabRow(
+            modifier = Modifier.testTag("tabRow_party"),
             selectedTabIndex = PartyTab.values().indexOf(selectedTab),
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = EmberGold,
@@ -70,6 +72,7 @@ fun PartyScreen(
         ) {
             PartyTab.values().forEach { tab ->
                 Tab(
+                    modifier = Modifier.testTag("tab_${tab.name.lowercase()}"),
                     selected = selectedTab == tab,
                     onClick = { selectedTab = tab },
                     text = { Text(tab.label, style = MaterialTheme.typography.labelLarge) },
@@ -167,6 +170,7 @@ private fun CompanionCard(
 
     Card(
         modifier = Modifier
+            .testTag("card_companion_${member.character.id}")
             .fillMaxWidth()
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
@@ -236,7 +240,10 @@ private fun CompanionDetail(
                         Text(it, style = MaterialTheme.typography.bodyMedium, color = FadedBone)
                     }
                 }
-                IconButton(onClick = onClose) {
+                IconButton(
+                    modifier = Modifier.testTag("btn_close_companion_detail"),
+                    onClick = onClose
+                ) {
                     Icon(Icons.Default.Close, "Close", tint = FadedBone)
                 }
             }

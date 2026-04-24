@@ -2,6 +2,7 @@ package com.chimera.feature.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -144,7 +145,9 @@ fun HomeScreen(
                             val target = uiState.continueSceneId ?: "prologue_scene_1"
                             onEnterScene(target)
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("btn_enter_hollow"),
                         colors = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
                     ) {
                         Text("Enter the Hollow")
