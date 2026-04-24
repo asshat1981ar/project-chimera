@@ -15,7 +15,11 @@ data class RelationshipDynamics(
 class GetRelationshipDynamicsUseCase @Inject constructor(
     private val archetypeEngine: RelationshipArchetypeEngine
 ) {
-    operator fun invoke(npcId: String, playerId: String = "player"): RelationshipDynamics {
+    companion object {
+        private const val DEFAULT_PLAYER_ID = "player"
+    }
+
+    operator fun invoke(npcId: String, playerId: String = DEFAULT_PLAYER_ID): RelationshipDynamics {
         val archetypes = archetypeEngine.getActiveArchetypes()
         val key = archetypes.keys.find { it.startsWith("${npcId}_") }
 
@@ -28,7 +32,12 @@ class GetRelationshipDynamicsUseCase @Inject constructor(
             )
         }
 
-        val type = archetypes[key]!!
+        val type = archetypes[key] ?: return RelationshipDynamics(
+            activeArchetype = null,
+            stabilityIndex = 1.0f,
+            feedbackLoops = emptyList(),
+            archetypeDescription = ""
+        )
         val stability = archetypeEngine.getStabilityReport()[key] ?: 1.0f
 
         return RelationshipDynamics(

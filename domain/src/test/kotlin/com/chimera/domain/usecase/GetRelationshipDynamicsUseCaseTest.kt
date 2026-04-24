@@ -1,11 +1,12 @@
 package com.chimera.domain.usecase
 
 import com.chimera.core.engine.RelationshipArchetypeEngine
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class GetRelationshipDynamicsUseCaseTest {
 
@@ -14,12 +15,14 @@ class GetRelationshipDynamicsUseCaseTest {
 
     @Before
     fun setUp() {
-        archetypeEngine = RelationshipArchetypeEngine()
+        archetypeEngine = mock()
         useCase = GetRelationshipDynamicsUseCase(archetypeEngine)
     }
 
     @Test
-    fun returnsNullArchetypeWhenNoneActive() = runTest {
+    fun returnsNullArchetypeWhenNoneActive() {
+        whenever(archetypeEngine.getActiveArchetypes()).thenReturn(emptyMap())
+
         val result = useCase("test_npc")
 
         assertEquals(null, result.activeArchetype)
@@ -28,12 +31,12 @@ class GetRelationshipDynamicsUseCaseTest {
     }
 
     @Test
-    fun returnsEscalationArchetypeData() = runTest {
-        archetypeEngine.initializeArchetype(
-            RelationshipArchetypeEngine.ArchetypeType.ESCALATION,
-            "test_npc",
-            "player"
-        )
+    fun returnsEscalationArchetypeData() {
+        val mockArchetype = mock<RelationshipArchetypeEngine.ArchetypeType>()
+        whenever(mockArchetype.name).thenReturn("ESCALATION")
+        whenever(mockArchetype.description).thenReturn("Escalation description")
+        whenever(archetypeEngine.getActiveArchetypes()).thenReturn(mapOf("test_npc_player" to mockArchetype))
+        whenever(archetypeEngine.getStabilityReport()).thenReturn(mapOf("test_npc_player" to 0.8f))
 
         val result = useCase("test_npc")
 
@@ -43,12 +46,12 @@ class GetRelationshipDynamicsUseCaseTest {
     }
 
     @Test
-    fun feedbackLoopsMatchArchetypeType() = runTest {
-        archetypeEngine.initializeArchetype(
-            RelationshipArchetypeEngine.ArchetypeType.SHIFTING_THE_BURDEN,
-            "warden",
-            "player"
-        )
+    fun feedbackLoopsMatchArchetypeType() {
+        val mockArchetype = mock<RelationshipArchetypeEngine.ArchetypeType>()
+        whenever(mockArchetype.name).thenReturn("SHIFTING_THE_BURDEN")
+        whenever(mockArchetype.description).thenReturn("Shifting the burden description")
+        whenever(archetypeEngine.getActiveArchetypes()).thenReturn(mapOf("warden_player" to mockArchetype))
+        whenever(archetypeEngine.getStabilityReport()).thenReturn(emptyMap())
 
         val result = useCase("warden")
 
