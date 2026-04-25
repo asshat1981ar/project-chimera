@@ -36,3 +36,4 @@ tasks/
 .vercel
 .env*.local
 .superpowers/
+.worktrees/
