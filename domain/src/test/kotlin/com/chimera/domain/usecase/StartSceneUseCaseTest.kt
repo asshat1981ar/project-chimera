@@ -90,7 +90,7 @@ class StartSceneUseCaseTest {
     }
 
     @Test
-    fun `execute_returnsSceneSummary() - correct summary returned`() = runTest {
+    fun `execute returns correct scene summary`() = runTest {
         // Arrange
         whenever(sceneLoader.getScene("watchtower_1")).thenReturn(testContract)
         whenever(dialogueRepository.createSceneInstance(1L, "watchtower_1", "warden")).thenReturn(100L)
@@ -117,7 +117,7 @@ class StartSceneUseCaseTest {
     }
 
     @Test
-    fun `execute_invalidSceneId_usesFallbackDefaults() - validation with fallback`() = runTest {
+    fun `execute uses fallback defaults for invalid scene id`() = runTest {
         // Arrange - scene not found, returns null
         whenever(sceneLoader.getScene("unknown_scene")).thenReturn(null)
         whenever(dialogueRepository.createSceneInstance(1L, "unknown_scene", "unknown")).thenReturn(200L)
@@ -140,7 +140,7 @@ class StartSceneUseCaseTest {
     }
 
     @Test
-    fun `execute_invalidSlotId_createsDefaultCharacterState() - slot validation with fallback`() = runTest {
+    fun `execute creates default character state for invalid slot`() = runTest {
         // Arrange - character state not found for slot
         whenever(sceneLoader.getScene("watchtower_1")).thenReturn(testContract)
         whenever(dialogueRepository.createSceneInstance(999L, "watchtower_1", "warden")).thenReturn(300L)
@@ -163,7 +163,7 @@ class StartSceneUseCaseTest {
     }
 
     @Test
-    fun `execute_setsInitialVariables() - scene variables initialized`() = runTest {
+    fun `execute sets initial scene variables`() = runTest {
         // Arrange
         val testMemories = listOf(
             MemoryShard(

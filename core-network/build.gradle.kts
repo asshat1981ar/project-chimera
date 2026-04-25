@@ -15,4 +15,12 @@ dependencies {
     implementation(libs.ktor.client.logging)
 
     implementation(libs.kotlinx.serialization.json)
+
+    // Testing
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation("io.ktor:ktor-client-mock:${libs.versions.ktor.get()}")
+    testImplementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
+    testImplementation("io.ktor:ktor-serialization-kotlinx-json:${libs.versions.ktor.get()}")
+    testImplementation("com.google.truth:truth:${libs.versions.truth.get()}")
 }

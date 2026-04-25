@@ -2,20 +2,15 @@ package com.chimera.network
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.http.contentType
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 
 /**
  * REST client for the Chimera cloud-save Cloudflare Worker.
@@ -30,27 +25,10 @@ import kotlinx.serialization.json.Json
  */
 class CloudSaveRepository(
     private val baseUrl: String,
-    private val apiToken: String
+    private val apiToken: String,
+    private val client: HttpClient = HttpClientFactory.create(connectTimeoutMs = 10_000, socketTimeoutMs = 20_000)
 ) {
-    private val client: HttpClient = HttpClient(Android) {
-        install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true; isLenient = true })
-        }
-        install(HttpRequestRetry) {
-            maxRetries = 3
-            retryOnServerErrors()
-            retryOnException(retryOnTimeout = true)
-            exponentialDelay(base = 2.0, maxDelayMs = 8_000)
-        }
-        engine {
-            connectTimeout = 10_000
-            socketTimeout  = 20_000
-        }
-    }
-
     private fun authHeader() = "Bearer $apiToken"
-
-    // ── Upload (upsert) ───────────────────────────────────────────────────────
 
     suspend fun uploadSave(request: CloudSaveRequest): CloudSaveResult<CloudSaveAck> = runCatching {
         val response = client.post("$baseUrl/save") {
@@ -64,8 +42,6 @@ class CloudSaveRepository(
         CloudSaveResult.Success(response.body<CloudSaveAck>())
     }.getOrElse { CloudSaveResult.Failure("Upload error: ${it.message}") }
 
-    // ── Download ──────────────────────────────────────────────────────────────
-
     suspend fun downloadSave(slotId: Long): CloudSaveResult<CloudSaveResponse?> = runCatching {
         val response = client.get("$baseUrl/save/$slotId") {
             headers { append("Authorization", authHeader()) }
@@ -76,8 +52,6 @@ class CloudSaveRepository(
             else -> CloudSaveResult.Failure("Download failed: HTTP ${response.status.value}")
         }
     }.getOrElse { CloudSaveResult.Failure("Download error: ${it.message}") }
-
-    // ── Delete ────────────────────────────────────────────────────────────────
 
     suspend fun deleteSave(slotId: Long): CloudSaveResult<CloudSaveAck> = runCatching {
         val response = client.delete("$baseUrl/save/$slotId") {
@@ -91,8 +65,6 @@ class CloudSaveRepository(
 
     fun close() = client.close()
 }
-
-// ── Result wrapper — never throws to callers ──────────────────────────────────
 
 sealed class CloudSaveResult<out T> {
     data class Success<T>(val data: T) : CloudSaveResult<T>()

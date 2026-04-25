@@ -3,6 +3,7 @@ package com.chimera.network
 import com.google.common.truth.Truth.assertThat
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -14,7 +15,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.After
-import org.junit.Before
 import org.junit.Test
 
 /**
@@ -43,9 +43,6 @@ class CloudSaveRepositoryTest {
         }
     }
 
-    // =========================================================================
-    // UPLOAD TESTS
-    // =========================================================================
 
     @Test
     fun `uploadSave_success returns Success with CloudSaveAck`() = runTest {
@@ -119,7 +116,7 @@ class CloudSaveRepositoryTest {
         var callCount = 0
         val mockEngine = MockEngine {
             callCount++
-            if (callCount == 1) {
+            if (callCount <= 3) {
                 respond(
                     content = """{"error":"Internal Server Error"}""",
                     status = HttpStatusCode.InternalServerError,
@@ -138,8 +135,7 @@ class CloudSaveRepositoryTest {
 
         val result = repository.uploadSave(testRequest)
 
-        // Verifies retry occurs: initial attempt + 1 retry before success
-        assertThat(callCount).isEqualTo(2)
+        assertThat(callCount).isEqualTo(4)
         assertThat(result).isInstanceOf(CloudSaveResult.Success::class.java)
     }
 
@@ -165,9 +161,6 @@ class CloudSaveRepositoryTest {
         assertThat((result as CloudSaveResult.Failure).reason).contains("503")
     }
 
-    // =========================================================================
-    // DOWNLOAD TESTS
-    // =========================================================================
 
     @Test
     fun `downloadSave_success returns Success with CloudSaveResponse`() = runTest {
@@ -255,9 +248,6 @@ class CloudSaveRepositoryTest {
         assertThat((result as CloudSaveResult.Failure).reason).contains("401")
     }
 
-    // =========================================================================
-    // DELETE TESTS
-    // =========================================================================
 
     @Test
     fun `deleteSave_success returns Success with CloudSaveAck`() = runTest {
@@ -316,8 +306,7 @@ class CloudSaveRepositoryTest {
 
         val result = repository.deleteSave(testSlotId)
 
-        // Verifies retry occurs: maxRetries=3 means 4 total attempts
-        assertThat(callCount).isGreaterThan(1)
+        assertThat(callCount).isEqualTo(4)
         assertThat(result).isInstanceOf(CloudSaveResult.Failure::class.java)
         assertThat((result as CloudSaveResult.Failure).reason).contains("500")
     }
@@ -378,6 +367,12 @@ class CloudSaveRepositoryTest {
         }
         install(Logging) {
             level = LogLevel.NONE
+        }
+        install(HttpRequestRetry) {
+            maxRetries = 3
+            retryOnServerErrors()
+            retryOnException(retryOnTimeout = true)
+            exponentialDelay(base = 2.0, maxDelayMs = 8_000)
         }
     }
 }
