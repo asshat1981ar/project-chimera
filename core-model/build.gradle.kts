@@ -15,4 +15,7 @@ kotlin {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
+
+    testImplementation(libs.junit)
+    testImplementation("com.google.truth:truth:${libs.versions.truth.get()}")
 }
