@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import com.chimera.data.ChimeraPreferences
 import com.chimera.ui.screens.onboarding.OnboardingScreen
 import com.chimera.ui.screens.saveslot.SaveSlotSelectScreen
+import com.chimera.feature.settings.FactionStandingScreen
 import com.chimera.feature.settings.SettingsScreen
 import com.chimera.ui.screens.acttransition.ActTransitionScreen
 import com.chimera.ui.screens.splash.SplashScreen
@@ -134,6 +135,15 @@ fun ChimeraNavHost(
 
             composable(ChimeraRoutes.SETTINGS) {
                 SettingsScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigateToFactionStanding = {
+                        navController.navigate(ChimeraRoutes.FACTION_STANDING)
+                    }
+                )
+            }
+
+            composable(ChimeraRoutes.FACTION_STANDING) {
+                FactionStandingScreen(
                     onBack = { navController.popBackStack() }
                 )
             }

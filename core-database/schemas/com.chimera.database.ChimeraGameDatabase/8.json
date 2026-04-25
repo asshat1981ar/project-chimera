@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "9ef4709683eab929984da7b2e4c39721",
+    "identityHash": "65f64b7dc2e39ea57ae44bbde40ac50e",
     "entities": [
       {
         "tableName": "save_slots",
@@ -222,6 +222,15 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_character_states_character_id` ON `${TABLE_NAME}` (`character_id`)"
+          },
+          {
+            "name": "index_character_states_save_slot_id",
+            "unique": false,
+            "columnNames": [
+              "save_slot_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_character_states_save_slot_id` ON `${TABLE_NAME}` (`save_slot_id`)"
           }
         ],
         "foreignKeys": [
@@ -1212,7 +1221,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9ef4709683eab929984da7b2e4c39721')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '65f64b7dc2e39ea57ae44bbde40ac50e')"
     ]
   }
 }

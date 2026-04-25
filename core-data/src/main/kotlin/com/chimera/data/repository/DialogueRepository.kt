@@ -54,10 +54,7 @@ class DialogueRepository @Inject constructor(
     }
 
     suspend fun getCompletedSceneIds(slotId: Long): Set<String> =
-        sceneInstanceDao.getBySlot(slotId)
-            .filter { it.status == "completed" }
-            .map { it.sceneId }
-            .toSet()
+        sceneInstanceDao.getCompletedSceneIds(slotId).toSet()
 
     /**
      * Returns the scene ID of the most recently started active (incomplete) scene for [slotId],

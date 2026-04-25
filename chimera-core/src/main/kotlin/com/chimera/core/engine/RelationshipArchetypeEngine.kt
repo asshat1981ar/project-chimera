@@ -134,6 +134,110 @@ class RelationshipArchetypeEngine {
             rootCause.value < 0.1f && dependency.value < 0.1f
     }
 
+    class FixesThatFailArchetype(
+        npcId: String,
+        playerId: String
+    ) : SystemArchetype(npcId, playerId, ArchetypeType.FIXES_THAT_FAIL) {
+
+        private val problemSeverity = Variable("problem_severity", 0.5f)
+        private val quickFixApplied = Variable("quick_fix_applied", 0.0f)
+        private val sideEffectAccumulation = Variable("side_effect_accumulation", 0.0f)
+        private val problemRecurrence = Variable("problem_recurrence", 0.0f)
+
+        init {
+            systemVariables["problem_severity"] = problemSeverity
+            systemVariables["quick_fix_applied"] = quickFixApplied
+            systemVariables["side_effect_accumulation"] = sideEffectAccumulation
+            systemVariables["problem_recurrence"] = problemRecurrence
+            createFeedbackLoops()
+        }
+
+        private fun createFeedbackLoops() {
+            // Relief loop: quick_fix -> symptom_relief (negative feedback - reduces problem)
+            feedbackLoops.add(FeedbackLoop("relief", quickFixApplied, problemSeverity, -0.6f))
+            // Side-effect loop: quick_fix -> side_effects increase (positive feedback)
+            feedbackLoops.add(FeedbackLoop("side_effect_buildup", quickFixApplied, sideEffectAccumulation, 0.5f))
+            // Recurrence loop: side_effects -> problem_severity increase (positive feedback)
+            feedbackLoops.add(FeedbackLoop("problem_recurrence", sideEffectAccumulation, problemSeverity, 0.4f))
+            // Decay loop: problem_recurrence accumulates over time
+            feedbackLoops.add(DelayedFeedbackLoop("delayed_consequences", problemSeverity, problemRecurrence, 0.3f, 3.0f))
+        }
+
+        override suspend fun processInteraction(interaction: NPCInteraction): EmotionalImpact {
+            when (interaction.type) {
+                InteractionType.HELP, InteractionType.GIFT -> {
+                    // Quick fixes provide temporary relief but build side effects
+                    quickFixApplied.addValue(0.4f * interaction.intensity)
+                    problemSeverity.subtractValue(0.2f * interaction.intensity)
+                }
+                InteractionType.TEACH -> {
+                    // Teaching addresses root cause, reduces problem severity sustainably
+                    problemSeverity.subtractValue(0.3f * interaction.intensity)
+                    sideEffectAccumulation.subtractValue(0.1f * interaction.intensity)
+                }
+                InteractionType.PERSUADE -> {
+                    // Persuasion helps NPC recognize the pattern
+                    quickFixApplied.multiplyValue(0.7f)
+                    problemRecurrence.subtractValue(0.15f * interaction.intensity)
+                }
+                InteractionType.IGNORE, InteractionType.REFUSE -> {
+                    // Ignoring allows problem to worsen
+                    problemSeverity.addValue(0.2f * interaction.intensity)
+                    problemRecurrence.addValue(0.1f * interaction.intensity)
+                }
+                InteractionType.THREATEN -> {
+                    // Threats force quick fixes, worsening side effects
+                    quickFixApplied.addValue(0.3f * interaction.intensity)
+                    sideEffectAccumulation.addValue(0.25f * interaction.intensity)
+                }
+                InteractionType.BARGAIN -> {
+                    // Bargaining is a moderate quick fix
+                    quickFixApplied.addValue(0.2f * interaction.intensity)
+                    sideEffectAccumulation.addValue(0.1f * interaction.intensity)
+                }
+                else -> {}
+            }
+            updateSystemState(interaction.deltaTime)
+            return calculateEmotionalImpact()
+        }
+
+        private fun calculateEmotionalImpact(): EmotionalImpact {
+            return when {
+                // Vicious cycle: high side effects, recurring problem
+                sideEffectAccumulation.value > 0.7f && problemRecurrence.value > 0.6f -> EmotionalImpact(
+                    emotions = mapOf("despair" to 0.8f, "confusion" to 0.7f, "frustration" to 0.6f),
+                    dialogueHint = "Every time I try to fix it, it just gets worse...",
+                    dispositionDelta = -0.15f
+                )
+                // Recognition phase: NPC sees the pattern
+                problemRecurrence.value > 0.5f && quickFixApplied.value > 0.4f -> EmotionalImpact(
+                    emotions = mapOf("realization" to 0.6f, "uncertainty" to 0.5f),
+                    dialogueHint = "I keep solving the same problem over and over...",
+                    dispositionDelta = -0.05f
+                )
+                // Breaking the cycle: low side effects, problem addressed
+                sideEffectAccumulation.value < 0.2f && problemSeverity.value < 0.3f -> EmotionalImpact(
+                    emotions = mapOf("relief" to 0.7f, "clarity" to 0.6f, "gratitude" to 0.5f),
+                    dialogueHint = "Finally, I understand what was really wrong!",
+                    dispositionDelta = 0.2f
+                )
+                // Early stage: manageable problem
+                problemSeverity.value < 0.4f && sideEffectAccumulation.value < 0.3f -> EmotionalImpact(
+                    emotions = mapOf("hope" to 0.4f, "determination" to 0.3f),
+                    dialogueHint = "I think I can handle this one.",
+                    dispositionDelta = 0.05f
+                )
+                else -> EmotionalImpact.NEUTRAL
+            }
+        }
+
+        override fun calculateStabilityIndex(): Float =
+            1.0f - (problemSeverity.value + sideEffectAccumulation.value + problemRecurrence.value) / 3.0f
+
+        override fun shouldTerminate(): Boolean =
+            problemSeverity.value < 0.1f && sideEffectAccumulation.value < 0.1f && problemRecurrence.value < 0.1f
+    }
+
     class EscalationArchetype(
         npcId: String,
         playerId: String
@@ -316,8 +420,9 @@ class RelationshipArchetypeEngine {
     ): String {
         val archetype = when (type) {
             ArchetypeType.SHIFTING_THE_BURDEN -> ShiftingTheBurdenArchetype(npcId, playerId)
+            ArchetypeType.FIXES_THAT_FAIL -> FixesThatFailArchetype(npcId, playerId)
             ArchetypeType.ESCALATION -> EscalationArchetype(npcId, playerId)
-            else -> throw IllegalArgumentException("Archetype $type not yet implemented")
+            ArchetypeType.GROWTH_AND_UNDERINVESTMENT -> throw IllegalArgumentException("Archetype $type not yet implemented")
         }
         val key = "${npcId}_${playerId}_${type.name}"
         activeArchetypes[key] = archetype

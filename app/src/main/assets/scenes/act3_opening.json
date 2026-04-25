@@ -1,0 +1,46 @@
+{
+  "sceneId": "act3_opening",
+  "sceneTitle": "The Broken Shore",
+  "isCinematic": true,
+  "npcId": "narrator",
+  "npcName": "Narrator",
+  "setting": "the coastal wastes where the corruption meets the sea",
+  "stakes": "The final act begins as the corruption's true nature is revealed",
+  "maxTurns": 1,
+  "allowedReveals": ["coastal_corruption", "tide_prophecy", "corruption_nature"],
+  "forbiddenTopics": [],
+  "cinematicLines": [
+    {
+      "speaker": "narrator",
+      "speakerName": "Narrator",
+      "text": "The journey ends where it began -- at the edge of the world, where the tide whispers secrets older than the crown.",
+      "emotion": "narrative"
+    },
+    {
+      "speaker": "narrator",
+      "speakerName": "Narrator",
+      "text": "The corruption has changed. No longer bound to the Hollow's stones, it flows now -- living, breathing, evolving. It has found a new throne in the depths.",
+      "emotion": "ominous"
+    },
+    {
+      "speaker": "narrator",
+      "speakerName": "Narrator",
+      "text": "Allies gather on the shore. The Tide-Speaker reads the waves. The Forgemaster crafts weapons from shipwrecks. The Reforged fleet waits beyond the horizon.",
+      "emotion": "hopeful"
+    },
+    {
+      "speaker": "narrator",
+      "speakerName": "Narrator",
+      "text": "The crown pulses in your grasp. It knows what comes. Three paths remain: destruction, dominion, or surrender. Each leads to an ending. None lead to peace.",
+      "emotion": "solemn"
+    },
+    {
+      "speaker": "narrator",
+      "speakerName": "Narrator",
+      "text": "The Heart of the Tide awaits. The final choice approaches. And the world holds its breath.",
+      "emotion": "final"
+    }
+  ],
+  "autoAdvanceDelayMs": 4000,
+  "onCompleteTag": "act3_begun"
+}

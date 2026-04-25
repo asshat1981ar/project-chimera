@@ -24,6 +24,11 @@ import javax.inject.Inject
  *
  * Call this use case after every scene completion inside [SubmitDialogueTurnUseCase]
  * or [StartSceneUseCase].
+ *
+ * Bridge tags for cinematic transitions:
+ *  - hollow_approach_complete → triggers act1_finale cinematic
+ *  - act2_climax_complete     → triggers act2_finale cinematic
+ *  - act3_begun               → marks act3 as started
  */
 class ChapterProgressionUseCase @Inject constructor(
     private val dialogueRepository: DialogueRepository,
@@ -57,6 +62,46 @@ class ChapterProgressionUseCase @Inject constructor(
         return newTag
     }
 
+    /**
+     * Check if a cinematic transition should be triggered based on completed scenes.
+     * Returns the cinematic scene ID if one should play, or null otherwise.
+     */
+    suspend fun getCinematicTransition(): String? {
+        val slotId = gameSessionManager.activeSlotId.value ?: return null
+        val completed = dialogueRepository.getCompletedSceneIds(slotId)
+
+        // Check for bridge tags that trigger cinematic transitions
+        return when {
+            // Act 1 → Act 2 transition: after hollow_approach but before act2 scenes
+            "hollow_approach" in completed &&
+            !CINEMATIC_1_COMPLETE_TAGS.any { it in completed } -> "act1_finale"
+
+            // Act 2 → Act 3 transition: after act2_climax but before act3 scenes
+            "act2_climax" in completed &&
+            !CINEMATIC_2_COMPLETE_TAGS.any { it in completed } -> "act2_finale"
+
+            // Act 3 opening: after act2_finale cinematic
+            "act2_finale" in completed &&
+            !CINEMATIC_3_COMPLETE_TAGS.any { it in completed } -> "act3_opening"
+
+            else -> null
+        }
+    }
+
+    /**
+     * Mark a cinematic transition as complete by recording the bridge tag.
+     */
+    suspend fun markCinematicComplete(cinematicSceneId: String) {
+        val slotId = gameSessionManager.activeSlotId.value ?: return
+        val bridgeTag = when (cinematicSceneId) {
+            "act1_finale" -> "hollow_approach_complete"
+            "act2_finale" -> "act2_climax_complete"
+            "act3_opening" -> "act3_begun"
+            else -> return
+        }
+        dialogueRepository.markSceneComplete(slotId, bridgeTag)
+    }
+
     companion object {
         /** Completing any of these marks the player as being in Act 2. */
         private val ACT2_ENTRY_SCENES = setOf("hollow_approach", "ashen_gate")
@@ -73,5 +118,14 @@ class ChapterProgressionUseCase @Inject constructor(
             "thorne_encounter", "vessa_shrine", "elena_recruitment",
             "warden_betrayal"
         )
+
+        /** Tags indicating Act 1→2 cinematic has been viewed. */
+        private val CINEMATIC_1_COMPLETE_TAGS = setOf("hollow_approach_complete", "act1_finale")
+
+        /** Tags indicating Act 2→3 cinematic has been viewed. */
+        private val CINEMATIC_2_COMPLETE_TAGS = setOf("act2_climax_complete", "act2_finale")
+
+        /** Tags indicating Act 3 opening cinematic has been viewed. */
+        private val CINEMATIC_3_COMPLETE_TAGS = setOf("act3_begun", "act3_opening")
     }
 }

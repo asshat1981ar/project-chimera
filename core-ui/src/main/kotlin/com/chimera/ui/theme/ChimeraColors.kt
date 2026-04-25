@@ -22,7 +22,7 @@ val CharcoalElevated = Color(0xFF222228)
 // Text tones
 val ParchmentWhite = Color(0xFFE8DCC8)
 val FadedBone = Color(0xFFA89B8C)
-val DimAsh = Color(0xFF6B6460)
+val DimAsh = Color(0xFF5A6270)
 
 // Status / semantic
 val BloodRed = Color(0xFFCC3333)

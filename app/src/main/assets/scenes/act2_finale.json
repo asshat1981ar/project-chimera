@@ -1,0 +1,46 @@
+{
+  "sceneId": "act2_finale",
+  "sceneTitle": "The Crown's Weight",
+  "isCinematic": true,
+  "npcId": "hollow_king",
+  "npcName": "The Hollow King's Echo",
+  "setting": "the Ashen Throne, where the boundary between echo and reality dissolves",
+  "stakes": "The truth of the crown is revealed, and the path to the coast opens",
+  "maxTurns": 1,
+  "allowedReveals": ["king_identity", "crown_nature", "corruption_source", "reforged_prophecy"],
+  "forbiddenTopics": [],
+  "cinematicLines": [
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "You stand where I once stood. You hold what I once held. Do you feel it now? The weight that bends the world?",
+      "emotion": "haunted"
+    },
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "The crown does not corrupt. It reveals. Every soul who wears it sees the truth: that power is isolation, that rule is sacrifice, that every choice births a thousand wounds.",
+      "emotion": "bitter"
+    },
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "The Reforged know this. They rejected the crown not from fear, but from wisdom. They chose to build anew rather than rule what was broken.",
+      "emotion": "respectful"
+    },
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "The corruption flees to the coast -- to the Heart of the Tide. It knows you follow. It knows the crown's power grows in your hands.",
+      "emotion": "intense"
+    },
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "Go now. The tide waits. And remember: the crown offers three ends. Destroy it, and free us all. Wear it, and become what I was. Or... offer it to those who would bear it willingly. Choose well. The world breaks either way.",
+      "emotion": "final"
+    }
+  ],
+  "autoAdvanceDelayMs": 4000,
+  "onCompleteTag": "act2_climax_complete"
+}

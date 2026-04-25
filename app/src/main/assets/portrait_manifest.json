@@ -1,0 +1,52 @@
+{
+  "portraits": [
+    {
+      "characterId": "warden",
+      "drawableName": "portrait_warden"
+    },
+    {
+      "characterId": "elena",
+      "drawableName": "portrait_elena"
+    },
+    {
+      "characterId": "marcus",
+      "drawableName": "portrait_marcus"
+    },
+    {
+      "characterId": "aria",
+      "drawableName": "portrait_aria"
+    },
+    {
+      "characterId": "hollow_king",
+      "drawableName": "portrait_hollow_king"
+    },
+    {
+      "characterId": "thorne",
+      "drawableName": "portrait_thorne"
+    },
+    {
+      "characterId": "vessa",
+      "drawableName": "portrait_vessa"
+    },
+    {
+      "characterId": "kael",
+      "drawableName": "portrait_kael"
+    },
+    {
+      "characterId": "seren",
+      "drawableName": "portrait_seren"
+    },
+    {
+      "characterId": "dara",
+      "drawableName": "portrait_dara"
+    },
+    {
+      "characterId": "rook",
+      "drawableName": "portrait_rook"
+    },
+    {
+      "characterId": "corruption",
+      "drawableName": "portrait_corruption"
+    }
+  ]
+}

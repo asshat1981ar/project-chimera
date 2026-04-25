@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("character_id")]
+    indices = [Index("character_id"), Index("save_slot_id")]
 )
 data class CharacterStateEntity(
     @PrimaryKey

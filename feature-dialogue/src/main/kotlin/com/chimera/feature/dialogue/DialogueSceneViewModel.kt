@@ -63,7 +63,10 @@ data class DialogueUiState(
     val isSceneComplete: Boolean = false,
     val triggerDuelWith: String? = null,
     val relationshipBanner: RelationshipBanner? = null,
-    val isSpeaking: Boolean = false   // true while TTS is playing an NPC line
+    val isSpeaking: Boolean = false,   // true while TTS is playing an NPC line
+    val isCinematic: Boolean = false,   // true for narration-only cinematic scenes
+    val cinematicIndex: Int = 0,        // current line index in cinematic sequence
+    val autoAdvanceTimerMs: Long = 0L   // delay before auto-advancing (0 = disabled)
 )
 
 data class RelationshipBanner(
@@ -163,34 +166,62 @@ class DialogueSceneViewModel @Inject constructor(
                     .map { it.toModel() }
                     .toMutableList()
 
-                val openingInput = PlayerInput(text = "[Scene begins]", isQuickIntent = true)
-                val result = orchestrator.generateTurn(
-                    contract, openingInput, charState, recentMemories, turnResults
-                )
-                turnResults.add(result)
+                // Handle cinematic scenes differently - no AI orchestration needed
+                if (contract.isCinematic && contract.cinematicLines.isNotEmpty()) {
+                    // Load first cinematic line immediately
+                    val firstLine = contract.cinematicLines.first()
+                    _uiState.value = _uiState.value.copy(
+                        transcript = listOf(
+                            DialogueLine(
+                                speakerId = firstLine.speaker,
+                                speakerName = firstLine.speakerName,
+                                text = firstLine.text,
+                                emotion = firstLine.emotion
+                            )
+                        ),
+                        npcId = contract.npcId,
+                        npcMood = firstLine.emotion,
+                        npcDisposition = charState.dispositionToPlayer,
+                        npcArchetype = charState.activeArchetype,
+                        quickIntents = emptyList(), // No intents in cinematic mode
+                        isFallbackMode = false,
+                        npcPortraitResName = portraitResName,
+                        isCinematic = true,
+                        cinematicIndex = 0,
+                        autoAdvanceTimerMs = contract.autoAdvanceDelayMs,
+                        isLoading = false
+                    )
+                } else {
+                    // Standard AI-driven dialogue scene
+                    val openingInput = PlayerInput(text = "[Scene begins]", isQuickIntent = true)
+                    val result = orchestrator.generateTurn(
+                        contract, openingInput, charState, recentMemories, turnResults
+                    )
+                    turnResults.add(result)
 
-                persistTurn(contract.npcId, result.npcLine, result.emotion)
+                    persistTurn(contract.npcId, result.npcLine, result.emotion)
 
-                val intents = orchestrator.generateIntents(contract, charState, turnResults)
+                    val intents = orchestrator.generateIntents(contract, charState, turnResults)
 
-                _uiState.value = _uiState.value.copy(
-                    transcript = listOf(
-                        DialogueLine(
-                            speakerId = contract.npcId,
-                            speakerName = contract.npcName,
-                            text = result.npcLine,
-                            emotion = result.emotion
-                        )
-                    ),
-                    npcId = contract.npcId,
-                    npcMood = result.emotion,
-                    npcDisposition = charState.dispositionToPlayer,
-                    npcArchetype = charState.activeArchetype,
-                    quickIntents = intents,
-                    isFallbackMode = orchestrator.isFallbackActive,
-                    npcPortraitResName = portraitResName,
-                    isLoading = false
-                )
+                    _uiState.value = _uiState.value.copy(
+                        transcript = listOf(
+                            DialogueLine(
+                                speakerId = contract.npcId,
+                                speakerName = contract.npcName,
+                                text = result.npcLine,
+                                emotion = result.emotion
+                            )
+                        ),
+                        npcId = contract.npcId,
+                        npcMood = result.emotion,
+                        npcDisposition = charState.dispositionToPlayer,
+                        npcArchetype = charState.activeArchetype,
+                        quickIntents = intents,
+                        isFallbackMode = orchestrator.isFallbackActive,
+                        npcPortraitResName = portraitResName,
+                        isLoading = false
+                    )
+                }
             } catch (e: Exception) {
                 Log.e("DialogueVM", "Failed to initialize scene", e)
                 _uiState.value = _uiState.value.copy(isLoading = false)
@@ -331,6 +362,76 @@ class DialogueSceneViewModel @Inject constructor(
 
     fun dismissRelationshipBanner() {
         _uiState.value = _uiState.value.copy(relationshipBanner = null)
+    }
+
+    /** Advance to the next cinematic line, or complete the scene if at the end. */
+    fun advanceCinematic() {
+        if (!_uiState.value.isCinematic) return
+
+        val currentIndex = _uiState.value.cinematicIndex
+        val lines = contract.cinematicLines
+
+        if (currentIndex >= lines.size - 1) {
+            // End of cinematic - mark complete and trigger chapter progression
+            completeCinematicScene()
+        } else {
+            // Advance to next line
+            val nextIndex = currentIndex + 1
+            val nextLine = lines[nextIndex]
+            _uiState.value = _uiState.value.copy(
+                transcript = _uiState.value.transcript + DialogueLine(
+                    speakerId = nextLine.speaker,
+                    speakerName = nextLine.speakerName,
+                    text = nextLine.text,
+                    emotion = nextLine.emotion
+                ),
+                cinematicIndex = nextIndex,
+                npcMood = nextLine.emotion
+            )
+            // Speak the line if voice is enabled
+            speakNpcLine(nextLine.text, nextLine.speaker)
+        }
+    }
+
+    /** Mark the cinematic scene as complete and trigger chapter progression. */
+    private fun completeCinematicScene() {
+        viewModelScope.launch {
+            try {
+                val slotId = gameSessionManager.activeSlotId.value ?: return@launch
+
+                // Mark scene as complete in database
+                sceneInstanceDao.completeScene(
+                    id = sceneInstanceId,
+                    turnCount = contract.cinematicLines.size,
+                    usedFallback = false
+                )
+
+                // Persist the cinematic lines as dialogue turns
+                contract.cinematicLines.forEach { line ->
+                    dialogueTurnDao.insert(
+                        DialogueTurnEntity(
+                            saveSlotId = slotId,
+                            sceneId = sceneId,
+                            speakerId = line.speaker,
+                            lineText = line.text,
+                            emotionJson = "{\"primary\":\"${line.emotion}\"}"
+                        )
+                    )
+                }
+
+                // Mark the bridge tag complete via chapter progression use case
+                contract.onCompleteTag?.let { tag ->
+                    chapterProgressionUseCase.markCinematicComplete(sceneId)
+                }
+
+                // Trigger chapter progression to update state
+                chapterProgressionUseCase()
+
+                _uiState.value = _uiState.value.copy(isSceneComplete = true)
+            } catch (e: Exception) {
+                Log.e("DialogueVM", "Failed to complete cinematic scene", e)
+            }
+        }
     }
 
     private suspend fun loadCharacterState(slotId: Long): CharacterState {

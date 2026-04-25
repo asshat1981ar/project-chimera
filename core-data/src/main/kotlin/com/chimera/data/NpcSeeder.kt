@@ -22,6 +22,17 @@ private data class NpcJson(
     val portraitResName: String? = null
 )
 
+@Serializable
+private data class PortraitManifest(
+    val portraits: List<PortraitEntry>
+)
+
+@Serializable
+private data class PortraitEntry(
+    val characterId: String,
+    val drawableName: String
+)
+
 @Singleton
 class NpcSeeder @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -30,7 +41,15 @@ class NpcSeeder @Inject constructor(
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
+    /**
+     * Seeds NPCs for a given save slot, populating portraitResName from the portrait manifest.
+     * The manifest maps character IDs to drawable resource names.
+     */
     suspend fun seedNpcsForSlot(slotId: Long) {
+        // Load portrait manifest
+        val portraitMap = loadPortraitManifest()
+
+        // Load NPCs and populate portrait data
         val text = context.assets.open("npcs.json").bufferedReader().use { it.readText() }
         val npcs = json.decodeFromString<List<NpcJson>>(text)
 
@@ -42,7 +61,7 @@ class NpcSeeder @Inject constructor(
                 title = npc.title,
                 role = npc.role,
                 isPlayerCharacter = false,
-                portraitResName = npc.portraitResName
+                portraitResName = portraitMap[npc.id] ?: npc.portraitResName
             )
         }
         characterDao.upsertAll(characters)
@@ -56,6 +75,21 @@ class NpcSeeder @Inject constructor(
                     activeArchetype = npc.archetype
                 )
             )
+        }
+    }
+
+    /**
+     * Loads the portrait manifest from assets and returns a map of characterId -> drawableName.
+     */
+    private fun loadPortraitManifest(): Map<String, String> {
+        return try {
+            val manifestText = context.assets.open("portrait_manifest.json")
+                .bufferedReader()
+                .use { it.readText() }
+            val manifest = json.decodeFromString<PortraitManifest>(manifestText)
+            manifest.portraits.associateBy({ it.characterId }, { it.drawableName })
+        } catch (e: Exception) {
+            emptyMap()
         }
     }
 }

@@ -16,6 +16,17 @@ data class DialogueTurnResult(
 )
 
 /**
+ * A single line in a cinematic scene sequence.
+ */
+@Serializable
+data class CinematicLine(
+    val speaker: String,
+    val speakerName: String,
+    val text: String,
+    val emotion: String = "neutral"
+)
+
+/**
  * Scene contract that constrains what the AI provider can generate.
  */
 @Serializable
@@ -28,7 +39,11 @@ data class SceneContract(
     val stakes: String = "",
     val allowedReveals: List<String> = emptyList(),
     val forbiddenTopics: List<String> = emptyList(),
-    val maxTurns: Int = 12
+    val maxTurns: Int = 12,
+    val isCinematic: Boolean = false,
+    val cinematicLines: List<CinematicLine> = emptyList(),
+    val autoAdvanceDelayMs: Long = 4000,
+    val onCompleteTag: String? = null
 )
 
 /**

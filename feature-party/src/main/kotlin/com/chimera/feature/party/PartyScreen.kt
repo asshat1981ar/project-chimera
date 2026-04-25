@@ -250,7 +250,7 @@ private fun CompanionDetail(
                     modifier = Modifier.testTag("btn_close_companion_detail"),
                     onClick = onClose
                 ) {
-                    Icon(Icons.Default.Close, "Close", tint = FadedBone)
+                    Icon(Icons.Default.Close, contentDescription = "Close companion details", tint = FadedBone)
                 }
             }
 

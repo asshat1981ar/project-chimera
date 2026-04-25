@@ -1,0 +1,46 @@
+{
+  "sceneId": "act1_finale",
+  "sceneTitle": "The Hollow King's Truth",
+  "isCinematic": true,
+  "npcId": "hollow_king",
+  "npcName": "The Hollow King's Echo",
+  "setting": "the throne room of the Hollow, where reality bends around the spectral crown",
+  "stakes": "The King reveals the truth of the corruption and the path forward",
+  "maxTurns": 1,
+  "allowedReveals": ["king_history", "corruption_source", "king_identity"],
+  "forbiddenTopics": [],
+  "cinematicLines": [
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "You have walked my Hollow. You have spoken with its guardians, its merchants, its priests. You have seen the cracks in my crown.",
+      "emotion": "somber"
+    },
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "I did not fall to corruption. I sacrificed myself to contain it. The crown... the crown was never meant to rule. It was meant to imprison.",
+      "emotion": "resigned"
+    },
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "But the prison weakens. The corruption spreads beyond my domain -- to the Ashen Reaches, to the coast, to the very tide itself.",
+      "emotion": "urgent"
+    },
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "You carry something... different. Not corruption. Not purity. Something in between. Perhaps... something that can walk the path I could not.",
+      "emotion": "hopeful"
+    },
+    {
+      "speaker": "hollow_king",
+      "speakerName": "The Hollow King",
+      "text": "The Ashen Gate awaits. Beyond it lies the forge that sealed this fate -- and the forge that may yet unmake it. Go. The Reaches will test you. But know this: the choice you make there... will echo beyond all our ends.",
+      "emotion": "solemn"
+    }
+  ],
+  "autoAdvanceDelayMs": 4000,
+  "onCompleteTag": "hollow_approach_complete"
+}

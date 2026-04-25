@@ -65,6 +65,51 @@ AI does not own game state, progression, or simulation truth.
 ./gradlew detekt                # Static analysis
 ```
 
+## AI Provider Setup
+
+The game works fully offline with authored dialogue templates. To enable cloud AI:
+
+### 1. Create `local.properties`
+
+Create a `local.properties` file in the project root (this file is git-ignored):
+
+```properties
+# Google AI Studio (Gemini) - Primary provider
+# Get your key at: https://aistudio.google.com/apikey
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Optional fallback providers
+GROQ_API_KEY=your_groq_api_key_here
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+```
+
+### 2. Get API Keys
+
+- **Gemini**: Free tier (1,500 req/day) at [Google AI Studio](https://aistudio.google.com/apikey)
+- **Groq**: Free tier (30 RPM, 14.4K tokens/min) at [Groq Console](https://console.groq.com)
+- **OpenRouter**: Access to 200+ models at [OpenRouter](https://openrouter.ai)
+
+### 3. Build with AI enabled
+
+```bash
+# Build with API keys from local.properties
+./gradlew assembleDevDebug
+
+# Install and run
+adb install app/build/outputs/apk/devDebug/app-dev-debug.apk
+```
+
+### 4. Verify AI Connection
+
+Open Settings in the app. The "AI Provider" indicator shows:
+- **AI: Connected (Gemini)** - Cloud AI active
+- **AI: Offline (Fallback)** - Using authored templates
+
+The app gracefully falls back to `FakeDialogueProvider` when:
+- No API key is configured
+- API service is unavailable
+- Network connection is lost
+
 ## Testing
 
 123+ unit tests across all modules. Core simulation tests require no Android framework.

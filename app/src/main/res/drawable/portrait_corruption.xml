@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder portrait for The Living Corruption - replace with actual artwork -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp"
+    android:height="192dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+    <path
+        android:fillColor="#1A5C2A"
+        android:pathData="M96,0L192,96L96,192L0,96Z"/>
+    <path
+        android:fillColor="#0D3015"
+        android:pathData="M96,24L168,96L96,168L24,96Z"/>
+    <path
+        android:fillColor="#5F9B6F"
+        android:pathData="M96,48L144,96L96,144L48,96Z"/>
+</vector>

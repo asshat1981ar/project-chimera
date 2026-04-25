@@ -72,13 +72,19 @@ class HomeViewModel @Inject constructor(
 
                 // Detect act advance — emit interstitial flag when chapter tag changes
                 // and it's not the first load (lastKnownChapterTag != null).
-                // hollow_approach_complete is a bridge tag: skipping it avoids double interstitial.
+                // Bridge tags (hollow_approach_complete, act2_climax_complete, act3_begun)
+                // are used internally for cinematic triggers and should not show interstitial.
                 val chapterTag = slot.chapterTag
+                val isBridgeTag = chapterTag in setOf(
+                    "hollow_approach_complete",
+                    "act2_climax_complete",
+                    "act3_begun"
+                )
                 val pending = if (
                     lastKnownChapterTag != null &&
                     lastKnownChapterTag != chapterTag &&
                     chapterTag != "prologue" &&
-                    chapterTag != "hollow_approach_complete"
+                    !isBridgeTag
                 ) chapterTag else null
                 lastKnownChapterTag = chapterTag
 

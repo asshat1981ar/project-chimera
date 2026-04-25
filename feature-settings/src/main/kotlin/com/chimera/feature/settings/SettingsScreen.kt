@@ -1,5 +1,6 @@
 package com.chimera.feature.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.platform.testTag
@@ -13,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -38,6 +40,7 @@ import com.chimera.ui.theme.HollowCrimson
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit = {},
+    onNavigateToFactionStanding: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
@@ -54,7 +57,7 @@ fun SettingsScreen(
                 modifier = Modifier.testTag("btn_back_settings"),
                 onClick = onBack
             ) {
-                Icon(Icons.Default.ArrowBack, "Back", tint = FadedBone)
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back to previous screen", tint = FadedBone)
             }
             Text("Settings", style = MaterialTheme.typography.headlineMedium, color = EmberGold)
         }
@@ -87,6 +90,21 @@ fun SettingsScreen(
                 description = if (settings.aiMode == AiMode.AUTO) "Auto (cloud when available)" else "Offline only (authored templates)",
                 checked = settings.aiMode == AiMode.OFFLINE_ONLY,
                 onToggle = { viewModel.toggleAiMode() }
+            )
+            ProviderStatusIndicator(
+                isAiConnected = settings.aiMode == AiMode.AUTO,
+                providerName = "Gemini"
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // World section
+        SettingsSection("World") {
+            SettingsNavItem(
+                label = "Faction Standing",
+                description = "View your reputation with each faction",
+                onClick = onNavigateToFactionStanding
             )
         }
 
@@ -208,5 +226,54 @@ private fun SliderSetting(
                 activeTrackColor = HollowCrimson
             )
         )
+    }
+}
+
+@Composable
+private fun SettingsNavItem(
+    label: String,
+    description: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.bodyLarge)
+            Text(description, style = MaterialTheme.typography.bodySmall, color = FadedBone)
+        }
+        Icon(
+            Icons.Default.ChevronRight,
+            contentDescription = "Navigate to faction standing",
+            tint = FadedBone
+        )
+    }
+}
+
+@Composable
+private fun ProviderStatusIndicator(
+    isAiConnected: Boolean,
+    providerName: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text("AI Provider", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = if (isAiConnected) "AI: Connected ($providerName)" else "AI: Offline (Fallback)",
+                style = MaterialTheme.typography.bodySmall,
+                color = if (isAiConnected) EmberGold else FadedBone
+            )
+        }
     }
 }

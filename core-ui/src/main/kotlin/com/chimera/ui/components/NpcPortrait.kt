@@ -167,16 +167,23 @@ fun NpcPortrait(
             // On Coil error the slot is empty and the letter-avatar base shows through.
             if (portraitResName != null) {
                 val context = LocalContext.current
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(portraitResName)
-                        .crossfade(300)
-                        .build(),
-                    contentDescription = contentDescription ?: npcName,
-                    contentScale = ContentScale.Crop,
-                    filterQuality = FilterQuality.Medium,
-                    modifier = Modifier.matchParentSize()
+                val drawableId = context.resources.getIdentifier(
+                    portraitResName,
+                    "drawable",
+                    context.packageName
                 )
+                if (drawableId != 0) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(drawableId)
+                            .crossfade(300)
+                            .build(),
+                        contentDescription = contentDescription ?: npcName,
+                        contentScale = ContentScale.Crop,
+                        filterQuality = FilterQuality.Medium,
+                        modifier = Modifier.matchParentSize()
+                    )
+                }
             }
         }
 
