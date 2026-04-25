@@ -1,6 +1,7 @@
 package com.chimera.feature.party
 
-import androidx.compose.foundation.BorderStroke
+import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.components.ManuscriptStatBar
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.testTag
@@ -13,21 +14,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Surface
+
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +43,9 @@ import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
+import com.chimera.ui.theme.Iron
+import com.chimera.ui.theme.Oxblood
+import com.chimera.ui.theme.ParchmentLight
 import com.chimera.ui.theme.VoidGreen
 import com.chimera.feature.party.RelationshipTrendGraph
 import com.chimera.feature.party.ArchetypeBadge
@@ -173,21 +173,17 @@ private fun CompanionCard(
         else -> HollowCrimson
     }
 
-    Card(
+    ManuscriptCard(
         modifier = Modifier
             .testTag("card_companion_${member.character.id}")
             .fillMaxWidth()
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant
-            else MaterialTheme.colorScheme.surface
-        ),
-        border = BorderStroke(1.dp, if (isSelected) EmberGold.copy(alpha = 0.6f) else moodColor.copy(alpha = 0.3f))
+        fillColor = if (isSelected) ParchmentLight else ParchmentLight,
+        borderColor = if (isSelected) EmberGold.copy(alpha = 0.6f) else moodColor.copy(alpha = 0.3f)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             com.chimera.ui.components.NpcPortrait(
@@ -211,15 +207,17 @@ private fun CompanionCard(
                     color = moodColor
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                LinearProgressIndicator(
-                    progress = ((disposition + 1f) / 2f).coerceIn(0f, 1f),
+                ManuscriptStatBar(
+                    fraction = ((disposition + 1f) / 2f).coerceIn(0f, 1f),
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics(mergeDescendants = true) {
                             contentDescription = "Disposition: ${((disposition + 1f) / 2f * 100).toInt()}%"
                         },
-                    color = moodColor,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    label = "Disposition",
+                    fillColor = moodColor,
+                    trackColor = Iron,
+                    height = 10.dp
                 )
             }
         }
@@ -231,13 +229,14 @@ private fun CompanionDetail(
     member: PartyMember,
     onClose: () -> Unit
 ) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ManuscriptCard(
+        fillColor = ParchmentLight,
+        borderColor = Oxblood,
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(4.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -331,13 +330,12 @@ private fun StatBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(label, style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(80.dp))
-        LinearProgressIndicator(
-            progress = normalized,
-            modifier = Modifier
-                .weight(1f)
-                .height(6.dp),
-            color = color,
-            trackColor = MaterialTheme.colorScheme.surface
+        ManuscriptStatBar(
+            fraction = normalized,
+            modifier = Modifier.weight(1f),
+            fillColor = color,
+            trackColor = Iron,
+            height = 10.dp
         )
         Text(
             "${(value * 100).toInt()}%",

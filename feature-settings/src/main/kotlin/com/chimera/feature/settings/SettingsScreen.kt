@@ -15,8 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import com.chimera.ui.components.ManuscriptCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -160,13 +159,12 @@ fun SettingsScreen(
 private fun SettingsSection(title: String, content: @Composable () -> Unit) {
     Text(title, style = MaterialTheme.typography.titleMedium, color = EmberGold)
     Spacer(modifier = Modifier.height(8.dp))
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.fillMaxWidth()
+    ManuscriptCard(
+        modifier = Modifier.fillMaxWidth(),
+        fillColor = MaterialTheme.colorScheme.surface,
+        contentPadding = 16.dp
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            content()
-        }
+        content()
     }
 }
 

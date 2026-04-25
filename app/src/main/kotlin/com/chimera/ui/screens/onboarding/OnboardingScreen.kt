@@ -1,6 +1,5 @@
 package com.chimera.ui.screens.onboarding
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,10 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -30,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.chimera.data.ChimeraPreferences
+import com.chimera.ui.components.GothicButton
+import com.chimera.ui.components.ManuscriptCard
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
@@ -78,42 +75,42 @@ fun OnboardingScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        ManuscriptCard(
+            fillColor = MaterialTheme.colorScheme.surface,
+            borderColor = MaterialTheme.colorScheme.outlineVariant,
+            borderWidth = 1.dp,
+            contentPadding = 20.dp
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                Text("Accessibility", style = MaterialTheme.typography.titleMedium, color = EmberGold)
-                Spacer(modifier = Modifier.height(12.dp))
+            Text("Accessibility", style = MaterialTheme.typography.titleMedium, color = EmberGold)
+            Spacer(modifier = Modifier.height(12.dp))
 
-                Text("Text Size: ${(textScale * 100).toInt()}%", style = MaterialTheme.typography.bodyMedium)
-                Slider(
-                    value = textScale,
-                    onValueChange = { textScale = it },
-                    valueRange = 0.8f..1.5f,
-                    colors = SliderDefaults.colors(thumbColor = EmberGold, activeTrackColor = HollowCrimson)
+            Text("Text Size: ${(textScale * 100).toInt()}%", style = MaterialTheme.typography.bodyMedium)
+            Slider(
+                value = textScale,
+                onValueChange = { textScale = it },
+                valueRange = 0.8f..1.5f,
+                colors = SliderDefaults.colors(thumbColor = EmberGold, activeTrackColor = HollowCrimson)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Reduce Motion", style = MaterialTheme.typography.bodyMedium)
+                Switch(
+                    checked = reduceMotion,
+                    onCheckedChange = { reduceMotion = it },
+                    colors = SwitchDefaults.colors(checkedThumbColor = EmberGold, checkedTrackColor = HollowCrimson)
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Reduce Motion", style = MaterialTheme.typography.bodyMedium)
-                    Switch(
-                        checked = reduceMotion,
-                        onCheckedChange = { reduceMotion = it },
-                        colors = SwitchDefaults.colors(checkedThumbColor = EmberGold, checkedTrackColor = HollowCrimson)
-                    )
-                }
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
+        GothicButton(
             onClick = {
                 scope.launch {
                     preferences?.setTextScale(textScale)
@@ -122,8 +119,7 @@ fun OnboardingScreen(
                     onComplete()
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Begin Your Journey", style = MaterialTheme.typography.labelLarge)
         }

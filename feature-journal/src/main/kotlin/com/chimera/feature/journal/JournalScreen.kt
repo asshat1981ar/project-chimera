@@ -1,6 +1,6 @@
 package com.chimera.feature.journal
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Column
@@ -15,15 +15,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Badge
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import com.chimera.ui.components.ManuscriptCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import com.chimera.ui.components.ParchmentInputField
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -60,14 +57,10 @@ fun JournalScreen(
         )
 
         // Search bar
-        OutlinedTextField(
+        ParchmentInputField(
             value = searchQuery,
             onValueChange = viewModel::setSearchQuery,
-            placeholder = { Text("Search entries…", color = DimAsh) },
-            leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = null,
-                    modifier = Modifier.size(18.dp), tint = DimAsh)
-            },
+            placeholder = "Search entries…",
             trailingIcon = {
                 if (searchQuery.isNotEmpty()) {
                     IconButton(
@@ -80,11 +73,6 @@ fun JournalScreen(
                 }
             },
             singleLine = true,
-            textStyle = MaterialTheme.typography.bodySmall,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = EmberGold,
-                unfocusedBorderColor = DimAsh.copy(alpha = 0.4f)
-            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("field_search_journal")
@@ -202,45 +190,44 @@ private fun JournalEntryCard(
     }
     val categoryLabel = entry.category.replaceFirstChar { it.uppercase() }
 
-    Card(
-        onClick = onClick,
-        modifier = Modifier.testTag("card_journal_entry_${entry.id}"),
-        colors = CardDefaults.cardColors(
-            containerColor = if (entry.isRead) {
-                MaterialTheme.colorScheme.surface
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
-        ),
-        border = BorderStroke(1.dp, borderColor)
+    ManuscriptCard(
+        modifier = Modifier
+            .testTag("card_journal_entry_${entry.id}")
+            .clickable { onClick() },
+        fillColor = if (entry.isRead) {
+            MaterialTheme.colorScheme.surface
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant
+        },
+        borderColor = borderColor,
+        borderWidth = 1.dp,
+        contentPadding = 16.dp
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = entry.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = if (entry.isRead) FadedBone else MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = categoryLabel,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = borderColor
-                )
-            }
-            Spacer(modifier = Modifier.height(6.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                text = entry.body,
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                color = FadedBone
+                text = entry.title,
+                style = MaterialTheme.typography.titleSmall,
+                color = if (entry.isRead) FadedBone else MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = categoryLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = borderColor
             )
         }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = entry.body,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            color = FadedBone
+        )
     }
 }
 
@@ -283,35 +270,35 @@ private fun VowCard(vow: VowEntity) {
         else -> FadedBone
     }
 
-    Card(
+    ManuscriptCard(
         modifier = Modifier.testTag("card_vow_${vow.id}"),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, statusColor.copy(alpha = 0.4f))
+        fillColor = MaterialTheme.colorScheme.surface,
+        borderColor = statusColor.copy(alpha = 0.4f),
+        borderWidth = 1.dp,
+        contentPadding = 16.dp
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = vow.description,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = vow.status.replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.labelMedium,
-                    color = statusColor
-                )
-            }
-            if (vow.swornTo != null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Sworn to: ${vow.swornTo}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = FadedBone
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = vow.description,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = vow.status.replaceFirstChar { it.uppercase() },
+                style = MaterialTheme.typography.labelMedium,
+                color = statusColor
+            )
+        }
+        if (vow.swornTo != null) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Sworn to: ${vow.swornTo}",
+                style = MaterialTheme.typography.bodySmall,
+                color = FadedBone
+            )
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.chimera.feature.party
 
-import androidx.compose.foundation.BorderStroke
+import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.components.ManuscriptStatBar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +24,8 @@ import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
+import com.chimera.ui.theme.Iron
+import com.chimera.ui.theme.ParchmentLight
 import com.chimera.ui.theme.VoidGreen
 
 /**
@@ -59,12 +59,12 @@ fun FactionStandingRow(
         else             -> "Enemy"
     }
 
-    Card(
+    ManuscriptCard(
         modifier = modifier.testTag("card_faction_${faction.factionId}").fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, standingColor.copy(alpha = 0.3f))
+        fillColor = ParchmentLight,
+        borderColor = standingColor.copy(alpha = 0.3f)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -98,11 +98,13 @@ fun FactionStandingRow(
                     color = DimAsh,
                     modifier = Modifier.width(64.dp)
                 )
-                LinearProgressIndicator(
-                    progress = faction.influence.coerceIn(0f, 1f),
-                    modifier = Modifier.weight(1f).height(4.dp),
-                    color = FadedBone.copy(alpha = 0.5f),
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                ManuscriptStatBar(
+                    fraction = faction.influence.coerceIn(0f, 1f),
+                    modifier = Modifier.weight(1f),
+                    label = "",
+                    fillColor = FadedBone.copy(alpha = 0.5f),
+                    trackColor = Iron,
+                    height = 10.dp
                 )
                 Text(
                     "${(faction.influence * 100).toInt()}%",
@@ -129,11 +131,13 @@ fun FactionStandingRow(
                     color = DimAsh,
                     modifier = Modifier.width(64.dp)
                 )
-                LinearProgressIndicator(
-                    progress = standingNorm,
-                    modifier = Modifier.weight(1f).height(4.dp),
-                    color = standingColor,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                ManuscriptStatBar(
+                    fraction = standingNorm,
+                    modifier = Modifier.weight(1f),
+                    label = "",
+                    fillColor = standingColor,
+                    trackColor = Iron,
+                    height = 10.dp
                 )
                 Text(
                     "${(standing * 100).toInt()}",

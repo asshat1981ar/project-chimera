@@ -1,9 +1,7 @@
 package com.chimera.feature.party
 
-import androidx.compose.foundation.BorderStroke
+import com.chimera.ui.components.ManuscriptCard
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.chimera.domain.usecase.RelationshipDynamics
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.HollowCrimson
+import com.chimera.ui.theme.ParchmentLight
 import com.chimera.ui.theme.VoidGreen
 
 /**
@@ -38,10 +37,10 @@ fun ArchetypeBadge(
         else -> HollowCrimson
     }
 
-    Card(
+    ManuscriptCard(
         modifier = modifier.padding(vertical = cardVerticalPadding),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        border = BorderStroke(1.dp, badgeColor.copy(alpha = 0.5f))
+        fillColor = ParchmentLight,
+        borderColor = badgeColor.copy(alpha = 0.5f)
     ) {
         Text(
             text = archetype,
