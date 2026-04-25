@@ -33,4 +33,10 @@ interface CraftingRecipeDao {
 
     @Query("UPDATE crafting_recipes SET is_discovered = 1 WHERE required_npc = :npcId")
     suspend fun discoverByNpc(npcId: String)
+
+    @Query("SELECT * FROM crafting_recipes WHERE scene_id = :sceneId")
+    fun getBySceneId(sceneId: String): List<CraftingRecipeEntity>
+
+    @Query("SELECT * FROM crafting_recipes WHERE npc_id = :npcId")
+    fun getByNpcId(npcId: String): List<CraftingRecipeEntity>
 }
