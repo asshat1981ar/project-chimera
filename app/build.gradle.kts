@@ -190,6 +190,9 @@ dependencies {
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.client.logging)
 
+    // SLF4J NOP implementation for R8/release builds (Ktor logging dependency)
+    implementation("org.slf4j:slf4j-nop:2.0.9")
+
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
