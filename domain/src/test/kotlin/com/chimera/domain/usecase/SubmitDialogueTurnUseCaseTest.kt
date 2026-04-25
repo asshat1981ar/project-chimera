@@ -77,7 +77,7 @@ class SubmitDialogueTurnUseCaseTest {
     )
 
     @Test
-    fun `execute_submitsTurn()` = runTest {
+    fun executeSubmitsTurn() = runTest {
         // Given
         val contract = fakeContract()
         val playerInput = fakePlayerInput("Hello")
@@ -104,7 +104,7 @@ class SubmitDialogueTurnUseCaseTest {
     }
 
     @Test
-    fun `execute_returnsDialogueResponse()` = runTest {
+    fun executeReturnsDialogueResponse() = runTest {
         // Given
         val contract = fakeContract()
         val playerInput = fakePlayerInput("What brings you here?")
@@ -135,7 +135,7 @@ class SubmitDialogueTurnUseCaseTest {
     }
 
     @Test
-    fun `execute_emptyInput_throwsException()` = runTest {
+    fun executeEmptyInputThrowsException() = runTest {
         // Given
         val contract = fakeContract()
         val emptyInput = fakePlayerInput(text = "")
@@ -160,7 +160,7 @@ class SubmitDialogueTurnUseCaseTest {
     }
 
     @Test
-    fun `execute_invalidSceneId_throwsException()` = runTest {
+    fun executeInvalidSceneIdThrowsException() = runTest {
         // Given
         val invalidContract = fakeContract(sceneId = "")
         val playerInput = fakePlayerInput("Hello")
@@ -185,7 +185,7 @@ class SubmitDialogueTurnUseCaseTest {
     }
 
     @Test
-    fun `execute_updatesTurnCount()` = runTest {
+    fun executeUpdatesTurnCount() = runTest {
         // Given
         val contract = fakeContract()
         val playerInput = fakePlayerInput("Let us continue")
@@ -212,7 +212,7 @@ class SubmitDialogueTurnUseCaseTest {
     }
 
     @Test
-    fun `execute_handlesProviderError()` = runTest {
+    fun executeHandlesProviderError() = runTest {
         // Given
         val contract = fakeContract()
         val playerInput = fakePlayerInput("Hello")
@@ -238,7 +238,7 @@ class SubmitDialogueTurnUseCaseTest {
     }
 
     @Test
-    fun `execute_persistsMemoryCandidates()` = runTest {
+    fun executePersistsMemoryCandidates() = runTest {
         // Given
         val contract = fakeContract()
         val playerInput = fakePlayerInput("Tell me about the shrine")
@@ -261,7 +261,7 @@ class SubmitDialogueTurnUseCaseTest {
         )
 
         // Then
-        val captor = argumentCaptor<List<MemoryShardEntity>>()
+        val captor = argumentCaptor<List<MemoryShard>>()
         verify(dialogueRepository).insertMemoryShards(captor.capture())
         val captured = captor.firstValue
         assertEquals(2, captured.size)
@@ -269,7 +269,7 @@ class SubmitDialogueTurnUseCaseTest {
     }
 
     @Test
-    fun `execute_adjustsDispositionOnRelationshipDelta()` = runTest {
+    fun executeAdjustsDispositionOnRelationshipDelta() = runTest {
         // Given
         val contract = fakeContract(npcId = "thorne")
         val playerInput = fakePlayerInput("I trust you")
@@ -294,11 +294,11 @@ class SubmitDialogueTurnUseCaseTest {
 
         // Then
         verify(characterRepository).adjustDisposition("thorne", 0.2f)
-        assertEquals(0.5f, result.updatedDisposition, 0.001f)
+        assertEquals(0.5f, result.updatedDisposition ?: 0f, 0.001f)
     }
 
     @Test
-    fun `execute_handlesRecruitCompanionFlag()` = runTest {
+    fun executeHandlesRecruitCompanionFlag() = runTest {
         // Given
         val contract = fakeContract(npcId = "vessa")
         val playerInput = fakePlayerInput("Join us")
@@ -323,7 +323,7 @@ class SubmitDialogueTurnUseCaseTest {
     }
 
     @Test
-    fun `execute_noRelationshipDelta_doesNotAdjustDisposition()` = runTest {
+    fun executeNoRelationshipDeltaDoesNotAdjustDisposition() = runTest {
         // Given
         val contract = fakeContract()
         val playerInput = fakePlayerInput("Neutral statement")

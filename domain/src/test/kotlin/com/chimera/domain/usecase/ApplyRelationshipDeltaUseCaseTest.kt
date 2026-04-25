@@ -2,7 +2,7 @@ package com.chimera.domain.usecase
 
 import com.chimera.data.repository.CharacterRepository
 import com.chimera.data.repository.JournalRepository
-import com.chimera.database.entity.JournalEntryEntity
+import com.chimera.model.JournalEntry
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -38,7 +38,7 @@ class ApplyRelationshipDeltaUseCaseTest {
     fun `inserts journal entry when positive delta meets threshold`() = runTest {
         useCase()(slotId = 1L, characterId = "elena", characterName = "Elena", delta = 0.15f)
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository).insertEntry(captor.capture())
         val entry = captor.firstValue
         assertEquals(1L, entry.saveSlotId)
@@ -51,7 +51,7 @@ class ApplyRelationshipDeltaUseCaseTest {
     fun `inserts journal entry with cold direction for negative delta`() = runTest {
         useCase()(slotId = 2L, characterId = "thorne", characterName = "Thorne", delta = -0.2f)
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository).insertEntry(captor.capture())
         assertTrue(captor.firstValue.body.contains("grown colder toward"))
     }
@@ -66,7 +66,7 @@ class ApplyRelationshipDeltaUseCaseTest {
             context = "the shrine encounter"
         )
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository).insertEntry(captor.capture())
         assertTrue(captor.firstValue.body.contains("the shrine encounter"))
     }

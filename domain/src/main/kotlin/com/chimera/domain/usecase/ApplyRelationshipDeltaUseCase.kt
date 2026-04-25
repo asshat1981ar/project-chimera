@@ -2,7 +2,7 @@ package com.chimera.domain.usecase
 
 import com.chimera.data.repository.CharacterRepository
 import com.chimera.data.repository.JournalRepository
-import com.chimera.database.entity.JournalEntryEntity
+import com.chimera.model.JournalEntry
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -26,7 +26,7 @@ class ApplyRelationshipDeltaUseCase @Inject constructor(
         if (abs(delta) >= JOURNAL_THRESHOLD) {
             val direction = if (delta > 0) "warmed to" else "grown colder toward"
             journalRepository.insertEntry(
-                JournalEntryEntity(
+                JournalEntry(
                     saveSlotId = slotId,
                     title = "$characterName's Regard",
                     body = "$characterName has $direction you${if (context.isNotBlank()) " after $context" else ""}.",

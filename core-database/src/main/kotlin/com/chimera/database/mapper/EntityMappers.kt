@@ -3,11 +3,13 @@ package com.chimera.database.mapper
 import com.chimera.database.converter.Converters
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.CharacterStateEntity
+import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.database.entity.SaveSlotEntity
 import com.chimera.model.Character
 import com.chimera.model.CharacterRole
 import com.chimera.model.CharacterState
+import com.chimera.model.JournalEntry
 import com.chimera.model.MemoryShard
 import com.chimera.model.SaveSlot
 
@@ -87,6 +89,30 @@ fun MemoryShardEntity.toModel() = MemoryShard(
     summary = summary,
     tags = converters.toStringList(tagsJson),
     importanceScore = importanceScore,
+    createdAt = createdAt
+)
+
+fun JournalEntryEntity.toModel() = JournalEntry(
+    id = id,
+    saveSlotId = saveSlotId,
+    title = title,
+    body = body,
+    category = category,
+    sceneId = sceneId,
+    characterId = characterId,
+    isRead = isRead,
+    createdAt = createdAt
+)
+
+fun JournalEntry.toEntity() = JournalEntryEntity(
+    id = id,
+    saveSlotId = saveSlotId,
+    title = title,
+    body = body,
+    category = category,
+    sceneId = sceneId,
+    characterId = characterId,
+    isRead = isRead,
     createdAt = createdAt
 )
 

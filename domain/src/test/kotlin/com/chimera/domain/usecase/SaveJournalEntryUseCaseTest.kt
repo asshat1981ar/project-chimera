@@ -1,7 +1,7 @@
 package com.chimera.domain.usecase
 
 import com.chimera.data.repository.JournalRepository
-import com.chimera.database.entity.JournalEntryEntity
+import com.chimera.model.JournalEntry
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -22,7 +22,7 @@ class SaveJournalEntryUseCaseTest {
         title: String = "Test",
         body: String = "Content",
         category: String = "story"
-    ) = JournalEntryEntity(
+    ) = JournalEntry(
         saveSlotId = saveSlotId,
         title = title,
         body = body,
@@ -57,7 +57,7 @@ class SaveJournalEntryUseCaseTest {
 
         useCase()(entry)
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository).insertEntry(captor.capture())
         val captured = captor.firstValue
         assertEquals(7L, captured.saveSlotId)
@@ -68,7 +68,7 @@ class SaveJournalEntryUseCaseTest {
 
     @Test
     fun `invoke_withMinimalEntry`() = runTest {
-        val entry = JournalEntryEntity(
+        val entry = JournalEntry(
             saveSlotId = 1L,
             title = "",
             body = "",

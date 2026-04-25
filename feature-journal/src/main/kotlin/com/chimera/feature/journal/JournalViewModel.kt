@@ -8,6 +8,7 @@ import com.chimera.database.dao.VowDao
 import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.VowEntity
 import com.chimera.domain.usecase.SaveJournalEntryUseCase
+import com.chimera.model.JournalEntry
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -123,7 +124,7 @@ class JournalViewModel @Inject constructor(
         }
     }
 
-    fun saveEntry(entry: JournalEntryEntity) {
+    fun saveEntry(entry: JournalEntry) {
         viewModelScope.launch {
             try {
                 saveJournalEntryUseCase(entry)

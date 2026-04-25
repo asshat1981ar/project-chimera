@@ -3,7 +3,6 @@ package com.chimera.domain.usecase
 import com.chimera.ai.DialogueOrchestrator
 import com.chimera.data.repository.CharacterRepository
 import com.chimera.data.repository.DialogueRepository
-import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.model.CharacterState
 import com.chimera.model.DialogueTurnResult
 import com.chimera.model.MemoryShard
@@ -45,7 +44,7 @@ class SubmitDialogueTurnUseCase @Inject constructor(
         // Batch insert memory candidates
         if (result.memoryCandidates.isNotEmpty()) {
             val shards = result.memoryCandidates.map { summary ->
-                MemoryShardEntity(
+                MemoryShard(
                     saveSlotId = slotId,
                     sceneId = sceneId,
                     characterId = contract.npcId,

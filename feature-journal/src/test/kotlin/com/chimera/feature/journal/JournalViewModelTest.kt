@@ -3,8 +3,8 @@ package com.chimera.feature.journal
 import com.chimera.data.GameSessionManager
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.VowDao
-import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.domain.usecase.SaveJournalEntryUseCase
+import com.chimera.model.JournalEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +49,7 @@ class JournalViewModelTest {
         saveJournalEntryUseCase = saveJournalEntryUseCase
     )
 
-    private fun fakeEntry(category: String = "story") = JournalEntryEntity(
+    private fun fakeEntry(category: String = "story") = JournalEntry(
         saveSlotId = 1L,
         title = "Test",
         body = "Content",
