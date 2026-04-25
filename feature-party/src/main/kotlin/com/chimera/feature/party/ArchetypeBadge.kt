@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.chimera.domain.usecase.RelationshipDynamics
 import com.chimera.ui.theme.EmberGold
@@ -56,4 +57,17 @@ private object ArchetypeBadgeDefaults {
     const val UNSTABLE_THRESHOLD = 0.4f
     val CARD_PADDING = 8.dp
     val CARD_VERTICAL_PADDING = 4.dp
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ArchetypeBadgePreview() {
+    ArchetypeBadge(
+        dynamics = RelationshipDynamics(
+            activeArchetype = "Mentor",
+            stabilityIndex = 0.85f,
+            feedbackLoops = listOf("Trust ↑", "Communication ↑"),
+            archetypeDescription = "A guiding relationship"
+        )
+    )
 }
