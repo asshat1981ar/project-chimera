@@ -172,6 +172,40 @@ jobs:
         path: app/build/outputs/apk/mockDemo/*.apk
         retention-days: 30
 
+  build-beta:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    name: Build Beta APK
+    if: startsWith(github.ref, 'refs/heads/feature/') || github.ref == 'refs/heads/develop'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build Beta APK
+      run: ./gradlew assembleProdBeta --no-daemon
+
+    - name: Upload Beta APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: chimera-beta-apk
+        path: app/build/outputs/apk/prod/beta/*.apk
+        retention-days: 30
+
   create-release:
     runs-on: ubuntu-latest
     needs: build-release

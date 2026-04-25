@@ -99,6 +99,7 @@ android {
             applicationIdSuffix = ".beta"
             versionNameSuffix = "-beta"
             isDebuggable = false  // Production-like but debug-signed
+            matchingFallbacks += listOf("debug")  // Fall back to debug variant in dependencies
         }
     }
 
