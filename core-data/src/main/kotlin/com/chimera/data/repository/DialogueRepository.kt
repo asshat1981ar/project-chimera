@@ -61,11 +61,9 @@ class DialogueRepository @Inject constructor(
 
     /**
      * Returns the scene ID of the most recently started active (incomplete) scene for [slotId],
-     * or null if none exists. [SceneInstanceDao.getBySlot] returns rows ordered by started_at DESC,
-     * so the first active row is the last-started one.
+     * or null if none exists. Uses [SceneInstanceDao.getLastIncompleteScene] which queries
+     * directly for the last active scene ordered by started_at DESC.
      */
     suspend fun getLastIncompleteSceneId(slotId: Long): String? =
-        sceneInstanceDao.getBySlot(slotId)
-            .firstOrNull { it.status == "active" }
-            ?.sceneId
+        sceneInstanceDao.getLastIncompleteScene(slotId)?.sceneId
 }

@@ -34,4 +34,11 @@ interface SceneInstanceDao {
 
     @Query("SELECT * FROM scene_instances WHERE save_slot_id = :slotId ORDER BY started_at DESC")
     suspend fun getBySlot(slotId: Long): List<SceneInstanceEntity>
+
+    @Query(
+        "SELECT * FROM scene_instances " +
+        "WHERE save_slot_id = :slotId AND status = 'active' " +
+        "ORDER BY started_at DESC LIMIT 1"
+    )
+    suspend fun getLastIncompleteScene(slotId: Long): SceneInstanceEntity?
 }
