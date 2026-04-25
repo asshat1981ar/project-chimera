@@ -4,8 +4,8 @@ import com.chimera.database.dao.DialogueTurnDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.entity.DialogueTurnEntity
-import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.database.entity.SceneInstanceEntity
+import com.chimera.database.mapper.toEntity
 import com.chimera.database.mapper.toModel
 import com.chimera.model.MemoryShard
 import kotlinx.coroutines.flow.Flow
@@ -44,13 +44,12 @@ class DialogueRepository @Inject constructor(
     suspend fun getRecentMemories(slotId: Long, characterId: String, limit: Int = 10): List<MemoryShard> =
         memoryShardDao.getTopMemories(slotId, characterId, limit).map { it.toModel() }
 
-    suspend fun insertMemoryShards(shards: List<MemoryShardEntity>) {
+    suspend fun insertMemoryShards(shards: List<MemoryShard>) {
         if (shards.isEmpty()) return
-        // Deduplicate: skip shards with identical summary for the same character in the same slot
         val deduped = shards.filter { shard ->
             memoryShardDao.countDuplicates(shard.saveSlotId, shard.characterId, shard.summary) == 0
         }
-        if (deduped.isNotEmpty()) memoryShardDao.insertAll(deduped)
+        if (deduped.isNotEmpty()) memoryShardDao.insertAll(deduped.map { it.toEntity() })
     }
 
     suspend fun getCompletedSceneIds(slotId: Long): Set<String> =

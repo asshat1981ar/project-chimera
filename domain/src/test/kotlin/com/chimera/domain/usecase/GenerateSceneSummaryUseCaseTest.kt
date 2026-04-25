@@ -1,8 +1,8 @@
 package com.chimera.domain.usecase
 
 import com.chimera.data.repository.JournalRepository
-import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.model.DialogueTurnResult
+import com.chimera.model.JournalEntry
 import com.chimera.model.SceneContract
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -39,7 +39,7 @@ class GenerateSceneSummaryUseCaseTest {
             turnResults = listOf(DialogueTurnResult("Opening line"))
         )
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository, times(1)).insertEntry(captor.capture())
         assertEquals("story", captor.firstValue.category)
         assertEquals(testContract.sceneTitle, captor.firstValue.title)
@@ -55,7 +55,7 @@ class GenerateSceneSummaryUseCaseTest {
             turnResults = listOf(DialogueTurnResult("Line"))
         )
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository).insertEntry(captor.capture())
         assertTrue(captor.firstValue.body.contains("brief encounter"))
     }
@@ -72,7 +72,7 @@ class GenerateSceneSummaryUseCaseTest {
 
         useCase()(slotId = 1L, contract = testContract, turnResults = turns)
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository, times(1)).insertEntry(captor.capture())
         assertTrue(captor.firstValue.body.contains("3"))
     }
@@ -90,7 +90,7 @@ class GenerateSceneSummaryUseCaseTest {
             )
         )
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository, times(2)).insertEntry(captor.capture())
         val companion = captor.allValues.first { it.category == "companion" }
         assertEquals("warden", companion.characterId)
@@ -107,10 +107,10 @@ class GenerateSceneSummaryUseCaseTest {
             turnResults = listOf(DialogueTurnResult("Nope"), DialogueTurnResult("Also nope"))
         )
 
-        val captor = argumentCaptor<JournalEntryEntity>()
+        val captor = argumentCaptor<JournalEntry>()
         verify(journalRepository, times(1)).insertEntry(captor.capture())
         assertEquals("story", captor.firstValue.category)
     }
 
-    private fun any() = org.mockito.kotlin.any<JournalEntryEntity>()
+    private fun any() = org.mockito.kotlin.any<JournalEntry>()
 }

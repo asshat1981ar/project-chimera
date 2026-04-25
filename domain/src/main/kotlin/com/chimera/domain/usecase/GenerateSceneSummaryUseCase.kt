@@ -1,8 +1,8 @@
 package com.chimera.domain.usecase
 
 import com.chimera.data.repository.JournalRepository
-import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.model.DialogueTurnResult
+import com.chimera.model.JournalEntry
 import com.chimera.model.SceneContract
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ class GenerateSceneSummaryUseCase @Inject constructor(
 
         // Story entry
         journalRepository.insertEntry(
-            JournalEntryEntity(
+            JournalEntry(
                 saveSlotId = slotId,
                 title = contract.sceneTitle,
                 body = summary,
@@ -37,7 +37,7 @@ class GenerateSceneSummaryUseCase @Inject constructor(
         // Companion entry on recruitment
         if (turnResults.any { it.flags.contains("recruit_companion") }) {
             journalRepository.insertEntry(
-                JournalEntryEntity(
+                JournalEntry(
                     saveSlotId = slotId,
                     title = "${contract.npcName} Joins",
                     body = "${contract.npcName} has agreed to join your cause.",

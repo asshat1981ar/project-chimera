@@ -4,6 +4,8 @@ import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.VowDao
 import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.VowEntity
+import com.chimera.database.mapper.toEntity
+import com.chimera.model.JournalEntry
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,8 +24,8 @@ class JournalRepository @Inject constructor(
     fun observeUnreadCount(slotId: Long): Flow<Int> =
         journalEntryDao.observeUnreadCount(slotId)
 
-    suspend fun insertEntry(entry: JournalEntryEntity): Long =
-        journalEntryDao.insert(entry)
+    suspend fun insertEntry(entry: JournalEntry): Long =
+        journalEntryDao.insert(entry.toEntity())
 
     suspend fun markRead(entryId: Long) =
         journalEntryDao.markRead(entryId)
