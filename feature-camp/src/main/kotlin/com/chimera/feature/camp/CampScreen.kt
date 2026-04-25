@@ -1,7 +1,9 @@
 package com.chimera.feature.camp
 
-import androidx.compose.foundation.BorderStroke
-import com.chimera.data.DutyType
+import com.chimera.ui.components.GothicButton
+import com.chimera.ui.components.GothicOutlinedButton
+import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.components.ManuscriptStatBar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -13,17 +15,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,10 +28,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.data.DutyType
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
+import com.chimera.ui.theme.Vellum
 import com.chimera.ui.theme.VoidGreen
 
 @Composable
@@ -79,21 +76,19 @@ fun CampScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedButton(
+                    GothicOutlinedButton(
                         onClick = onNavigateToInventory,
                         modifier = Modifier
                             .weight(1f)
-                            .testTag("btn_inventory"),
-                        border = BorderStroke(1.dp, FadedBone.copy(alpha = 0.3f))
+                            .testTag("btn_inventory")
                     ) {
                         Text("Inventory", color = FadedBone)
                     }
-                    OutlinedButton(
+                    GothicOutlinedButton(
                         onClick = onNavigateToCrafting,
                         modifier = Modifier
                             .weight(1f)
-                            .testTag("btn_crafting"),
-                        border = BorderStroke(1.dp, EmberGold.copy(alpha = 0.3f))
+                            .testTag("btn_crafting")
                     ) {
                         Text("Crafting", color = EmberGold)
                     }
@@ -102,36 +97,29 @@ fun CampScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Morale bar
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                ManuscriptCard(
+                    modifier = Modifier.semantics(mergeDescendants = true) {
+                        contentDescription = "Camp Morale: ${(uiState.morale * 100).toInt()}%"
+                    }
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .semantics(mergeDescendants = true) {
-                                contentDescription = "Camp Morale: ${(uiState.morale * 100).toInt()}%"
-                            }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Camp Morale", style = MaterialTheme.typography.titleSmall)
-                            Text(
-                                "${(uiState.morale * 100).toInt()}%",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = moraleColor(uiState.morale)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        LinearProgressIndicator(
-                            progress = uiState.morale,
-                            modifier = Modifier.fillMaxWidth(),
-                            color = moraleColor(uiState.morale),
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+                        Text("Camp Morale", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "${(uiState.morale * 100).toInt()}%",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = moraleColor(uiState.morale)
                         )
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ManuscriptStatBar(
+                        fraction = uiState.morale,
+                        modifier = Modifier.fillMaxWidth(),
+                        label = "Morale",
+                        fillColor = moraleColor(uiState.morale)
+                    )
                 }
             }
         }
@@ -173,37 +161,30 @@ fun CampScreen(
                 )
             }
             items(uiState.dutyAssignments, key = { it.companionId }) { assignment ->
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                ManuscriptCard(
+                    contentPadding = 12.dp
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(assignment.companionName, style = MaterialTheme.typography.titleSmall)
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            DutyType.values().forEach { duty ->
-                                val isSelected = assignment.duty == duty
-                                OutlinedButton(
-                                    onClick = {
-                                        if (isSelected) viewModel.clearDuty(assignment.companionId)
-                                        else viewModel.assignDuty(assignment.companionId, duty)
-                                    },
-                                    border = BorderStroke(
-                                        1.dp,
-                                        if (isSelected) EmberGold else FadedBone.copy(alpha = 0.3f)
-                                    ),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .testTag("btn_duty_${duty.name.lowercase()}")
-                                ) {
-                                    Text(
-                                        duty.label,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = if (isSelected) EmberGold else FadedBone
-                                    )
-                                }
+                    Text(assignment.companionName, style = MaterialTheme.typography.titleSmall)
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        DutyType.values().forEach { duty ->
+                            val isSelected = assignment.duty == duty
+                            GothicOutlinedButton(
+                                onClick = {
+                                    if (isSelected) viewModel.clearDuty(assignment.companionId)
+                                    else viewModel.assignDuty(assignment.companionId, duty)
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag("btn_duty_${duty.name.lowercase()}")
+                            ) {
+                                Text(
+                                    duty.label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (isSelected) EmberGold else FadedBone
+                                )
                             }
                         }
                     }
@@ -222,14 +203,13 @@ fun CampScreen(
                 )
             }
             items(uiState.activeVows, key = { it.id }) { vow ->
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    border = BorderStroke(1.dp, HollowCrimson.copy(alpha = 0.3f))
+                ManuscriptCard(
+                    borderColor = HollowCrimson.copy(alpha = 0.3f),
+                    contentPadding = 12.dp
                 ) {
                     Text(
                         text = vow.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(12.dp)
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
@@ -238,12 +218,11 @@ fun CampScreen(
         // Night event trigger
         item {
             if (uiState.nightEvent == null) {
-                Button(
+                GothicButton(
                     onClick = { viewModel.triggerNightEvent() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag("btn_rest_night"),
-                    colors = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
+                        .testTag("btn_rest_night")
                 ) {
                     Text("Rest for the Night")
                 }
@@ -253,46 +232,42 @@ fun CampScreen(
         // Night event display
         uiState.nightEvent?.let { event ->
             item {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    border = BorderStroke(1.dp, EmberGold.copy(alpha = 0.5f)),
-                    modifier = Modifier.fillMaxWidth()
+                ManuscriptCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    fillColor = Vellum,
+                    borderColor = EmberGold.copy(alpha = 0.5f),
+                    contentPadding = 20.dp
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Text(event.title, style = MaterialTheme.typography.titleMedium, color = EmberGold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(event.narrative, style = MaterialTheme.typography.bodyMedium)
-                        Spacer(modifier = Modifier.height(12.dp))
+                    Text(event.title, style = MaterialTheme.typography.titleMedium, color = EmberGold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(event.narrative, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                        if (uiState.nightEventOutcome != null) {
-                            Text(
-                                uiState.nightEventOutcome!!,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = VoidGreen
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            OutlinedButton(
-                                onClick = { viewModel.dismissNightEvent() },
+                    if (uiState.nightEventOutcome != null) {
+                        Text(
+                            uiState.nightEventOutcome!!,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = VoidGreen
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        GothicOutlinedButton(
+                            onClick = { viewModel.dismissNightEvent() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("btn_dawn_breaks")
+                        ) {
+                            Text("Dawn Breaks")
+                        }
+                    } else {
+                        event.choices.forEach { choice ->
+                            GothicOutlinedButton(
+                                onClick = { viewModel.resolveNightEvent(choice) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .testTag("btn_dawn_breaks")
+                                    .padding(vertical = 4.dp)
+                                    .testTag("btn_night_event_choice")
                             ) {
-                                Text("Dawn Breaks")
-                            }
-                        } else {
-                            event.choices.forEach { choice ->
-                                OutlinedButton(
-                                    onClick = { viewModel.resolveNightEvent(choice) },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp)
-                                        .testTag("btn_night_event_choice"),
-                                    border = BorderStroke(1.dp, FadedBone.copy(alpha = 0.3f))
-                                ) {
-                                    Text(choice.text)
-                                }
+                                Text(choice.text)
                             }
                         }
                     }
@@ -321,15 +296,12 @@ private fun CompanionCard(data: CompanionCardData) {
         else -> HollowCrimson
     }
 
-    Card(
+    ManuscriptCard(
         modifier = Modifier.testTag("card_companion_${data.character.id}"),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, moodColor.copy(alpha = 0.3f))
+        borderColor = moodColor.copy(alpha = 0.3f)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Avatar
@@ -365,15 +337,15 @@ private fun CompanionCard(data: CompanionCardData) {
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                LinearProgressIndicator(
-                    progress = ((disposition + 1f) / 2f).coerceIn(0f, 1f),
+                ManuscriptStatBar(
+                    fraction = ((disposition + 1f) / 2f).coerceIn(0f, 1f),
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics(mergeDescendants = true) {
                             contentDescription = "Disposition: ${((disposition + 1f) / 2f * 100).toInt()}%"
                         },
-                    color = moodColor,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                    label = "Disposition",
+                    fillColor = moodColor
                 )
             }
         }

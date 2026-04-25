@@ -20,8 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import com.chimera.ui.components.GothicButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
@@ -279,10 +278,9 @@ private fun NodeDetailSheet(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (node.sceneId != null && node.isUnlocked) {
-            Button(
+            GothicButton(
                 onClick = onEnterScene,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(if (node.isCompleted) "Return" else "Enter")
             }

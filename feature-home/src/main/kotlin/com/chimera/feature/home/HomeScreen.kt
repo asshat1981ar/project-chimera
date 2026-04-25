@@ -1,6 +1,5 @@
 package com.chimera.feature.home
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.Column
@@ -18,10 +17,6 @@ import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Badge
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +30,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.ui.components.GothicButton
+import com.chimera.ui.components.ManuscriptCard
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -106,72 +103,73 @@ fun HomeScreen(
 
         // ── Continue CTA ─────────────────────────────────────────────────────
         item {
-            Card(
+            ManuscriptCard(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                border = BorderStroke(1.dp, HollowCrimson.copy(alpha = 0.5f))
+                fillColor = MaterialTheme.colorScheme.surface,
+                borderColor = HollowCrimson.copy(alpha = 0.5f),
+                borderWidth = 1.dp,
+                contentPadding = 24.dp
             ) {
-                Column(modifier = Modifier.padding(24.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.AutoStories,
-                            contentDescription = "Auto stories",
-                            tint = EmberGold,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Continue Your Journey",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    uiState.continueSceneTitle?.let { sceneTitle ->
-                        Text(
-                            text = sceneTitle,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = FadedBone,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    } ?: Text(
-                        text = "The Hollow awaits. Shadows stir where the king once sat.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = FadedBone
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.AutoStories,
+                        contentDescription = "Auto stories",
+                        tint = EmberGold,
+                        modifier = Modifier.size(20.dp)
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Continue Your Journey",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    Button(
-                        onClick = {
-                            val target = uiState.continueSceneId ?: "prologue_scene_1"
-                            onEnterScene(target)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("btn_enter_hollow"),
-                        colors = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
-                    ) {
-                        Text("Enter the Hollow")
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(
-                            Icons.Default.KeyboardArrowRight,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
+                uiState.continueSceneTitle?.let { sceneTitle ->
+                    Text(
+                        text = sceneTitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = FadedBone,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                } ?: Text(
+                    text = "The Hollow awaits. Shadows stir where the king once sat.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = FadedBone
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                GothicButton(
+                    onClick = {
+                        val target = uiState.continueSceneId ?: "prologue_scene_1"
+                        onEnterScene(target)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("btn_enter_hollow")
+                ) {
+                    Text("Enter the Hollow")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        Icons.Default.KeyboardArrowRight,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
         }
 
         // ── Active vows ───────────────────────────────────────────────────────
         item {
-            Card(
+            ManuscriptCard(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                fillColor = MaterialTheme.colorScheme.surface,
+                borderColor = MaterialTheme.colorScheme.outlineVariant,
+                borderWidth = 1.dp,
+                contentPadding = 0.dp
             ) {
                 Row(
                     modifier = Modifier.padding(20.dp).fillMaxWidth(),

@@ -6,12 +6,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,15 +24,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chimera.core.engine.CombatEngine
+import com.chimera.ui.components.GothicButton
+import com.chimera.ui.components.GothicOutlinedButton
+import com.chimera.ui.components.ManuscriptCard
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -87,12 +86,13 @@ fun DuelScreen(
         Spacer(Modifier.height(16.dp))
 
         // ── Resolve bars ──────────────────────────────────────────────────────
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(0.5.dp, DimAsh.copy(alpha = 0.3f))
+        ManuscriptCard(
+            fillColor = MaterialTheme.colorScheme.surface,
+            borderColor = DimAsh.copy(alpha = 0.3f),
+            borderWidth = 0.5.dp,
+            contentPadding = 14.dp
         ) {
-            Column(modifier = Modifier.padding(14.dp)) {
-                ResolveRow(
+            ResolveRow(
                     label       = "${uiState.opponentName}'s Resolve",
                     current     = uiState.opponentResolve,
                     max         = CombatEngine.MAX_RESOLVE,
@@ -113,7 +113,6 @@ fun DuelScreen(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
-            }
         }
 
         Spacer(Modifier.height(20.dp))
@@ -170,12 +169,9 @@ private fun IntentCard(
     val bonusColor = if (intent.statBonus >= 0) VoidGreen else HollowCrimson
     val bonusText  = if (intent.statBonus >= 0) "+${intent.statBonus}" else "${intent.statBonus}"
 
-    OutlinedButton(
-        onClick    = onClick,
-        modifier   = Modifier.fillMaxWidth(),
-        border     = BorderStroke(1.dp, EmberGold.copy(alpha = 0.4f)),
-        colors     = ButtonDefaults.outlinedButtonColors(contentColor = FadedBone),
-        shape      = MaterialTheme.shapes.medium
+    GothicOutlinedButton(
+        onClick  = onClick,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -213,10 +209,12 @@ private fun ResolvingPhase(
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         // Die face
-        Card(
+        ManuscriptCard(
             modifier = Modifier.size(100.dp),
-            colors   = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border   = BorderStroke(1.dp, EmberGold.copy(alpha = 0.6f))
+            fillColor = MaterialTheme.colorScheme.surface,
+            borderColor = EmberGold.copy(alpha = 0.6f),
+            borderWidth = 1.dp,
+            contentPadding = 0.dp
         ) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -251,24 +249,24 @@ private fun ResolvingPhase(
         Spacer(Modifier.height(14.dp))
 
         // Narrative
-        Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(0.5.dp, DimAsh.copy(alpha = 0.25f))
+        ManuscriptCard(
+            fillColor = MaterialTheme.colorScheme.surface,
+            borderColor = DimAsh.copy(alpha = 0.25f),
+            borderWidth = 0.5.dp,
+            contentPadding = 16.dp
         ) {
             Text(
                 text = result.narrative,
                 style = MaterialTheme.typography.bodyLarge,
-                color = FadedBone,
-                modifier = Modifier.padding(16.dp)
+                color = FadedBone
             )
         }
 
         Spacer(Modifier.height(24.dp))
 
-        Button(
+        GothicButton(
             onClick  = onContinue,
-            modifier = Modifier.fillMaxWidth(),
-            colors   = ButtonDefaults.buttonColors(containerColor = HollowCrimson)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(if (uiState.isComplete) "See outcome" else "Continue")
         }
@@ -315,10 +313,9 @@ private fun CompletePhase(
 
         Spacer(Modifier.height(24.dp))
 
-        Button(
+        GothicButton(
             onClick  = onReturn,
-            modifier = Modifier.fillMaxWidth(),
-            colors   = ButtonDefaults.buttonColors(containerColor = accentColor)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Return to scene")
         }

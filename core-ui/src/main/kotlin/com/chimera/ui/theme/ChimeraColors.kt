@@ -2,32 +2,48 @@ package com.chimera.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary: Deep crimson / blood red
-val HollowCrimson = Color(0xFF8B1A1A)
-val HollowCrimsonLight = Color(0xFFB73030)
+// ── Primary: Deep oxblood / dark crimson ──
+val Oxblood = Color(0xFF5C1A1A)
+val OxbloodLight = Color(0xFF8B2A2A)
 
-// Secondary: Ember gold
-val EmberGold = Color(0xFFD4A017)
-val EmberGoldMuted = Color(0xFF9E7A1A)
+// ── Secondary: Aged gold / ember gold ──
+val AgedGold = Color(0xFFC89B3C)
+val AgedGoldBright = Color(0xFFD4A84E)
+val AgedGoldMuted = Color(0xFF9E7A1A)
 
-// Tertiary: Corruption / magic green
-val VoidGreen = Color(0xFF2E5E3F)
-val VoidGreenBright = Color(0xFF3D8B5A)
+// ── Tertiary: Verdigris / corruption green ──
+val Verdigris = Color(0xFF4A7C59)
+val VerdigrisBright = Color(0xFF3D8B5A)
 
-// Background tones
+// ── Background tones ──
 val AshBlack = Color(0xFF0D0D0F)
-val CharcoalSurface = Color(0xFF1A1A1F)
-val CharcoalElevated = Color(0xFF222228)
+val Iron = Color(0xFF2A2A2E)
+val IronElevated = Color(0xFF343438)
 
-// Text tones
-val ParchmentWhite = Color(0xFFE8DCC8)
+// ── Text tones ──
+val Vellum = Color(0xFFF5ECD7)
 val FadedBone = Color(0xFFA89B8C)
 val DimAsh = Color(0xFF5A6270)
 
-// Status / semantic
+// ── Parchment textures ──
+val ParchmentLight = Color(0xFFF5ECD7)
+val ParchmentDark = Color(0xFFE8DCC8)
+
+// ── Status / semantic ──
 val BloodRed = Color(0xFFCC3333)
 val HealGreen = Color(0xFF4CAF50)
 val ManaBlue = Color(0xFF5C7CBA)
 
-// Overlay
+// ── Overlay ──
 val ShadowVeil = Color(0xCC000000)
+
+// ── Backward compatibility aliases ──
+val HollowCrimson = Oxblood
+val HollowCrimsonLight = OxbloodLight
+val EmberGold = AgedGold
+val EmberGoldMuted = AgedGoldMuted
+val VoidGreen = Verdigris
+val VoidGreenBright = VerdigrisBright
+val CharcoalSurface = Iron
+val CharcoalElevated = IronElevated
+val ParchmentWhite = Vellum

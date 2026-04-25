@@ -16,10 +16,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.chimera.ui.components.GothicOutlinedButton
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -182,13 +180,8 @@ fun ActTransitionScreen(
                 enter = fadeIn(tween(600)),
                 exit = fadeOut()
             ) {
-                OutlinedButton(
+                GothicOutlinedButton(
                     onClick = onContinue,
-                    shape = RoundedCornerShape(4.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = EmberGold
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, EmberGold),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(

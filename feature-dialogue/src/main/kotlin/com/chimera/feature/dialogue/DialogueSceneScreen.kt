@@ -10,7 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.BorderStroke
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.background
@@ -32,21 +32,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.components.ParchmentInputField
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,7 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.detectTapGestures
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
+
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -293,21 +291,15 @@ fun DialogueSceneScreen(
                         .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
+                    ParchmentInputField(
                         value = typedInput,
                         onValueChange = { typedInput = it },
                         modifier = Modifier
                             .weight(1f)
                             .testTag("field_dialogue_input"),
-                        placeholder = { Text("Speak your mind...") },
+                        placeholder = "Speak your mind...",
                         singleLine = true,
-                        enabled = !uiState.isLoading,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                        keyboardActions = KeyboardActions(onSend = { sendMessage() }),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = EmberGold,
-                            cursorColor = EmberGold
-                        )
+                        enabled = !uiState.isLoading
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
@@ -366,17 +358,15 @@ private fun DialogueBubble(line: DialogueLine) {
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            ),
-            border = BorderStroke(1.dp, borderColor),
+        ManuscriptCard(
+            fillColor = MaterialTheme.colorScheme.surfaceVariant,
+            borderColor = borderColor,
+            borderWidth = 1.dp,
             modifier = Modifier.fillMaxWidth(0.85f)
         ) {
             Text(
                 text = line.text,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(12.dp),
                 color = MaterialTheme.colorScheme.onSurface
             )
         }

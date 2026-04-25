@@ -13,8 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import com.chimera.ui.components.ManuscriptCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -109,38 +108,37 @@ fun FactionStandingScreen(
 
 @Composable
 private fun StandingReferenceCard() {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        modifier = Modifier.fillMaxWidth()
+    ManuscriptCard(
+        modifier = Modifier.fillMaxWidth(),
+        fillColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentPadding = 16.dp
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    Icons.Default.Info,
-                    contentDescription = null,
-                    tint = EmberGold,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    "Standing Tiers",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = EmberGold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            StandingTierRow(label = "Revered", range = "> +0.7", color = EmberGold)
-            StandingTierRow(label = "Honoured", range = "+0.4 to +0.7", color = EmberGold)
-            StandingTierRow(label = "Friendly", range = "+0.1 to +0.4", color = EmberGold)
-            StandingTierRow(label = "Neutral", range = "-0.1 to +0.1", color = FadedBone)
-            StandingTierRow(label = "Wary", range = "-0.4 to -0.1", color = FadedBone)
-            StandingTierRow(label = "Hostile", range = "-0.7 to -0.4", color = MaterialTheme.colorScheme.error)
-            StandingTierRow(label = "Enemy", range = "< -0.7", color = MaterialTheme.colorScheme.error)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                Icons.Default.Info,
+                contentDescription = null,
+                tint = EmberGold,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Text(
+                "Standing Tiers",
+                style = MaterialTheme.typography.titleSmall,
+                color = EmberGold
+            )
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        StandingTierRow(label = "Revered", range = "> +0.7", color = EmberGold)
+        StandingTierRow(label = "Honoured", range = "+0.4 to +0.7", color = EmberGold)
+        StandingTierRow(label = "Friendly", range = "+0.1 to +0.4", color = EmberGold)
+        StandingTierRow(label = "Neutral", range = "-0.1 to +0.1", color = FadedBone)
+        StandingTierRow(label = "Wary", range = "-0.4 to -0.1", color = FadedBone)
+        StandingTierRow(label = "Hostile", range = "-0.7 to -0.4", color = MaterialTheme.colorScheme.error)
+        StandingTierRow(label = "Enemy", range = "< -0.7", color = MaterialTheme.colorScheme.error)
     }
 }
 

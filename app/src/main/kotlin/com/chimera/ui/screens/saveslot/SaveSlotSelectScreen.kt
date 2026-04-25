@@ -1,6 +1,5 @@
 package com.chimera.ui.screens.saveslot
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -13,19 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,6 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.ui.components.GothicButton
+import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.components.ParchmentInputField
 import com.chimera.model.SaveSlot
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -176,63 +170,55 @@ private fun SaveSlotCard(
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    Card(
+    ManuscriptCard(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (slot.isEmpty) {
-                MaterialTheme.colorScheme.outlineVariant
-            } else {
-                EmberGold.copy(alpha = 0.4f)
-            }
-        )
+        fillColor = MaterialTheme.colorScheme.surface,
+        borderColor = if (slot.isEmpty) {
+            MaterialTheme.colorScheme.outlineVariant
+        } else {
+            EmberGold.copy(alpha = 0.4f)
+        },
+        borderWidth = 1.dp
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            if (slot.isEmpty) {
+        if (slot.isEmpty) {
+            Text(
+                text = "New Journey",
+                style = MaterialTheme.typography.titleLarge,
+                color = FadedBone,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Slot ${slot.slotIndex + 1}",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        } else {
+            Text(
+                text = slot.playerName,
+                style = MaterialTheme.typography.titleLarge,
+                color = EmberGold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
-                    text = "New Journey",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = FadedBone,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                    text = com.chimera.ui.util.ChapterDisplayStrings.tagToTitle(slot.chapterTag),
+                    style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Slot ${slot.slotIndex + 1}",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                    text = formatPlaytime(slot.playtimeSeconds),
+                    style = MaterialTheme.typography.bodyMedium
                 )
-            } else {
-                Text(
-                    text = slot.playerName,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = EmberGold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = com.chimera.ui.util.ChapterDisplayStrings.tagToTitle(slot.chapterTag),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = formatPlaytime(slot.playtimeSeconds),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
             }
         }
     }
@@ -254,24 +240,17 @@ private fun NewGameDialog(
             )
         },
         text = {
-            OutlinedTextField(
+            ParchmentInputField(
                 value = name,
                 onValueChange = { if (it.length <= 24) name = it },
                 singleLine = true,
-                placeholder = { Text("Wanderer") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = EmberGold,
-                    cursorColor = EmberGold
-                )
+                placeholder = "Wanderer"
             )
         },
         confirmButton = {
-            Button(
+            GothicButton(
                 onClick = { onConfirm(name) },
-                enabled = name.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = HollowCrimson
-                )
+                enabled = name.isNotBlank()
             ) {
                 Text("Begin")
             }
