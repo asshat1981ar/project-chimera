@@ -17,11 +17,6 @@ class SceneLoader @Inject constructor(
     private val sceneFiles = listOf("act1_scenes.json", "act2_scenes.json", "act3_scenes.json")
     private val cinematicSceneFiles = listOf("act1_finale.json", "act2_finale.json", "act3_opening.json")
 
-    /**
-     * Load all scenes including cinematic transitions.
-     * Regular scenes are in scenes/*.json, cinematic scenes are also in scenes/*.json
-     */
-
     fun getScene(sceneId: String): SceneContract? {
         return loadAll()[sceneId]
     }
@@ -30,26 +25,18 @@ class SceneLoader @Inject constructor(
         return loadAll().values.toList()
     }
 
-    fun getScenesByAct(act: String): List<SceneContract> {
-        val prefix = when (act) {
-            "act1", "prologue" -> "act1_scenes.json"
-            "act2" -> "act2_scenes.json"
-            else -> return emptyList()
-        }
-        return loadFromFile(prefix)
-    }
-
-    /**
-     * Get a cinematic transition scene by ID.
-     */
     fun getCinematicScene(sceneId: String): SceneContract? {
-        return loadCinematicScene(sceneId)
+        return when (sceneId) {
+            "act1_finale" -> loadCinematicSceneFromFile("act1_finale.json")
+            "act2_finale" -> loadCinematicSceneFromFile("act2_finale.json")
+            "act3_opening" -> loadCinematicSceneFromFile("act3_opening.json")
+            else -> null
+        }
     }
 
     private fun loadAll(): Map<String, SceneContract> {
         cache?.let { return it }
-        val allScenes = sceneFiles.flatMap { loadFromFile(it) } +
-            cinematicSceneFiles.mapNotNull { loadCinematicSceneFromFile(it) }
+        val allScenes = sceneFiles.flatMap { loadFromFile(it) }
         val map = allScenes.associateBy { it.sceneId }
         cache = map
         return map
@@ -71,15 +58,5 @@ class SceneLoader @Inject constructor(
         } catch (_: Exception) {
             null
         }
-    }
-
-    private fun loadCinematicScene(sceneId: String): SceneContract? {
-        val filename = when (sceneId) {
-            "act1_finale" -> "act1_finale.json"
-            "act2_finale" -> "act2_finale.json"
-            "act3_opening" -> "act3_opening.json"
-            else -> return null
-        }
-        return loadCinematicSceneFromFile(filename)
     }
 }

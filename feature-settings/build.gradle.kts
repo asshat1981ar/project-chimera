@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":core-database"))
     implementation(project(":core-data"))
     implementation(project(":domain"))
+    implementation(project(":feature-party"))
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)

@@ -63,4 +63,13 @@ class DialogueRepository @Inject constructor(
      */
     suspend fun getLastIncompleteSceneId(slotId: Long): String? =
         sceneInstanceDao.getLastIncompleteScene(slotId)?.sceneId
+
+    /**
+     * Marks a scene as complete and records the bridge tag for chapter progression.
+     */
+    suspend fun markSceneComplete(slotId: Long, bridgeTag: String) {
+        val sceneId = sceneInstanceDao.getLastIncompleteScene(slotId)?.sceneId ?: return
+        val instance = sceneInstanceDao.getActiveScene(slotId, sceneId) ?: return
+        sceneInstanceDao.completeScene(instance.id, 0, false)
+    }
 }
