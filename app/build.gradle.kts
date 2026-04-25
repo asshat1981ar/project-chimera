@@ -94,6 +94,12 @@ android {
             applicationIdSuffix = ".demo"
             buildConfigField("Boolean", "DEMO_MODE", "true")
         }
+        create("beta") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".beta"
+            versionNameSuffix = "-beta"
+            isDebuggable = false  // Production-like but debug-signed
+        }
     }
 
     compileOptions {
@@ -212,6 +218,8 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
     testImplementation(libs.truth)
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito:mockito-core:5.8.0")
 
     androidTestImplementation(libs.androidx.test.ext)
     androidTestImplementation(libs.espresso.core)
