@@ -32,12 +32,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chimera.ui.components.GothicButton
 import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.components.ObjectiveChip
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import androidx.compose.runtime.LaunchedEffect
 import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
+import com.chimera.model.ObjectivePrimaryAction
 
 // File-level Modifier constants for reusable chains
 private val FillMaxSizeWithPadding = Modifier.fillMaxSize().padding(horizontal = 24.dp)
@@ -48,6 +50,7 @@ fun HomeScreen(
     onEnterScene: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
     onActTransition: (String) -> Unit = DefaultOnActTransition,
+    onPrimaryObjectiveAction: (ObjectivePrimaryAction, relatedId: String?) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -203,6 +206,27 @@ fun HomeScreen(
                         color = FadedBone,
                         modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
                     )
+                }
+            }
+        }
+
+        // ── Active Objectives HUD ─────────────────────────────────────────────
+        if (uiState.objectives.isNotEmpty()) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Current Objectives",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = EmberGold
+                    )
+                    uiState.objectives.forEach { obj ->
+                        ObjectiveChip(
+                            summary = obj,
+                            onPrimaryAction = {
+                                onPrimaryObjectiveAction(obj.primaryAction, obj.relatedLocationId ?: obj.relatedNpcId)
+                            }
+                        )
+                    }
                 }
             }
         }

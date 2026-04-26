@@ -8,6 +8,8 @@ import com.chimera.data.repository.DialogueRepository
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.VowDao
 import com.chimera.database.mapper.toModel
+import com.chimera.domain.usecase.ObserveActiveObjectiveSummariesUseCase
+import com.chimera.model.ActiveObjectiveSummary
 import com.chimera.ui.util.ChapterDisplayStrings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +30,7 @@ data class HomeUiState(
     val continueSceneTitle: String? = null,
     val activeVowCount: Int = 0,
     val completedSceneCount: Int = 0,
+    val objectives: List<ActiveObjectiveSummary> = emptyList(),
     val isLoading: Boolean = true,
     /** Non-null when a chapter transition just occurred and an interstitial should be shown. */
     val pendingActTransition: String? = null
@@ -39,6 +42,7 @@ class HomeViewModel @Inject constructor(
     private val dialogueRepository: DialogueRepository,
     private val vowDao: VowDao,
     private val sceneLoader: SceneLoader,
+    private val observeActiveObjectiveSummaries: ObserveActiveObjectiveSummariesUseCase,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
@@ -52,13 +56,14 @@ class HomeViewModel @Inject constructor(
             combine(
                 saveSlotDao.observeAll(),
                 vowDao.observeActive(slotId),
+                observeActiveObjectiveSummaries(slotId),
                 flow {
                     emit(
                         dialogueRepository.getLastIncompleteSceneId(slotId) to
                             dialogueRepository.getCompletedSceneIds(slotId)
                     )
                 }
-            ) { slots, vows, (lastActiveSceneId, completedIds) ->
+            ) { slots, vows, objectives, (lastActiveSceneId, completedIds) ->
                 val slot = slots.find { it.id == slotId }?.toModel()
                     ?: return@combine HomeUiState(isLoading = false)
 
@@ -70,10 +75,7 @@ class HomeViewModel @Inject constructor(
 
                 val continueTitle = sceneLoader.getScene(fallbackSceneId)?.sceneTitle
 
-                // Detect act advance — emit interstitial flag when chapter tag changes
-                // and it's not the first load (lastKnownChapterTag != null).
-                // Bridge tags (hollow_approach_complete, act2_climax_complete, act3_begun)
-                // are used internally for cinematic triggers and should not show interstitial.
+                // Detect act advance
                 val chapterTag = slot.chapterTag
                 val isBridgeTag = chapterTag in setOf(
                     "hollow_approach_complete",
@@ -96,6 +98,7 @@ class HomeViewModel @Inject constructor(
                     continueSceneTitle = continueTitle,
                     activeVowCount = vows.size,
                     completedSceneCount = completedIds.size,
+                    objectives = objectives,
                     isLoading = false,
                     pendingActTransition = pending
                 )
