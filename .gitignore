@@ -37,3 +37,6 @@ tasks/
 .env*.local
 .superpowers/
 .worktrees/
+.claude/
+.serena/
+sqlite_mcp_server.db

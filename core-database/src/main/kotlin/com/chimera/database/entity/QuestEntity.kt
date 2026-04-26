@@ -43,9 +43,18 @@ data class QuestEntity(
     @ColumnInfo(name = "source_npc_id")
     val sourceNpcId: String? = null,
 
+    @ColumnInfo(name = "pinned_order")
+    val pinnedOrder: Int? = null,
+
+    @ColumnInfo(name = "outcome_text")
+    val outcomeText: String? = null,
+
     @ColumnInfo(name = "created_at")
     val createdAt: Long = System.currentTimeMillis(),
 
     @ColumnInfo(name = "completed_at")
-    val completedAt: Long? = null
+    val completedAt: Long? = null,
+
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Long = System.currentTimeMillis()
 )

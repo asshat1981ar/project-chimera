@@ -1,6 +1,7 @@
 package com.chimera.model
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -77,5 +78,25 @@ class ModelValidationTest {
         assertTrue(slotSelected is GameEvent)
         assertTrue(sceneEntered is GameEvent)
         assertTrue(relationshipChanged is GameEvent)
+    }
+
+    @Test
+    fun `QuestObjectiveStatus blocking statuses exclude completed optional`() {
+        assertTrue(QuestObjectiveStatus.ACTIVE.blocksQuestCompletion)
+        assertTrue(QuestObjectiveStatus.HIDDEN.blocksQuestCompletion)
+        assertFalse(QuestObjectiveStatus.COMPLETED.blocksQuestCompletion)
+        assertFalse(QuestObjectiveStatus.OPTIONAL_COMPLETED.blocksQuestCompletion)
+    }
+
+    @Test
+    fun `ActiveObjectiveSummary primary action defaults to none`() {
+        val summary = ActiveObjectiveSummary(
+            questId = 1L,
+            objectiveId = 2L,
+            title = "Reach the Processional",
+            storyContext = "The Warden's warning points toward the throne road."
+        )
+
+        assertEquals(ObjectivePrimaryAction.NONE, summary.primaryAction)
     }
 }
