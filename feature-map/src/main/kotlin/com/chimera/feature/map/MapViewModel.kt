@@ -10,7 +10,9 @@ import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.entity.FactionStateEntity
+import com.chimera.domain.usecase.ObserveMapQuestMarkersUseCase
 import com.chimera.model.MapNode
+import com.chimera.model.MapQuestMarker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -26,7 +29,8 @@ import javax.inject.Inject
 data class MapUiState(
     val nodes: List<MapNode> = emptyList(),
     val factions: List<FactionStateEntity> = emptyList(),
-    val selectedNode: MapNode? = null
+    val selectedNode: MapNode? = null,
+    val questMarkers: List<MapQuestMarker> = emptyList()
 )
 
 @HiltViewModel
@@ -36,6 +40,7 @@ class MapViewModel @Inject constructor(
     private val factionStateDao: FactionStateDao,
     private val characterStateDao: CharacterStateDao,
     private val mapNodeLoader: MultiActMapNodeLoader,
+    private val observeMapQuestMarkers: ObserveMapQuestMarkersUseCase,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
@@ -69,25 +74,14 @@ class MapViewModel @Inject constructor(
                     }
                 }.toMap()
 
-                // Load character states for relationship-based unlock checks
-                val charStates = characterStateDao.observeBySlot(slotId)
-                val dispositions = mutableMapOf<String, Float>()
-                // Build a simple disposition lookup (using cached data from combine)
-
                 val nodes = baseNodes.map { node ->
                     val isCompleted = node.sceneId in completedScenes
-                    // Unlock if: node is default unlocked, OR a connected node is completed
                     val isUnlocked = node.isUnlocked || node.connectedTo.any { connId ->
                         baseNodes.find { it.id == connId }?.let { conn ->
                             conn.isUnlocked || conn.sceneId in completedScenes
                         } ?: false
                     }
-                    // Fog-of-war reveal rules (computed, not persisted):
-                    //  1. Node is the act-start node (isUnlocked=true in JSON) → always revealed
-                    //  2. Node is completed → revealed
-                    //  3. Any connected neighbor is completed → revealed
-                    //  4. All other nodes → hidden (isRevealed=false)
-                    val isRevealed = node.isUnlocked ||   // act-start nodes are pre-unlocked in JSON
+                    val isRevealed = node.isUnlocked ||
                         isCompleted ||
                         node.connectedTo.any { connId ->
                             val neighbor = baseNodes.find { it.id == connId }
@@ -102,15 +96,23 @@ class MapViewModel @Inject constructor(
                     )
                 }
 
-                // Fog filter: only pass revealed nodes to the UI
-                // Fog placeholder nodes are rendered by MapScreen from connectedTo refs
                 val revealedNodes = nodes.filter { it.isRevealed }
-
-                MapUiState(
-                    nodes = revealedNodes,
-                    factions = factions,
-                    selectedNode = selected
-                )
+                Triple(revealedNodes, factions, selected)
+            }.flatMapLatest { (revealedNodes, factions, selected) ->
+                val nodeId = selected?.id
+                val markersFlow = if (nodeId != null) {
+                    observeMapQuestMarkers(nodeId)
+                } else {
+                    flowOf(emptyList())
+                }
+                markersFlow.map { markers ->
+                    MapUiState(
+                        nodes = revealedNodes,
+                        factions = factions,
+                        selectedNode = selected,
+                        questMarkers = markers
+                    )
+                }
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MapUiState())
@@ -126,16 +128,12 @@ class MapViewModel @Inject constructor(
     /**
      * Returns (xFraction, yFraction) pairs for nodes that are NOT yet revealed
      * but are connected to at least one revealed node in [visibleNodes].
-     * Used by MapScreen to render fog-of-war placeholder dots at the right positions.
-     * Computed from [baseNodes] so positions are always available regardless of reveal state.
      */
     fun fogAdjacentPositions(visibleNodes: List<MapNode>): List<Pair<Float, Float>> {
         val visibleIds = visibleNodes.map { it.id }.toSet()
         return baseNodes
             .filter { candidate ->
-                // Not already visible
                 candidate.id !in visibleIds &&
-                // Connected to at least one visible node
                 candidate.connectedTo.any { it in visibleIds }
             }
             .map { it.xFraction to it.yFraction }

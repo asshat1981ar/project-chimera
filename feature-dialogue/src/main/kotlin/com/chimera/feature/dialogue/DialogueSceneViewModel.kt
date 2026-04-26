@@ -1,11 +1,13 @@
 package com.chimera.feature.dialogue
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.ai.AudioProvider
 import com.chimera.ai.DialogueOrchestrator
+import com.chimera.ai.PortraitGenerationService
 import com.chimera.data.GameSessionManager
 import com.chimera.data.SceneLoader
 import com.chimera.database.dao.CharacterDao
@@ -36,7 +38,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
 import javax.inject.Inject
 
 data class DialogueLine(
@@ -81,6 +87,7 @@ data class RelationshipBanner(
 
 @HiltViewModel
 class DialogueSceneViewModel @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     savedStateHandle: SavedStateHandle,
     private val orchestrator: DialogueOrchestrator,
     private val gameSessionManager: GameSessionManager,
@@ -94,6 +101,7 @@ class DialogueSceneViewModel @Inject constructor(
     private val saveSlotDao: SaveSlotDao,
     private val vowDao: VowDao,
     private val audioProvider: AudioProvider,
+    private val portraitGenerationService: PortraitGenerationService,
     private val preferences: ChimeraPreferences,
     private val chapterProgressionUseCase: ChapterProgressionUseCase
 ) : ViewModel() {
@@ -106,6 +114,7 @@ class DialogueSceneViewModel @Inject constructor(
     private var recentMemories = mutableListOf<MemoryShard>()
     private var sceneInstanceId: Long = 0
     private var cachedCharState: CharacterState? = null
+    private val portraitRequests = mutableSetOf<String>()
 
     companion object {
         private const val MAX_TURN_HISTORY = 20
@@ -191,6 +200,7 @@ class DialogueSceneViewModel @Inject constructor(
                         autoAdvanceTimerMs = contract.autoAdvanceDelayMs,
                         isLoading = false
                     )
+                    queueEncounterPortraitGeneration(slotId, firstLine.emotion, charState)
                 } else {
                     // Standard AI-driven dialogue scene
                     val openingInput = PlayerInput(text = "[Scene begins]", isQuickIntent = true)
@@ -221,6 +231,7 @@ class DialogueSceneViewModel @Inject constructor(
                         npcPortraitResName = portraitResName,
                         isLoading = false
                     )
+                    queueEncounterPortraitGeneration(slotId, result.emotion, charState)
                 }
             } catch (e: Exception) {
                 Log.e("DialogueVM", "Failed to initialize scene", e)
@@ -278,9 +289,11 @@ class DialogueSceneViewModel @Inject constructor(
                     recentMemories.addAll(shards.map { it.toModel() })
                 }
 
+                var latestCharState = charState
                 if (result.relationshipDelta != 0f) {
                     characterStateDao.adjustDisposition(contract.npcId, result.relationshipDelta)
                     cachedCharState = null
+                    latestCharState = loadCharacterState(slotId)
                 }
 
                 // Companion recruitment: promote NPC role to COMPANION
@@ -309,18 +322,17 @@ class DialogueSceneViewModel @Inject constructor(
                 }
 
                 val banner = if (kotlin.math.abs(result.relationshipDelta) >= RelationshipBanner.SIGNIFICANCE_THRESHOLD) {
-                    val updated = loadCharacterState(slotId)
                     RelationshipBanner(
                         npcName = contract.npcName,
                         delta = result.relationshipDelta,
-                        newDisposition = updated.dispositionToPlayer
+                        newDisposition = latestCharState.dispositionToPlayer
                     )
                 } else null
 
                 _uiState.value = _uiState.value.copy(
                     transcript = _uiState.value.transcript + playerLine + npcLine,
                     npcMood = result.emotion,
-                    npcDisposition = banner?.newDisposition ?: _uiState.value.npcDisposition,
+                    npcDisposition = latestCharState.dispositionToPlayer,
                     quickIntents = intents,
                     isFallbackMode = orchestrator.isFallbackActive,
                     isSceneComplete = isEnding,
@@ -328,6 +340,7 @@ class DialogueSceneViewModel @Inject constructor(
                     relationshipBanner = banner,
                     isLoading = false
                 )
+                queueEncounterPortraitGeneration(slotId, result.emotion, latestCharState)
 
                 // Speak NPC line aloud if voice is enabled (fire-and-forget, stops on scene complete)
                 if (!isEnding) speakNpcLine(result.npcLine, contract.npcId)
@@ -534,6 +547,95 @@ class DialogueSceneViewModel @Inject constructor(
 
         vows.forEach { vowDao.insert(it) }
     }
+
+    private fun queueEncounterPortraitGeneration(
+        slotId: Long,
+        mood: String,
+        charState: CharacterState
+    ) {
+        val signature = portraitSignature(contract.npcId, mood, charState)
+        if (!portraitRequests.add(signature)) return
+
+        viewModelScope.launch {
+            try {
+                val generatedPath = generateEncounterPortrait(slotId, mood, charState, signature)
+                if (!generatedPath.isNullOrBlank() && _uiState.value.npcId == contract.npcId) {
+                    _uiState.update { it.copy(npcPortraitResName = generatedPath) }
+                }
+            } catch (e: Exception) {
+                Log.w("DialogueVM", "Portrait generation failed for ${contract.npcId}: ${e.message}")
+            } finally {
+                portraitRequests.remove(signature)
+            }
+        }
+    }
+
+    private suspend fun generateEncounterPortrait(
+        slotId: Long,
+        mood: String,
+        charState: CharacterState,
+        signature: String
+    ): String? = withContext(Dispatchers.IO) {
+        val character = characterDao.getById(contract.npcId) ?: return@withContext null
+        if (character.saveSlotId != slotId || character.isPlayerCharacter) return@withContext null
+
+        val existingPath = character.portraitResName
+        if (!existingPath.isNullOrBlank() && existingPath.contains(signature)) {
+            val existingFile = File(existingPath.removePrefix("file://"))
+            if (existingFile.exists()) return@withContext existingPath
+        }
+
+        val status = portraitStatus(charState)
+        val bytes = portraitGenerationService.generatePortrait(
+            npcName = character.name,
+            npcRole = character.role,
+            npcTitle = character.title,
+            identityKey = character.id,
+            mood = mood,
+            status = status,
+            disposition = charState.dispositionToPlayer,
+            archetype = charState.activeArchetype,
+            healthFraction = charState.healthFraction
+        ) ?: return@withContext null
+
+        val portraitDir = File(appContext.filesDir, "portraits").apply { mkdirs() }
+        val file = File(portraitDir, "npc_${signature}.jpg")
+        file.writeBytes(bytes)
+
+        characterDao.updatePortraitResName(character.id, file.absolutePath)
+        file.absolutePath
+    }
+
+    private fun portraitSignature(
+        npcId: String,
+        mood: String,
+        charState: CharacterState
+    ): String {
+        val dispositionBand = when {
+            charState.dispositionToPlayer > 0.35f -> "trusted"
+            charState.dispositionToPlayer < -0.35f -> "hostile"
+            else -> "neutral"
+        }
+        return listOf(
+            npcId,
+            sanitizePortraitPart(mood),
+            sanitizePortraitPart(portraitStatus(charState)),
+            dispositionBand,
+            sanitizePortraitPart(charState.activeArchetype ?: "none")
+        ).joinToString("_")
+    }
+
+    private fun portraitStatus(charState: CharacterState): String = when {
+        charState.healthFraction < 0.35f -> "wounded"
+        charState.healthFraction < 0.7f -> "fatigued"
+        else -> "steady"
+    }
+
+    private fun sanitizePortraitPart(value: String): String =
+        value.lowercase()
+            .replace(Regex("[^a-z0-9]+"), "_")
+            .trim('_')
+            .ifBlank { "unknown" }
 
     private suspend fun persistTurn(speakerId: String, text: String, emotion: String) {
         val slotId = gameSessionManager.activeSlotId.value ?: return

@@ -16,6 +16,7 @@ import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
+import com.chimera.domain.usecase.ObserveMapQuestMarkersUseCase
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -29,6 +30,7 @@ class MapViewModelTest {
     private val factionStateDao: FactionStateDao = mock()
     private val characterStateDao: CharacterStateDao = mock()
     private val mapNodeLoader: MultiActMapNodeLoader = mock()
+    private val observeMapQuestMarkers: ObserveMapQuestMarkersUseCase = mock()
     private val gameSessionManager: GameSessionManager = mock()
 
     @Before
@@ -48,6 +50,7 @@ class MapViewModelTest {
         factionStateDao = factionStateDao,
         characterStateDao = characterStateDao,
         mapNodeLoader = mapNodeLoader,
+        observeMapQuestMarkers = observeMapQuestMarkers,
         gameSessionManager = gameSessionManager
     )
 

@@ -1,8 +1,10 @@
 package com.chimera.feature.dialogue
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import com.chimera.ai.AudioProvider
 import com.chimera.ai.DialogueOrchestrator
+import com.chimera.ai.PortraitGenerationService
 import com.chimera.data.AppSettings
 import com.chimera.data.ChimeraPreferences
 import com.chimera.data.GameSessionManager
@@ -47,6 +49,8 @@ class DialogueSceneViewModelTest {
     private val saveSlotDao: SaveSlotDao = mock()
     private val vowDao: VowDao = mock()
     private val audioProvider: AudioProvider = mock()
+    private val appContext: Context = mock()
+    private val portraitGenerationService: PortraitGenerationService = mock()
     private val preferences: ChimeraPreferences = mock()
     private val chapterProgressionUseCase: ChapterProgressionUseCase = mock()
 
@@ -64,6 +68,7 @@ class DialogueSceneViewModelTest {
     }
 
     private fun buildViewModel() = DialogueSceneViewModel(
+        appContext = appContext,
         savedStateHandle = SavedStateHandle(),
         orchestrator = orchestrator,
         gameSessionManager = gameSessionManager,
@@ -77,6 +82,7 @@ class DialogueSceneViewModelTest {
         saveSlotDao = saveSlotDao,
         vowDao = vowDao,
         audioProvider = audioProvider,
+        portraitGenerationService = portraitGenerationService,
         preferences = preferences,
         chapterProgressionUseCase = chapterProgressionUseCase
     )

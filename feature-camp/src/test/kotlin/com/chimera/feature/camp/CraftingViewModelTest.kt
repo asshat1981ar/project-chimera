@@ -24,6 +24,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -336,7 +337,7 @@ class CraftingViewModelTest {
 
             // Verify only first removal was attempted
             verify(inventoryDao, times(1)).removeQuantity(slotId, "item_herb", 2)
-            verify(inventoryDao, times(0)).removeQuantity(any(), any(), any())
+            verify(inventoryDao, times(0)).removeQuantity(org.mockito.kotlin.eq(slotId), org.mockito.kotlin.eq("item_vial"), org.mockito.kotlin.any())
 
             // Verify error message
             assertEquals("Missing materials!", expectMostRecentItem().craftResult)
@@ -488,7 +489,7 @@ class CraftingViewModelTest {
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
-    private fun stubActiveSlotWithData(
+    private suspend fun stubActiveSlotWithData(
         recipes: List<CraftingRecipeEntity> = emptyList(),
         inventory: List<InventoryItemEntity> = emptyList(),
         existingResult: InventoryItemEntity? = null
@@ -509,8 +510,8 @@ class CraftingViewModelTest {
 
         // Default successful removal
         whenever(inventoryDao.removeQuantity(any(), any(), any())).thenAnswer { invocation ->
-            val itemId = invocation.getArgument<String>(2)
-            val quantity = invocation.getArgument<Int>(3)
+            val itemId = invocation.getArgument<String>(1)
+            val quantity = invocation.getArgument<Int>(2)
             val item = inventory.find { it.itemId == itemId }
             if (item != null && item.quantity >= quantity) quantity else 0
         }

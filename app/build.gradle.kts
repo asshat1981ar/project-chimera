@@ -38,6 +38,10 @@ android {
         // HuggingFace — portrait generation via Inference API
         // HUGGING_FACE_TOKEN=hf_... (read/inference scope, set via local.properties or CI)
         buildConfigField("String", "HUGGING_FACE_TOKEN", "\"${project.findProperty("HUGGING_FACE_TOKEN") ?: ""}\"")
+        // Ollama local LLM configuration
+        buildConfigField("String", "OLLAMA_BASE_URL", "\"${project.findProperty("OLLAMA_BASE_URL") ?: "http://10.0.2.2:11434"}\"")
+        buildConfigField("String", "OLLAMA_MODEL", "\"${project.findProperty("OLLAMA_MODEL") ?: "llama3.2"}\"")
+        buildConfigField("int", "OLLAMA_TIMEOUT_MS", "${project.findProperty("OLLAMA_TIMEOUT_MS") ?: "60000"}")
     }
 
     flavorDimensions += "environment"

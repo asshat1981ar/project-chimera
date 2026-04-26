@@ -1,6 +1,5 @@
 package com.chimera.ai
 
-import android.util.Log
 import com.chimera.model.DialogueTurnResult
 import com.chimera.model.SceneContract
 import kotlinx.serialization.json.Json
@@ -30,7 +29,7 @@ object DialogueResponseParser {
             lower.contains(topic.replace("_", " "))
         }
         return if (violated) {
-            Log.w("DialogueParser", "Forbidden topic detected, sanitizing response")
+            println("WARN: DialogueParser - Forbidden topic detected, sanitizing response")
             result.copy(
                 npcLine = "I... cannot speak of that. Ask me something else.",
                 directorNotes = "Original response violated forbidden topics: ${contract.forbiddenTopics}"
@@ -47,9 +46,13 @@ object DialogueResponseParser {
     fun parse(raw: String): DialogueTurnResult? {
         return try {
             // Try direct deserialization first
-            json.decodeFromString<DialogueTurnResult>(extractJson(raw))
+            val result = json.decodeFromString<DialogueTurnResult>(extractJson(raw))
+            result.copy(
+                relationshipDelta = result.relationshipDelta.coerceIn(-0.25f, 0.25f),
+                memoryCandidates = result.memoryCandidates.take(3)
+            )
         } catch (e: Exception) {
-            Log.w("DialogueParser", "Structured parse failed, trying manual extraction", e)
+            println("WARN: DialogueParser - Structured parse failed, trying manual extraction: ${e.message}")
             tryManualParse(raw)
         }
     }
@@ -63,7 +66,7 @@ object DialogueResponseParser {
             val array = json.parseToJsonElement(jsonStr).jsonArray
             array.map { it.jsonPrimitive.content }.filter { it.isNotBlank() }.take(5)
         } catch (e: Exception) {
-            Log.w("DialogueParser", "Intent parse failed", e)
+            println("WARN: DialogueParser - Intent parse failed: ${e.message}")
             null
         }
     }
@@ -121,7 +124,7 @@ object DialogueResponseParser {
                 memoryCandidates = memories.take(3)
             )
         } catch (e: Exception) {
-            Log.e("DialogueParser", "Manual parse also failed", e)
+            println("ERROR: DialogueParser - Manual parse also failed: ${e.message}")
             null
         }
     }

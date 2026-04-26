@@ -7,8 +7,10 @@ import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.VowDao
 import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.VowEntity
+import com.chimera.domain.usecase.ObserveActiveQuestsWithObjectivesUseCase
 import com.chimera.domain.usecase.SaveJournalEntryUseCase
 import com.chimera.model.JournalEntry
+import com.chimera.model.QuestWithObjectives
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -28,6 +30,7 @@ enum class JournalTab(val label: String, val category: String?) {
     STORY("Story", "story"),
     RUMORS("Rumors", "rumor"),
     VOWS("Vows", null),
+    QUESTS("Quests", null),
     COMPANIONS("Companions", "companion")
 }
 
@@ -35,8 +38,17 @@ data class JournalUiState(
     val selectedTab: JournalTab = JournalTab.ALL,
     val entries: List<JournalEntryEntity> = emptyList(),
     val vows: List<VowEntity> = emptyList(),
+    val quests: List<QuestWithObjectives> = emptyList(),
     val unreadCount: Int = 0,
     val searchQuery: String = ""
+)
+
+private data class Quintuple<A, B, C, D, E>(
+    val first: A,
+    val second: B,
+    val third: C,
+    val fourth: D,
+    val fifth: E
 )
 
 /** Escapes FTS5 special characters in a query string. */
@@ -49,7 +61,8 @@ class JournalViewModel @Inject constructor(
     private val journalEntryDao: JournalEntryDao,
     private val vowDao: VowDao,
     private val gameSessionManager: GameSessionManager,
-    private val saveJournalEntryUseCase: SaveJournalEntryUseCase
+    private val saveJournalEntryUseCase: SaveJournalEntryUseCase,
+    private val observeActiveQuestsWithObjectives: ObserveActiveQuestsWithObjectivesUseCase
 ) : ViewModel() {
 
     private val _selectedTab = MutableStateFlow(JournalTab.ALL)
@@ -72,11 +85,11 @@ class JournalViewModel @Inject constructor(
                 _selectedTab,
                 debouncedQuery,
                 vowDao.observeAll(slotId),
+                observeActiveQuestsWithObjectives(slotId),
                 journalEntryDao.observeUnreadCount(slotId)
-            ) { tab, query, vows, unread ->
-                Triple(tab, query.trim(), vows to unread)
-            }.flatMapLatest { (tab, query, vowsAndUnread) ->
-                val (vows, unread) = vowsAndUnread
+            ) { tab, query, vows, quests, unread ->
+                Quintuple(tab, query.trim(), vows, quests, unread)
+            }.flatMapLatest { (tab, query, vows, quests, unread) ->
                 val entriesFlow = when {
                     // No search — use existing category flows
                     query.isBlank() && tab == JournalTab.ALL ->
@@ -92,11 +105,12 @@ class JournalViewModel @Inject constructor(
                         journalEntryDao.searchEntries(slotId, escapeFtsQuery(query))
                 }
                 entriesFlow.flatMapLatest { entries ->
-                    val filtered = if (tab == JournalTab.VOWS) emptyList() else entries
+                    val filtered = if (tab == JournalTab.VOWS || tab == JournalTab.QUESTS) emptyList() else entries
                     flowOf(JournalUiState(
                         selectedTab = tab,
                         entries = filtered,
                         vows = vows,
+                        quests = quests,
                         unreadCount = unread,
                         searchQuery = query
                     ))

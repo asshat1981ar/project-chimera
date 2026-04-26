@@ -3,7 +3,6 @@ package com.chimera
 import android.app.Application
 import android.os.Build
 import android.os.Trace
-import android.view.FrameMetrics
 import android.view.Window
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
@@ -28,6 +27,11 @@ import javax.inject.Inject
 class ChimeraApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     /** Timestamp when application started loading */
     val startupTimestamp: Long = System.currentTimeMillis()
@@ -94,74 +98,16 @@ class ChimeraApplication : Application(), Configuration.Provider {
  * Wrapper for FrameMetricsAggregator to handle API differences
  */
 class FrameMetricsAggregatorWrapper {
-    private val aggregator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        android.view.FrameMetricsAggregator()
-    } else {
-        null
-    }
-
-    private var trackingStarted = false
-
     fun addWindow(window: Window) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            aggregator?.addWindow(window)
-            trackingStarted = true
-        }
+        // No-op until frame metrics are wired through a supported AndroidX aggregator.
     }
 
     fun removeAndClear(): FrameMetricsResult {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || aggregator == null) {
-            return FrameMetricsResult()
-        }
-
-        val metrics = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            aggregator?.metrics
-        } else {
-            @Suppress("DEPRECATION")
-            aggregator?.getMetrics()
-        }
-
-        val result = metrics?.let {
-            val totalFrames = it.totalFrames
-            val slowFrames = it.slowFrames  // >16ms
-            val frozenFrames = it.frozenFrames  // >700ms
-            val jankPercentage = if (totalFrames > 0) {
-                ((slowFrames + frozenFrames) / totalFrames.toFloat()) * 100
-            } else 0f
-
-            FrameMetricsResult(
-                totalFrames = totalFrames,
-                slowFrames = slowFrames,
-                frozenFrames = frozenFrames,
-                jankPercentage = jankPercentage,
-                averageFrameTimeMs = it.averageFrameTimeMs,
-                p90FrameTimeMs = it.percentile90FrameTimeMs,
-                p99FrameTimeMs = it.percentile99FrameTimeMs
-            )
-        } ?: FrameMetricsResult()
-
-        aggregator?.clear()
-        trackingStarted = false
-        return result
+        return FrameMetricsResult()
     }
 
     fun getJankPercentage(): Float {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !trackingStarted) {
-            return 0f
-        }
-
-        val metrics = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            aggregator?.metrics
-        } else {
-            @Suppress("DEPRECATION")
-            aggregator?.getMetrics()
-        }
-
-        return metrics?.let {
-            if (it.totalFrames > 0) {
-                ((it.slowFrames + it.frozenFrames) / it.totalFrames.toFloat()) * 100
-            } else 0f
-        } ?: 0f
+        return 0f
     }
 }
 

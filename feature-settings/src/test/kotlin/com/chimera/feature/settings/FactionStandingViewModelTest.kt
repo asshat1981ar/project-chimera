@@ -55,9 +55,11 @@ class FactionStandingViewModelTest {
     @Test
     fun uiState_emptyList_whenNoSlotId() = runTest(testDispatcher) {
         val viewModel = buildViewModel()
+        val job = launch { viewModel.uiState.collect {} }
         advanceUntilIdle()
         assertTrue(viewModel.uiState.value.factions.isEmpty())
         assertFalse(viewModel.uiState.value.isLoading)
+        job.cancel()
     }
 
     @Test
@@ -86,10 +88,12 @@ class FactionStandingViewModelTest {
         whenever(factionStateDao.observeAll(1L)).thenReturn(flowOf(testFactions))
 
         val viewModel = buildViewModel()
+        val job = launch { viewModel.uiState.collect {} }
         advanceUntilIdle()
 
         assertEquals(2, viewModel.uiState.value.factions.size)
         assertFalse(viewModel.uiState.value.isLoading)
+        job.cancel()
     }
 
     @Test
@@ -118,9 +122,11 @@ class FactionStandingViewModelTest {
         whenever(factionStateDao.observeAll(1L)).thenReturn(flowOf(testFactions))
 
         val viewModel = buildViewModel()
+        val job = launch { viewModel.uiState.collect {} }
         advanceUntilIdle()
 
         assertEquals("high", viewModel.uiState.value.factions.first().factionId)
+        job.cancel()
     }
 
     @Test

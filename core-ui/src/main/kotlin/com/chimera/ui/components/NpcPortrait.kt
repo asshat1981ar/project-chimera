@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -22,14 +23,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
+import java.io.File
 
 @Composable
 fun NpcPortrait(
@@ -74,6 +78,17 @@ fun NpcPortrait(
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
+
+        if (!portraitResName.isNullOrBlank()) {
+            AsyncImage(
+                model = portraitResName.toPortraitModel(),
+                contentDescription = contentDescription,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape)
+            )
+        }
 
         archetype?.let {
             Box(
@@ -126,32 +141,31 @@ private fun archetypeColor(archetype: String): Color = when {
     else -> Color(0xFF888888)
 }
 
+private fun String.toPortraitModel(): Any =
+    if (startsWith("/")) File(this) else this
+
 internal fun npcInitial(name: String): String {
-    val trimmed = name.trim()
-    if (trimmed.isEmpty()) return "?"
-    if (trimmed.all { it.isDigit() }) return "?"
-
-    val words = trimmed.split("\\s+".toRegex())
-    val letters = mutableListOf<String>()
-
-    for (word in words) {
-        val firstLetter = word.firstOrNull { it.isLetter() }
-        if (firstLetter != null) {
-            letters.add(firstLetter.uppercase())
-        }
-        if (letters.size >= 2) break
-    }
-
-    if (letters.size == 1 && words.size == 1) {
-        val word = words[0]
-        val firstLetterIdx = word.indexOfFirst { it.isLetter() }
-        if (firstLetterIdx >= 0 && firstLetterIdx + 1 < word.length) {
-            val nextChar = word[firstLetterIdx + 1]
-            if (nextChar.isDigit()) {
-                letters.add(nextChar.toString())
-            }
+    val words = name.trim().split(Regex("[\\s-]+")).filter { it.any { c -> c.isLetterOrDigit() } }
+    if (words.isEmpty()) return "?"
+    
+    val firstWord = words.first()
+    val firstLetterIdx = firstWord.indexOfFirst { it.isLetter() }
+    if (firstLetterIdx == -1) return "?"
+    val firstChar = firstWord[firstLetterIdx].uppercaseChar()
+    
+    if (words.size > 1) {
+        val secondWord = words[1]
+        val secondChar = secondWord.firstOrNull { it.isLetterOrDigit() }
+        if (secondChar != null) {
+            return "$firstChar${secondChar.uppercaseChar()}"
         }
     }
-
-    return if (letters.isEmpty()) "?" else letters.joinToString("").take(2)
+    
+    val remaining = firstWord.substring(firstLetterIdx + 1)
+    val secondChar = remaining.firstOrNull { it.isLetterOrDigit() }
+    if (secondChar != null) {
+        return "$firstChar${secondChar.uppercaseChar()}"
+    }
+    
+    return firstChar.toString()
 }

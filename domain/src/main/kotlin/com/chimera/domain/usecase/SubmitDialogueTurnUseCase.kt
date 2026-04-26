@@ -30,6 +30,9 @@ class SubmitDialogueTurnUseCase @Inject constructor(
         recentMemories: List<MemoryShard>,
         turnHistory: List<DialogueTurnResult>
     ): TurnOutcome {
+        require(sceneId.isNotBlank()) { "Scene ID cannot be blank" }
+        require(playerInput.text.isNotBlank()) { "Player input text cannot be blank or empty" }
+
         // Persist player turn
         dialogueRepository.persistTurn(slotId, sceneId, "player", playerInput.text, "")
 

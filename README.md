@@ -110,6 +110,21 @@ The app gracefully falls back to `FakeDialogueProvider` when:
 - API service is unavailable
 - Network connection is lost
 
+### NPC Portrait Generation
+
+When `HUGGING_FACE_TOKEN` is configured, dialogue encounters request NPC portraits through the Hugging Face router. The prompt uses the NPC id/name/title/archetype as a stable identity anchor and layers current mood, relationship disposition, and health/status on top, so each NPC keeps a permanent character identity while contact-specific variants can reflect the current scene. Generated images are cached under app internal storage and stored on the character record as `portraitResName`.
+
+## Hugging Face Developer Tools
+
+Repo-local Hugging Face helpers live in `tools/huggingface/`. They are developer tools for evaluating and probing NPC portrait-generation models; they do not change Android source, Gradle configuration, generated assets, or `portrait_manifest.json`.
+
+```bash
+tools/huggingface/hf_portrait_model_audit.sh --help
+tools/huggingface/hf_portrait_probe.sh --dry-run
+```
+
+Set `HF_TOKEN` for authenticated Hugging Face API access. This is separate from the app's `HUGGING_FACE_TOKEN` Gradle property.
+
 ## Testing
 
 123+ unit tests across all modules. Core simulation tests require no Android framework.

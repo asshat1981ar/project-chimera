@@ -15,11 +15,13 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 /**
  * Calls the HuggingFace Inference API to generate a character portrait image.
  *
- * Model: stabilityai/stable-diffusion-xl-base-1.0 (free tier, widely available)
+ * Model: black-forest-labs/FLUX.1-schnell (HF router, text-to-image)
  * Returns raw JPEG bytes, or null on any failure — callers degrade gracefully.
  *
  * Adversarial notes:
@@ -53,18 +55,42 @@ class PortraitGenerationService(
     suspend fun generatePortrait(
         npcName: String,
         npcRole: String,
-        npcTitle: String?
+        npcTitle: String?,
+        identityKey: String = npcName,
+        mood: String = "neutral",
+        status: String = "steady",
+        disposition: Float = 0f,
+        archetype: String? = null,
+        healthFraction: Float = 1f
     ): ByteArray? {
         if (hfToken.isBlank()) return null
 
-        val prompt = buildPrompt(npcName, npcRole, npcTitle)
+        val prompt = buildPrompt(
+            name = npcName,
+            role = npcRole,
+            title = npcTitle,
+            identityKey = identityKey,
+            mood = mood,
+            status = status,
+            disposition = disposition,
+            archetype = archetype,
+            healthFraction = healthFraction
+        )
         return try {
             val response = client.post(
-                "https://api-inference.huggingface.co/models/$modelId"
+                "https://router.huggingface.co/hf-inference/models/$modelId"
             ) {
                 header(HttpHeaders.Authorization, "Bearer $hfToken")
                 contentType(ContentType.Application.Json)
-                setBody("""{"inputs":"$prompt","parameters":{"num_inference_steps":20}}""")
+                setBody(
+                    buildJsonObject {
+                        put("inputs", prompt)
+                        put("parameters", buildJsonObject {
+                            put("num_inference_steps", 20)
+                            put("seed", stableSeed(identityKey))
+                        })
+                    }.toString()
+                )
             }
             when {
                 response.status.isSuccess()             -> response.body<ByteArray>()
@@ -78,22 +104,56 @@ class PortraitGenerationService(
 
     fun close() = client.close()
 
-    private fun buildPrompt(name: String, role: String, title: String?): String {
+    private fun buildPrompt(
+        name: String,
+        role: String,
+        title: String?,
+        identityKey: String,
+        mood: String,
+        status: String,
+        disposition: Float,
+        archetype: String?,
+        healthFraction: Float
+    ): String {
         val roleHint = when (role.uppercase()) {
-            "COMPANION"  -> "trusted companion, loyal ally"
-            "ANTAGONIST" -> "menacing villain, threatening"
-            "MENTOR"     -> "wise elder, experienced guide"
-            "MERCHANT"   -> "traveling merchant, weathered"
-            "GUARDIAN"   -> "armored guardian, stoic warrior"
-            else         -> "fantasy NPC"
+            "COMPANION", "NPC_ALLY" -> "trusted companion, loyal ally"
+            "ANTAGONIST", "NPC_HOSTILE", "FACTION_LEADER" -> "menacing villain, threatening presence"
+            "MENTOR" -> "wise elder, experienced guide"
+            "MERCHANT" -> "traveling merchant, weathered"
+            "GUARDIAN" -> "armored guardian, stoic warrior"
+            else -> "fantasy NPC"
         }
         val titlePart = if (!title.isNullOrBlank()) "$title, " else ""
+        val dispositionHint = when {
+            disposition > 0.45f -> "trusting expression toward the viewer"
+            disposition > 0.15f -> "cautiously warm expression"
+            disposition < -0.45f -> "hostile expression toward the viewer"
+            disposition < -0.15f -> "guarded suspicious expression"
+            else -> "measured neutral expression"
+        }
+        val healthHint = when {
+            healthFraction < 0.35f -> "wounded and exhausted"
+            healthFraction < 0.7f -> "fatigued but standing"
+            else -> "steady and alert"
+        }
+        val archetypeHint = archetype
+            ?.replace('_', ' ')
+            ?.lowercase()
+            ?.let { ", behavioral theme: $it" }
+            .orEmpty()
+        val identityHint = "stable identity anchor: Project Chimera NPC $identityKey, " +
+            "same face, same age, same facial structure, same costume silhouette"
         return "detailed fantasy RPG portrait of $name, ${titlePart}$roleHint, " +
+               "$identityHint, " +
+               "current mood: $mood, current status: $status, $dispositionHint, $healthHint$archetypeHint, " +
                "dark fantasy art, dramatic lighting, highly detailed face, " +
                "character portrait, professional concept art"
     }
 
+    private fun stableSeed(identityKey: String): Int =
+        identityKey.hashCode().and(Int.MAX_VALUE).coerceAtLeast(1)
+
     companion object {
-        const val DEFAULT_MODEL = "stabilityai/stable-diffusion-xl-base-1.0"
+        const val DEFAULT_MODEL = "black-forest-labs/FLUX.1-schnell"
     }
 }

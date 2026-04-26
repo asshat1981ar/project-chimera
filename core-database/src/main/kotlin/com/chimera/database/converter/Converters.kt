@@ -1,6 +1,5 @@
 package com.chimera.database.converter
 
-import android.util.Log
 import androidx.room.TypeConverter
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,7 +17,7 @@ class Converters {
         try {
             json.decodeFromString(value)
         } catch (e: Exception) {
-            Log.w("Converters", "Malformed JSON for float map: '$value'", e)
+            println("WARN: Converters - Malformed JSON for float map: '$value' - ${e.message}")
             emptyMap()
         }
 
@@ -31,7 +30,7 @@ class Converters {
         try {
             json.decodeFromString(value)
         } catch (e: Exception) {
-            Log.w("Converters", "Malformed JSON for string list: '$value'", e)
+            println("WARN: Converters - Malformed JSON for string list: '$value' - ${e.message}")
             emptyList()
         }
 }

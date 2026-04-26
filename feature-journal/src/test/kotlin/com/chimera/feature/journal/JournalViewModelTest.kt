@@ -17,6 +17,7 @@ import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
+import com.chimera.domain.usecase.ObserveActiveQuestsWithObjectivesUseCase
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -30,6 +31,7 @@ class JournalViewModelTest {
     private val vowDao: VowDao = mock()
     private val gameSessionManager: GameSessionManager = mock()
     private val saveJournalEntryUseCase: SaveJournalEntryUseCase = mock()
+    private val observeActiveQuestsWithObjectives: ObserveActiveQuestsWithObjectivesUseCase = mock()
 
     @Before
     fun setUp() {
@@ -46,7 +48,8 @@ class JournalViewModelTest {
         journalEntryDao = journalEntryDao,
         vowDao = vowDao,
         gameSessionManager = gameSessionManager,
-        saveJournalEntryUseCase = saveJournalEntryUseCase
+        saveJournalEntryUseCase = saveJournalEntryUseCase,
+        observeActiveQuestsWithObjectives = observeActiveQuestsWithObjectives
     )
 
     private fun fakeEntry(category: String = "story") = JournalEntry(

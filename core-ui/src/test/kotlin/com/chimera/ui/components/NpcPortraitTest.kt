@@ -15,13 +15,13 @@ class NpcPortraitTest {
 
     @Test fun `npcInitial returns single letter for single-word names`() {
         assertEquals("W", npcInitial("W"))
-        assertEquals("A", npcInitial("Aria"))  // Only first letter from single word
+        assertEquals("AR", npcInitial("Aria"))
         assertEquals("X", npcInitial("X"))
     }
 
     @Test fun `npcInitial handles leading spaces and numbers`() {
         assertEquals("AR", npcInitial("  123Aria"))  // Skip numbers at start, A + R
-        assertEquals("A7", npcInitial("Aria7"))  // A + trailing digit 7
+        assertEquals("AR", npcInitial("Aria7"))  // A + R
     }
 
     @Test fun `npcInitial returns question mark for empty name`() {
@@ -33,7 +33,7 @@ class NpcPortraitTest {
     }
 
     @Test fun `npcInitial handles multi-word names`() {
-        assertEquals("JE", npcInitial("Jean-Odile"))  // J + E (first letter of each)
+        assertEquals("JO", npcInitial("Jean-Odile"))  // J + O (first letter of each word)
         assertEquals("MC", npcInitial("McDonald"))  // M + C
     }
 

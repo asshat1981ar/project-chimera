@@ -33,4 +33,9 @@ object EnvironmentConfig {
     val geminiApiKey: String = BuildConfig.GEMINI_API_KEY
     val groqApiKey: String = BuildConfig.GROQ_API_KEY
     val openRouterApiKey: String = BuildConfig.OPENROUTER_API_KEY
+
+    // Ollama local LLM configuration
+    val ollamaBaseUrl: String = BuildConfig.OLLAMA_BASE_URL
+    val ollamaModel: String = BuildConfig.OLLAMA_MODEL
+    val ollamaTimeoutMs: Int = BuildConfig.OLLAMA_TIMEOUT_MS
 }
