@@ -18,6 +18,7 @@ import com.chimera.database.dao.InventoryDao
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.QuestDao
+import com.chimera.database.dao.QuestObjectiveDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
@@ -31,6 +32,7 @@ import com.chimera.database.entity.InventoryItemEntity
 import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.MemoryShardEntity
 import com.chimera.database.entity.QuestEntity
+import com.chimera.database.entity.QuestObjectiveEntity
 import com.chimera.database.entity.RumorPacketEntity
 import com.chimera.database.entity.SaveSlotEntity
 import com.chimera.database.entity.SceneInstanceEntity
@@ -49,10 +51,11 @@ import com.chimera.database.entity.VowEntity
         RumorPacketEntity::class,
         FactionStateEntity::class,
         QuestEntity::class,
+        QuestObjectiveEntity::class,
         InventoryItemEntity::class,
         CraftingRecipeEntity::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -67,6 +70,7 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
     abstract fun journalEntryDao(): JournalEntryDao
     abstract fun vowDao(): VowDao
     abstract fun questDao(): QuestDao
+    abstract fun questObjectiveDao(): QuestObjectiveDao
     abstract fun inventoryDao(): InventoryDao
     abstract fun craftingRecipeDao(): CraftingRecipeDao
     abstract fun rumorPacketDao(): RumorPacketDao
@@ -82,7 +86,7 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
                 DATABASE_NAME
             )
                 .addCallback(PrepopulateCallback())
-                .addMigrations(MIGRATION_7_8)
+                .addMigrations(MIGRATION_7_8, MIGRATION_8_9)
             if (BuildConfig.DEBUG) builder.fallbackToDestructiveMigration()
             return builder.build()
         }
@@ -108,6 +112,45 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
                     INSERT INTO journal_entries_fts(rowid, title, body)
                     SELECT id, title, body FROM journal_entries
                 """.trimIndent())
+            }
+        }
+
+        /**
+         * 8 → 9: Add quest_objectives table.
+         */
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS quest_objectives (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        quest_id INTEGER NOT NULL,
+                        step_index INTEGER NOT NULL,
+                        type TEXT NOT NULL,
+                        status TEXT NOT NULL DEFAULT 'ACTIVE',
+                        is_required INTEGER NOT NULL DEFAULT 1,
+                        target_scene_id TEXT,
+                        target_map_node_id TEXT,
+                        target_npc_id TEXT,
+                        target_rumor_id INTEGER,
+                        target_recipe_id TEXT,
+                        target_item_id TEXT,
+                        title TEXT NOT NULL,
+                        story_context TEXT NOT NULL,
+                        recent_consequence TEXT,
+                        known_requirement TEXT,
+                        reward_hint TEXT,
+                        risk_hint TEXT,
+                        created_at INTEGER NOT NULL,
+                        activated_at INTEGER,
+                        completed_at INTEGER,
+                        FOREIGN KEY(quest_id) REFERENCES quests(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_quest_objectives_quest_id ON quest_objectives(quest_id)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_quest_objectives_target_scene_id ON quest_objectives(target_scene_id)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_quest_objectives_target_map_node_id ON quest_objectives(target_map_node_id)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_quest_objectives_target_npc_id ON quest_objectives(target_npc_id)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_quest_objectives_quest_step ON quest_objectives(quest_id, step_index)")
             }
         }
     }

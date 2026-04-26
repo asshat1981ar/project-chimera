@@ -11,6 +11,7 @@ import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.JournalEntryDao
 import com.chimera.database.dao.MemoryShardDao
 import com.chimera.database.dao.QuestDao
+import com.chimera.database.dao.QuestObjectiveDao
 import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
@@ -43,6 +44,7 @@ object DatabaseModule {
     @Provides fun provideRumorPacketDao(db: ChimeraGameDatabase): RumorPacketDao = db.rumorPacketDao()
     @Provides fun provideFactionStateDao(db: ChimeraGameDatabase): FactionStateDao = db.factionStateDao()
     @Provides fun provideQuestDao(db: ChimeraGameDatabase): QuestDao = db.questDao()
+    @Provides fun provideQuestObjectiveDao(db: ChimeraGameDatabase): QuestObjectiveDao = db.questObjectiveDao()
     @Provides fun provideInventoryDao(db: ChimeraGameDatabase): InventoryDao = db.inventoryDao()
     @Provides fun provideCraftingRecipeDao(db: ChimeraGameDatabase): CraftingRecipeDao = db.craftingRecipeDao()
 }
