@@ -43,7 +43,9 @@ data class Quest(
     val pinnedOrder: Int? = null,
     val outcomeText: String? = null,
     val createdAt: Long = 0L,
-    val completedAt: Long? = null
+    val completedAt: Long? = null,
+    val totalSteps: Int = 0,
+    val currentStep: Int = 0
 )
 
 data class QuestObjective(

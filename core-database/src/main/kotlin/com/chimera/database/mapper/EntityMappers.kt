@@ -11,6 +11,13 @@ import com.chimera.model.CharacterRole
 import com.chimera.model.CharacterState
 import com.chimera.model.JournalEntry
 import com.chimera.model.MemoryShard
+import com.chimera.database.entity.QuestEntity
+import com.chimera.database.entity.QuestObjectiveEntity
+import com.chimera.model.Quest
+import com.chimera.model.QuestObjective
+import com.chimera.model.QuestObjectiveStatus
+import com.chimera.model.QuestObjectiveType
+import com.chimera.model.QuestStatus
 import com.chimera.model.SaveSlot
 
 private val converters = Converters()
@@ -125,4 +132,43 @@ fun MemoryShard.toEntity() = MemoryShardEntity(
     tagsJson = converters.fromStringList(tags),
     importanceScore = importanceScore,
     createdAt = createdAt
+)
+
+fun QuestEntity.toModel() = Quest(
+    id = id,
+    saveSlotId = saveSlotId,
+    title = title,
+    description = description,
+    status = try { QuestStatus.valueOf(status.uppercase()) } catch (_: Exception) { QuestStatus.ACTIVE },
+    sourceSceneId = sourceSceneId,
+    sourceNpcId = sourceNpcId,
+    pinnedOrder = pinnedOrder,
+    outcomeText = outcomeText,
+    createdAt = createdAt,
+    completedAt = completedAt,
+    totalSteps = totalSteps,
+    currentStep = currentStep
+)
+
+fun QuestObjectiveEntity.toModel() = QuestObjective(
+    id = id,
+    questId = questId,
+    stepIndex = stepIndex,
+    type = try { QuestObjectiveType.valueOf(type.uppercase().replace(" ", "_")) } catch (_: Exception) { QuestObjectiveType.COMPLETE_SCENE },
+    status = try { QuestObjectiveStatus.valueOf(status.uppercase()) } catch (_: Exception) { QuestObjectiveStatus.ACTIVE },
+    isRequired = isRequired,
+    targetSceneId = targetSceneId,
+    targetMapNodeId = targetMapNodeId,
+    targetNpcId = targetNpcId,
+    targetRumorId = targetRumorId,
+    targetRecipeId = targetRecipeId,
+    targetItemId = targetItemId,
+    title = title,
+    storyContext = storyContext,
+    recentConsequence = recentConsequence,
+    knownRequirement = knownRequirement,
+    rewardHint = rewardHint,
+    riskHint = riskHint,
+    activatedAt = activatedAt,
+    completedAt = completedAt
 )
