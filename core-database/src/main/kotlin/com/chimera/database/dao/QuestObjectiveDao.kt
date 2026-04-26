@@ -48,4 +48,10 @@ interface QuestObjectiveDao {
 
     @Query("SELECT * FROM quest_objectives WHERE target_map_node_id = :nodeId AND status = 'ACTIVE'")
     fun observeActiveByMapNode(nodeId: String): Flow<List<QuestObjectiveEntity>>
+
+    @Query("""SELECT qo.* FROM quest_objectives qo  
+        INNER JOIN quests q ON qo.quest_id = q.id 
+        WHERE q.save_slot_id = :slotId 
+        ORDER BY qo.quest_id, qo.step_index ASC""")
+    fun observeBySaveSlot(slotId: Long): Flow<List<QuestObjectiveEntity>>
 }

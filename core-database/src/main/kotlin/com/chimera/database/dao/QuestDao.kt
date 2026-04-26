@@ -29,4 +29,9 @@ interface QuestDao {
 
     @Query("SELECT COUNT(*) FROM quests WHERE save_slot_id = :slotId AND status = 'active'")
     fun observeActiveCount(slotId: Long): Flow<Int>
+    @Query("SELECT * FROM quests WHERE id = :id")
+    suspend fun getById(id: Long): QuestEntity?
+
+    @Query("UPDATE quests SET pinned_order = :order WHERE id = :id")
+    suspend fun pinQuest(id: Long, order: Int?)
 }
