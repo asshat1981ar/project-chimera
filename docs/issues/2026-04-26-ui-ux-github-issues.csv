@@ -1,0 +1,13 @@
+title,labels,summary
+Build reusable quest objective HUD card,"ui-ux,core-ui,quest,good-first-implementation",Create QuestObjectiveHudCard in core-ui for current objective display.
+Wire active quest objective into Home screen,"ui-ux,quest,feature-home",Show active objective summary on Home and hide safely when absent.
+Add semantic quest markers to Map,"ui-ux,quest,map,core-ui",Render active/hidden/completed/failed/locked quest markers on map nodes.
+Add Quest Journal screen section,"ui-ux,quest,journal",Group quests by status and show objective progress.
+Add act transition interstitial screen,"ui-ux,navigation,feature-home",Cinematic transition surface for chapter advancement.
+Extend NPC portrait fallback and expression system,"ui-ux,dialogue,core-ui,accessibility","Support assets, fallback initials, disposition ring, expression hooks."
+Add dialogue tone ring and memory rune chips,"ui-ux,dialogue,core-ui",Expose mood and memory influence without raw scores.
+Upgrade inventory and crafting visuals,"ui-ux,camp,core-ui","Parchment cells, rarity seals, requirement slots, category counts."
+Improve faction standing screen,"ui-ux,faction,feature-settings","Rich faction cards with tier, influence, threshold, and safe copy."
+Add shared atmosphere visual system,"ui-ux,core-ui,theme","Atmosphere theme primitives, overlays, route mapping."
+Add Room-backed quest repository tests,"testing,quest,core-data,core-database",Real database tests for objective completion semantics.
+Reconcile beta build docs and CI verification,"docs,testing,ci",Build docs and CI match current Gradle variants.

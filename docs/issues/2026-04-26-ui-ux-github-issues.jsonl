@@ -1,0 +1,12 @@
+{"title": "Build reusable quest objective HUD card", "labels": ["ui-ux", "core-ui", "quest", "good-first-implementation"], "summary": "Create QuestObjectiveHudCard in core-ui for current objective display."}
+{"title": "Wire active quest objective into Home screen", "labels": ["ui-ux", "quest", "feature-home"], "summary": "Show active objective summary on Home and hide safely when absent."}
+{"title": "Add semantic quest markers to Map", "labels": ["ui-ux", "quest", "map", "core-ui"], "summary": "Render active/hidden/completed/failed/locked quest markers on map nodes."}
+{"title": "Add Quest Journal screen section", "labels": ["ui-ux", "quest", "journal"], "summary": "Group quests by status and show objective progress."}
+{"title": "Add act transition interstitial screen", "labels": ["ui-ux", "navigation", "feature-home"], "summary": "Cinematic transition surface for chapter advancement."}
+{"title": "Extend NPC portrait fallback and expression system", "labels": ["ui-ux", "dialogue", "core-ui", "accessibility"], "summary": "Support assets, fallback initials, disposition ring, expression hooks."}
+{"title": "Add dialogue tone ring and memory rune chips", "labels": ["ui-ux", "dialogue", "core-ui"], "summary": "Expose mood and memory influence without raw scores."}
+{"title": "Upgrade inventory and crafting visuals", "labels": ["ui-ux", "camp", "core-ui"], "summary": "Parchment cells, rarity seals, requirement slots, category counts."}
+{"title": "Improve faction standing screen", "labels": ["ui-ux", "faction", "feature-settings"], "summary": "Rich faction cards with tier, influence, threshold, and safe copy."}
+{"title": "Add shared atmosphere visual system", "labels": ["ui-ux", "core-ui", "theme"], "summary": "Atmosphere theme primitives, overlays, route mapping."}
+{"title": "Add Room-backed quest repository tests", "labels": ["testing", "quest", "core-data", "core-database"], "summary": "Real database tests for objective completion semantics."}
+{"title": "Reconcile beta build docs and CI verification", "labels": ["docs", "testing", "ci"], "summary": "Build docs and CI match current Gradle variants."}
