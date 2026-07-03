@@ -119,8 +119,9 @@ The following stale surfaces were removed to keep the repo Android-only and buil
 - `scripts/chimera-sdlc/` — shell orchestrator that depended on `sdlc-workflow/`.
 - `tools/` — stale Python generators pointing at the removed root `src/`.
 - `.mcp.json` — auxiliary config with hard-coded host paths.
+- SDLC automation plans in `docs/superpowers/plans/` and `docs/sdlc/{workflow,tool-registry}.md` — referenced the removed workflow surface.
 
-`agents/`, `docs/`, `scripts/github/`, and `scripts/mcp-*/` remain as auxiliary guidance.
+`agents/`, remaining `docs/`, `scripts/github/`, and `scripts/mcp-*/` remain as auxiliary guidance.
 
 ## Testing
 

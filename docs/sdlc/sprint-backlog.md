@@ -100,17 +100,16 @@
 
 ---
 
-## ✅ Sprint 6 — SDLC Wiring + Build DRY [COMPLETE]
+## ✅ Sprint 6 — Build DRY [COMPLETE]; SDLC Wiring [REMOVED]
 
-**Goal:** Wire the shell SDLC orchestrator to the live Vercel Workflow system and eliminate build.gradle.kts boilerplate via convention plugins.
+**Goal:** Eliminate build.gradle.kts boilerplate via convention plugins. The Vercel Workflow SDLC orchestrator and its shell scripts were removed during repo cleanup.
 
 **Scope:**
-- ✅ PRO-65 (M): Rewrite `scripts/chimera-sdlc/phases/implement.sh` — POST to Vercel Workflow `/start`, poll `/status`, write `current-run-id.txt`, human approval instructions; `approve-implement.sh` with env validation; `IMPLEMENT_MODE=agent` autonomous path; `review-agent.sh` for agent-mode decision
+- 🗑️ PRO-65 (M): Removed — `scripts/chimera-sdlc/` and `sdlc-workflow/` were non-Android residue.
 - ✅ PRO-64 (M): `build-logic/` convention plugins — `ChimeraAndroidLibraryPlugin` + `ChimeraAndroidLibraryComposePlugin`; `pluginManagement { includeBuild("build-logic") }` in `settings.gradle.kts`; applied to all 14 library/feature modules
 
 **Exit Criteria met:**
-- ✅ `./orchestrator.sh` dispatches to Vercel Workflow and pauses for human approval (fallback: local manifest)
-- ✅ `./gradlew assembleMockDebug` passes
+- 🗑️ `./orchestrator.sh` removed along with the SDLC workflow surface.
 - ✅ All 14 `build.gradle.kts` files use `chimera.android.library` or `chimera.android.library.compose`
 
 ---
