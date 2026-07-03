@@ -51,11 +51,11 @@ For every task, follow this loop:
 
 ## Immediate priorities
 
-1. Fix root Gradle correctness.
-2. Confirm root-level build commands.
-3. Eliminate duplicate Android paths.
-4. Remove or quarantine non-Android residue.
-5. Rewrite docs to match the surviving repo.
+1. ✅ Eliminate duplicate Android paths — root `src/` removed.
+2. ✅ Remove or quarantine non-Android residue — `sdlc-workflow/`, `scripts/chimera-sdlc/`, `tools/`, `.mcp.json` removed.
+3. ✅ Rewrite docs to match the surviving repo — README updated.
+4. Confirm root-level build commands (requires Android SDK; JVM-only `:chimera-core:test` verified passing).
+5. Fix root Gradle correctness if any build-time issues remain.
 
 ## Architecture direction
 

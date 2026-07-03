@@ -110,9 +110,25 @@ The app gracefully falls back to `FakeDialogueProvider` when:
 - API service is unavailable
 - Network connection is lost
 
+## Repository cleanup
+
+The following stale surfaces were removed to keep the repo Android-only and buildable from the root:
+
+- Root `src/` — orphan agent-generated code not wired into any Gradle module.
+- `sdlc-workflow/` — Next.js Vercel workflow; no longer maintained.
+- `scripts/chimera-sdlc/` — shell orchestrator that depended on `sdlc-workflow/`.
+- `tools/` — stale Python generators pointing at the removed root `src/`.
+- `.mcp.json` — auxiliary config with hard-coded host paths.
+
+`agents/`, `docs/`, `scripts/github/`, and `scripts/mcp-*/` remain as auxiliary guidance.
+
 ## Testing
 
 123+ unit tests across all modules. Core simulation tests require no Android framework.
+
+```bash
+./gradlew :chimera-core:test
+```
 
 ## License
 
