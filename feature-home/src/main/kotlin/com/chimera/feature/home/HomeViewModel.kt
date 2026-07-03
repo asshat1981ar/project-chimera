@@ -8,6 +8,8 @@ import com.chimera.data.repository.DialogueRepository
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.VowDao
 import com.chimera.database.mapper.toModel
+import com.chimera.domain.usecase.ObserveActiveObjectiveSummariesUseCase
+import com.chimera.model.ActiveObjectiveSummary
 import com.chimera.ui.util.ChapterDisplayStrings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +30,7 @@ data class HomeUiState(
     val continueSceneTitle: String? = null,
     val activeVowCount: Int = 0,
     val completedSceneCount: Int = 0,
+    val activeObjectives: List<ActiveObjectiveSummary> = emptyList(),
     val isLoading: Boolean = true,
     /** Non-null when a chapter transition just occurred and an interstitial should be shown. */
     val pendingActTransition: String? = null
@@ -39,6 +42,7 @@ class HomeViewModel @Inject constructor(
     private val dialogueRepository: DialogueRepository,
     private val vowDao: VowDao,
     private val sceneLoader: SceneLoader,
+    private val observeActiveObjectiveSummariesUseCase: ObserveActiveObjectiveSummariesUseCase,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
 
@@ -52,13 +56,14 @@ class HomeViewModel @Inject constructor(
             combine(
                 saveSlotDao.observeAll(),
                 vowDao.observeActive(slotId),
+                observeActiveObjectiveSummariesUseCase(slotId),
                 flow {
                     emit(
                         dialogueRepository.getLastIncompleteSceneId(slotId) to
                             dialogueRepository.getCompletedSceneIds(slotId)
                     )
                 }
-            ) { slots, vows, (lastActiveSceneId, completedIds) ->
+            ) { slots, vows, activeObjectives, (lastActiveSceneId, completedIds) ->
                 val slot = slots.find { it.id == slotId }?.toModel()
                     ?: return@combine HomeUiState(isLoading = false)
 
@@ -96,6 +101,7 @@ class HomeViewModel @Inject constructor(
                     continueSceneTitle = continueTitle,
                     activeVowCount = vows.size,
                     completedSceneCount = completedIds.size,
+                    activeObjectives = activeObjectives,
                     isLoading = false,
                     pendingActTransition = pending
                 )

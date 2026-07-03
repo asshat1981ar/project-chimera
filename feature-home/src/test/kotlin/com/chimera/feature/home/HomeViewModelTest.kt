@@ -5,14 +5,17 @@ import com.chimera.data.SceneLoader
 import com.chimera.data.repository.DialogueRepository
 import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.VowDao
+import com.chimera.domain.usecase.ObserveActiveObjectiveSummariesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -27,6 +30,7 @@ class HomeViewModelTest {
     private val dialogueRepository: DialogueRepository = mock()
     private val vowDao: VowDao = mock()
     private val sceneLoader: SceneLoader = mock()
+    private val observeActiveObjectiveSummariesUseCase: ObserveActiveObjectiveSummariesUseCase = mock()
     private val gameSessionManager: GameSessionManager = mock()
 
     @Before
@@ -45,6 +49,7 @@ class HomeViewModelTest {
         dialogueRepository = dialogueRepository,
         vowDao = vowDao,
         sceneLoader = sceneLoader,
+        observeActiveObjectiveSummariesUseCase = observeActiveObjectiveSummariesUseCase,
         gameSessionManager = gameSessionManager
     )
 
@@ -52,5 +57,11 @@ class HomeViewModelTest {
     fun initialState_isNotNull() {
         val viewModel = buildViewModel()
         assertNotNull(viewModel.uiState)
+    }
+
+    @Test
+    fun initialState_hasNoActiveObjectives() {
+        val viewModel = buildViewModel()
+        assertTrue(viewModel.uiState.value.activeObjectives.isEmpty())
     }
 }

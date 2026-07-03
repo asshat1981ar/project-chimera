@@ -30,8 +30,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.model.ObjectivePrimaryAction
 import com.chimera.ui.components.GothicButton
 import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.components.ObjectiveHudAction
+import com.chimera.ui.components.QuestObjectiveHudCard
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -98,6 +101,30 @@ fun HomeScreen(
                         color = DimAsh
                     )
                 }
+            }
+        }
+
+        // ── Active objective HUD ─────────────────────────────────────────────
+        item {
+            uiState.activeObjectives.firstOrNull()?.let { objective ->
+                QuestObjectiveHudCard(
+                    title = objective.title,
+                    storyContext = objective.storyContext,
+                    actionHint = actionHint(objective.primaryAction),
+                    action = objective.primaryAction.toHudAction(),
+                    onClick = {
+                        when (objective.primaryAction) {
+                            ObjectivePrimaryAction.CONTINUE_SCENE -> {
+                                val target = uiState.continueSceneId ?: "prologue_scene_1"
+                                onEnterScene(target)
+                            }
+                            ObjectivePrimaryAction.OPEN_MAP -> { /* TODO: navigate to map */ }
+                            ObjectivePrimaryAction.VIEW_JOURNAL -> { /* TODO: navigate to journal */ }
+                            ObjectivePrimaryAction.NONE -> { }
+                        }
+                    },
+                    modifier = Modifier.testTag("quest_objective_hud")
+                )
             }
         }
 
@@ -209,4 +236,18 @@ fun HomeScreen(
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
     }
+}
+
+private fun ObjectivePrimaryAction.toHudAction(): ObjectiveHudAction = when (this) {
+    ObjectivePrimaryAction.OPEN_MAP -> ObjectiveHudAction.OPEN_MAP
+    ObjectivePrimaryAction.VIEW_JOURNAL -> ObjectiveHudAction.VIEW_JOURNAL
+    ObjectivePrimaryAction.CONTINUE_SCENE -> ObjectiveHudAction.CONTINUE_SCENE
+    ObjectivePrimaryAction.NONE -> ObjectiveHudAction.NONE
+}
+
+private fun actionHint(action: ObjectivePrimaryAction): String? = when (action) {
+    ObjectivePrimaryAction.OPEN_MAP -> "Tap to open the map"
+    ObjectivePrimaryAction.VIEW_JOURNAL -> "Tap to view the journal"
+    ObjectivePrimaryAction.CONTINUE_SCENE -> "Tap to continue the scene"
+    ObjectivePrimaryAction.NONE -> null
 }
