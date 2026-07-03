@@ -2,6 +2,7 @@ package com.chimera.feature.map
 
 import com.chimera.data.GameSessionManager
 import com.chimera.data.MultiActMapNodeLoader
+import com.chimera.data.repository.QuestRepository
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.RumorPacketDao
@@ -9,11 +10,13 @@ import com.chimera.database.dao.SceneInstanceDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -28,6 +31,7 @@ class MapViewModelTest {
     private val rumorPacketDao: RumorPacketDao = mock()
     private val factionStateDao: FactionStateDao = mock()
     private val characterStateDao: CharacterStateDao = mock()
+    private val questRepository: QuestRepository = mock()
     private val mapNodeLoader: MultiActMapNodeLoader = mock()
     private val gameSessionManager: GameSessionManager = mock()
 
@@ -35,6 +39,7 @@ class MapViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         whenever(gameSessionManager.activeSlotId).thenReturn(MutableStateFlow(null))
+        whenever(questRepository.observeActiveQuestsWithObjectives(org.mockito.kotlin.any())).thenReturn(flowOf(emptyList()))
     }
 
     @After
@@ -47,6 +52,7 @@ class MapViewModelTest {
         rumorPacketDao = rumorPacketDao,
         factionStateDao = factionStateDao,
         characterStateDao = characterStateDao,
+        questRepository = questRepository,
         mapNodeLoader = mapNodeLoader,
         gameSessionManager = gameSessionManager
     )
@@ -55,5 +61,11 @@ class MapViewModelTest {
     fun initialState_isNotNull() {
         val viewModel = buildViewModel()
         assertNotNull(viewModel.uiState)
+    }
+
+    @Test
+    fun initialState_hasNoQuestMarkers() {
+        val viewModel = buildViewModel()
+        assertTrue(viewModel.uiState.value.nodes.all { it.questMarkers.isEmpty() })
     }
 }

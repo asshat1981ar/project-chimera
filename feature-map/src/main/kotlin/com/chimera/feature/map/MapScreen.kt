@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chimera.model.MapNode
+import com.chimera.model.QuestObjectiveStatus
 import com.chimera.ui.theme.AshBlack
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
@@ -139,8 +140,8 @@ private fun MapConnections(nodes: List<MapNode>) {
 
         nodes.forEach { node ->
             val start = Offset(node.xFraction * w, node.yFraction * h)
-            node.connectedTo.forEach { targetId ->
-                val target = nodes.find { it.id == targetId } ?: return@forEach
+            node.connectedTo.forEach connection@{ targetId ->
+                val target = nodes.find { it.id == targetId } ?: return@connection
                 val end = Offset(target.xFraction * w, target.yFraction * h)
                 val lineColor = if (node.isUnlocked && target.isUnlocked) {
                     FadedBone.copy(alpha = 0.3f)
@@ -217,6 +218,14 @@ private fun MapNodeMarker(
                         ) {
                             Text("${node.rumorCount}")
                         }
+                    }
+
+                    // Quest marker indicator
+                    node.questMarkers.mostSignificantStatus()?.let { status ->
+                        QuestMarkerDot(
+                            status = status,
+                            modifier = Modifier.align(Alignment.BottomEnd)
+                        )
                     }
                 }
 
@@ -316,4 +325,41 @@ private fun FogNodePlaceholder(
             center = Offset(cx, cy)
         )
     }
+}
+
+/**
+ * Returns the most visually significant quest status for a node.
+ * Priority: FAILED > ACTIVE/HIDDEN > COMPLETED/OPTIONAL_COMPLETED.
+ */
+private fun List<com.chimera.model.MapQuestMarker>.mostSignificantStatus(): QuestObjectiveStatus? {
+    if (isEmpty()) return null
+    return when {
+        any { it.status == QuestObjectiveStatus.FAILED } -> QuestObjectiveStatus.FAILED
+        any { it.status == QuestObjectiveStatus.ACTIVE || it.status == QuestObjectiveStatus.HIDDEN } ->
+            QuestObjectiveStatus.ACTIVE
+        any { it.status == QuestObjectiveStatus.COMPLETED || it.status == QuestObjectiveStatus.OPTIONAL_COMPLETED } ->
+            QuestObjectiveStatus.COMPLETED
+        else -> firstOrNull()?.status
+    }
+}
+
+/**
+ * Small colored dot indicating a quest state on a map node.
+ */
+@Composable
+private fun QuestMarkerDot(
+    status: QuestObjectiveStatus,
+    modifier: Modifier = Modifier
+) {
+    val color = when (status) {
+        QuestObjectiveStatus.FAILED -> HollowCrimson
+        QuestObjectiveStatus.ACTIVE, QuestObjectiveStatus.HIDDEN -> EmberGold
+        QuestObjectiveStatus.COMPLETED, QuestObjectiveStatus.OPTIONAL_COMPLETED -> VoidGreen
+    }
+
+    Surface(
+        shape = CircleShape,
+        color = color,
+        modifier = modifier.size(10.dp)
+    ) { }
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.data.GameSessionManager
 import com.chimera.data.MultiActMapNodeLoader
+import com.chimera.data.repository.QuestRepository
 import com.chimera.database.dao.CharacterStateDao
 import kotlinx.serialization.json.Json
 import com.chimera.database.dao.FactionStateDao
@@ -11,6 +12,8 @@ import com.chimera.database.dao.RumorPacketDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.entity.FactionStateEntity
 import com.chimera.model.MapNode
+import com.chimera.model.MapQuestMarker
+import com.chimera.model.QuestObjectiveStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +38,7 @@ class MapViewModel @Inject constructor(
     private val rumorPacketDao: RumorPacketDao,
     private val factionStateDao: FactionStateDao,
     private val characterStateDao: CharacterStateDao,
+    private val questRepository: QuestRepository,
     private val mapNodeLoader: MultiActMapNodeLoader,
     gameSessionManager: GameSessionManager
 ) : ViewModel() {
@@ -49,8 +53,9 @@ class MapViewModel @Inject constructor(
             combine(
                 rumorPacketDao.observeAll(slotId),
                 factionStateDao.observeAll(slotId),
+                questRepository.observeActiveQuestsWithObjectives(slotId),
                 _selectedNode
-            ) { rumors, factions, selected ->
+            ) { rumors, factions, activeQuests, selected ->
                 val completedScenes = sceneInstanceDao.getBySlot(slotId)
                     .filter { it.status == "completed" }
                     .map { it.sceneId }
@@ -68,6 +73,25 @@ class MapViewModel @Inject constructor(
                         emptyList()
                     }
                 }.toMap()
+
+                // Derive quest markers for each map node from active quest objectives.
+                val markersByNode = mutableMapOf<String, MutableList<MapQuestMarker>>()
+                activeQuests.forEach { qwo ->
+                    qwo.objectives.forEach objective@{ obj ->
+                        val nodeId = obj.targetMapNodeId ?: return@objective
+                        val status = obj.status
+                        val marker = MapQuestMarker(
+                            mapNodeId = nodeId,
+                            questId = qwo.quest.id,
+                            objectiveId = obj.id,
+                            title = obj.title,
+                            isActiveTarget = status == QuestObjectiveStatus.ACTIVE || status == QuestObjectiveStatus.HIDDEN,
+                            isLockedTarget = status == QuestObjectiveStatus.FAILED,
+                            status = status
+                        )
+                        markersByNode.getOrPut(nodeId) { mutableListOf() }.add(marker)
+                    }
+                }
 
                 // Load character states for relationship-based unlock checks
                 val charStates = characterStateDao.observeBySlot(slotId)
@@ -98,7 +122,8 @@ class MapViewModel @Inject constructor(
                         isCompleted = isCompleted,
                         isRevealed = isRevealed,
                         rumorCount = rumorsByLocation[node.id] ?: 0,
-                        faction = factionByLocation[node.id]
+                        faction = factionByLocation[node.id],
+                        questMarkers = markersByNode[node.id] ?: emptyList()
                     )
                 }
 

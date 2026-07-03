@@ -12,5 +12,6 @@ data class MapNode(
     val connectedTo: List<String> = emptyList(),
     val sceneId: String? = null,
     val xFraction: Float = 0.5f,
-    val yFraction: Float = 0.5f
+    val yFraction: Float = 0.5f,
+    val questMarkers: List<MapQuestMarker> = emptyList()
 )
