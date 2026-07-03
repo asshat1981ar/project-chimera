@@ -16,19 +16,29 @@ import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.dao.VowDao
 import com.chimera.domain.usecase.ChapterProgressionUseCase
+import com.chimera.model.CinematicLine
+import com.chimera.model.SceneContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DialogueSceneViewModelTest {
@@ -55,6 +65,12 @@ class DialogueSceneViewModelTest {
         Dispatchers.setMain(testDispatcher)
         whenever(gameSessionManager.activeSlotId).thenReturn(MutableStateFlow(null))
         whenever(preferences.settings).thenReturn(flowOf(AppSettings()))
+        wheneverBlocking { sceneInstanceDao.insert(org.mockito.kotlin.any()) } doReturn 1L
+        wheneverBlocking { sceneInstanceDao.completeScene(org.mockito.kotlin.any(), org.mockito.kotlin.any(), org.mockito.kotlin.any(), org.mockito.kotlin.any()) } doAnswer { }
+        wheneverBlocking { dialogueTurnDao.insert(org.mockito.kotlin.any()) } doReturn 0L
+        wheneverBlocking { chapterProgressionUseCase.invoke() } doReturn "prologue"
+        wheneverBlocking { chapterProgressionUseCase.getCinematicTransition() } doReturn null
+        wheneverBlocking { chapterProgressionUseCase.markCinematicComplete(org.mockito.kotlin.any()) } doAnswer { }
         // sceneLoader.getScene returns null by default; VM handles via elvis
     }
 
@@ -63,8 +79,8 @@ class DialogueSceneViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun buildViewModel() = DialogueSceneViewModel(
-        savedStateHandle = SavedStateHandle(),
+    private fun buildViewModel(savedStateHandle: SavedStateHandle = SavedStateHandle()) = DialogueSceneViewModel(
+        savedStateHandle = savedStateHandle,
         orchestrator = orchestrator,
         gameSessionManager = gameSessionManager,
         sceneLoader = sceneLoader,
@@ -85,5 +101,54 @@ class DialogueSceneViewModelTest {
     fun initialState_isNotNull() {
         val viewModel = buildViewModel()
         assertNotNull(viewModel.uiState)
+    }
+
+    @Test
+    fun cinematicCompletion_emitsNextSceneEvent() = runTest(testDispatcher) {
+        val slotId = 1L
+        val cinematicSceneId = "act1_finale"
+        val nextSceneId = "act2_finale"
+        whenever(gameSessionManager.activeSlotId).thenReturn(MutableStateFlow(slotId))
+        whenever(sceneLoader.getScene(cinematicSceneId)).thenReturn(null)
+        whenever(sceneLoader.getCinematicScene(cinematicSceneId)).thenReturn(
+            SceneContract(
+                sceneId = cinematicSceneId,
+                sceneTitle = "The Hollow Threshold",
+                npcId = "narrator",
+                npcName = "Narrator",
+                isCinematic = true,
+                cinematicLines = listOf(
+                    CinematicLine(
+                        speaker = "narrator",
+                        speakerName = "Narrator",
+                        text = "The threshold opens."
+                    )
+                ),
+                onCompleteTag = "hollow_approach_complete"
+            )
+        )
+        wheneverBlocking { chapterProgressionUseCase.getCinematicTransition() } doReturn nextSceneId
+
+        val viewModel = buildViewModel(savedStateHandle = SavedStateHandle(mapOf("sceneId" to cinematicSceneId)))
+        val emitted = mutableListOf<String?>()
+        backgroundScope.launch {
+            viewModel.sceneCompleteEvent.collect { emitted.add(it) }
+        }
+
+        // Let initializeScene complete before advancing the cinematic.
+        advanceUntilIdle()
+        assertEquals(cinematicSceneId, viewModel.uiState.value.sceneId)
+        assertEquals("The Hollow Threshold", viewModel.uiState.value.sceneTitle)
+        assertTrue(viewModel.uiState.value.isCinematic)
+
+        viewModel.advanceCinematic()
+        advanceUntilIdle()
+
+        assertTrue(
+            "Expected scene to be marked complete",
+            viewModel.uiState.value.isSceneComplete
+        )
+        assertEquals(1, emitted.size)
+        assertEquals(nextSceneId, emitted[0])
     }
 }

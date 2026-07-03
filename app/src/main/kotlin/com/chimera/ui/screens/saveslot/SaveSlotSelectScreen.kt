@@ -27,13 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chimera.ui.components.GothicButton
 import com.chimera.ui.components.ManuscriptCard
 import com.chimera.ui.components.ParchmentInputField
-import com.chimera.model.SaveSlot
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
@@ -47,7 +47,7 @@ fun SaveSlotSelectScreen(
     val slots by viewModel.saveSlots.collectAsStateWithLifecycle()
     val isRestoring by viewModel.isRestoring.collectAsStateWithLifecycle()
     var showNewGameDialog by remember { mutableStateOf<Int?>(null) }
-    var showDeleteDialog by remember { mutableStateOf<SaveSlot?>(null) }
+    var showDeleteDialog by remember { mutableStateOf<SaveSlotDisplay?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -166,7 +166,7 @@ fun SaveSlotSelectScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SaveSlotCard(
-    slot: SaveSlot,
+    slot: SaveSlotDisplay,
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
@@ -218,6 +218,16 @@ private fun SaveSlotCard(
                 Text(
                     text = formatPlaytime(slot.playtimeSeconds),
                     style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            slot.lastSceneTitle?.let { lastScene ->
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Last: $lastScene",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = FadedBone,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

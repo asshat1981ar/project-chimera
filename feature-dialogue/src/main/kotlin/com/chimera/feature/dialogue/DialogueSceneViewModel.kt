@@ -30,8 +30,11 @@ import com.chimera.model.SceneContract
 import com.chimera.data.ChimeraPreferences
 import com.chimera.domain.usecase.ChapterProgressionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -102,6 +105,11 @@ class DialogueSceneViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DialogueUiState(sceneId = sceneId))
     val uiState: StateFlow<DialogueUiState> = _uiState.asStateFlow()
 
+    /** One-shot events signalling the scene is finished. Value is the next scene to enter
+     *  (e.g. a cinematic), or null if the player should simply return to the previous screen. */
+    private val _sceneCompleteEvent = MutableSharedFlow<String?>(extraBufferCapacity = 1)
+    val sceneCompleteEvent: SharedFlow<String?> = _sceneCompleteEvent.asSharedFlow()
+
     private val turnResults = mutableListOf<DialogueTurnResult>()
     private var recentMemories = mutableListOf<MemoryShard>()
     private var sceneInstanceId: Long = 0
@@ -130,13 +138,16 @@ class DialogueSceneViewModel @Inject constructor(
         audioProvider.release()
     }
 
-    private val contract: SceneContract = sceneLoader.getScene(sceneId) ?: SceneContract(
-        sceneId = sceneId,
-        sceneTitle = "Unknown Scene",
-        npcId = "unknown",
-        npcName = "Stranger",
-        setting = "an unfamiliar place"
-    )
+    private val contract: SceneContract =
+        sceneLoader.getScene(sceneId)
+            ?: sceneLoader.getCinematicScene(sceneId)
+            ?: SceneContract(
+                sceneId = sceneId,
+                sceneTitle = "Unknown Scene",
+                npcId = "unknown",
+                npcName = "Stranger",
+                setting = "an unfamiliar place"
+            )
 
     init {
         initializeScene()
@@ -352,6 +363,9 @@ class DialogueSceneViewModel @Inject constructor(
                             )
                         )
                     }
+                    // If a cinematic transition is warranted, navigate to it instead of popping.
+                    val cinematicSceneId = chapterProgressionUseCase.getCinematicTransition()
+                    _sceneCompleteEvent.emit(cinematicSceneId)
                 }
             } catch (e: Exception) {
                 Log.e("DialogueVM", "Failed to process turn", e)
@@ -428,6 +442,10 @@ class DialogueSceneViewModel @Inject constructor(
                 chapterProgressionUseCase()
 
                 _uiState.value = _uiState.value.copy(isSceneComplete = true)
+
+                // Chain into the next cinematic if one is queued (e.g. act2_finale -> act3_opening).
+                val nextSceneId = chapterProgressionUseCase.getCinematicTransition()
+                _sceneCompleteEvent.emit(nextSceneId)
             } catch (e: Exception) {
                 Log.e("DialogueVM", "Failed to complete cinematic scene", e)
             }

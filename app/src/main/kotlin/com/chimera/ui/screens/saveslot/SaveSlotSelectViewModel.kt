@@ -47,6 +47,29 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/** UI-facing save slot row with the last played scene resolved for display. */
+data class SaveSlotDisplay(
+    val id: Long,
+    val slotIndex: Int,
+    val playerName: String,
+    val chapterTag: String,
+    val playtimeSeconds: Long,
+    val lastPlayedAt: Long,
+    val isEmpty: Boolean,
+    val lastSceneTitle: String?
+)
+
+private fun com.chimera.model.SaveSlot.toDisplay(lastSceneTitle: String?) = SaveSlotDisplay(
+    id = id,
+    slotIndex = slotIndex,
+    playerName = playerName,
+    chapterTag = chapterTag,
+    playtimeSeconds = playtimeSeconds,
+    lastPlayedAt = lastPlayedAt,
+    isEmpty = isEmpty,
+    lastSceneTitle = lastSceneTitle
+)
+
 @HiltViewModel
 class SaveSlotSelectViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -71,8 +94,21 @@ class SaveSlotSelectViewModel @Inject constructor(
     private val _isRestoring = MutableStateFlow(false)
     val isRestoring: StateFlow<Boolean> = _isRestoring.asStateFlow()
 
-    val saveSlots: StateFlow<List<SaveSlot>> = saveSlotDao.observeAll()
-        .map { entities -> entities.map { it.toModel() } }
+    val saveSlots: StateFlow<List<SaveSlotDisplay>> = saveSlotDao.observeAll()
+        .map { entities ->
+            entities.map { entity ->
+                val slot = entity.toModel()
+                val lastSceneTitle = if (slot.isEmpty) {
+                    null
+                } else {
+                    val lastSceneId = sceneInstanceDao.getBySlot(slot.id)
+                        .maxByOrNull { it.startedAt }
+                        ?.sceneId
+                    lastSceneId?.let { sceneLoader.getScene(it)?.sceneTitle }
+                }
+                slot.toDisplay(lastSceneTitle)
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun createNewGame(slotIndex: Int, playerName: String, onCreated: (Long) -> Unit) {

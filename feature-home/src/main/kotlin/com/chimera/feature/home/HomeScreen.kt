@@ -115,8 +115,7 @@ fun HomeScreen(
                     onClick = {
                         when (objective.primaryAction) {
                             ObjectivePrimaryAction.CONTINUE_SCENE -> {
-                                val target = uiState.continueSceneId ?: "prologue_scene_1"
-                                onEnterScene(target)
+                                uiState.continueSceneId?.let(onEnterScene)
                             }
                             ObjectivePrimaryAction.OPEN_MAP -> { /* TODO: navigate to map */ }
                             ObjectivePrimaryAction.VIEW_JOURNAL -> { /* TODO: navigate to journal */ }
@@ -161,19 +160,27 @@ fun HomeScreen(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                } ?: Text(
-                    text = "The Hollow awaits. Shadows stir where the king once sat.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = FadedBone
-                )
+                } ?: if (uiState.continueSceneId == null) {
+                    Text(
+                        text = "No open path. The Hollow is silent for now.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = FadedBone
+                    )
+                } else {
+                    Text(
+                        text = "The Hollow awaits. Shadows stir where the king once sat.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = FadedBone
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 GothicButton(
                     onClick = {
-                        val target = uiState.continueSceneId ?: "prologue_scene_1"
-                        onEnterScene(target)
+                        uiState.continueSceneId?.let(onEnterScene)
                     },
+                    enabled = uiState.continueSceneId != null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("btn_enter_hollow")

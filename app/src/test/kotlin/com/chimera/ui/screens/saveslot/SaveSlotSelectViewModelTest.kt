@@ -14,6 +14,8 @@ import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.SaveSlotEntity
+import com.chimera.database.entity.SceneInstanceEntity
+import com.chimera.model.SceneContract
 import com.chimera.network.CloudSaveRepository
 import com.chimera.network.CloudSaveResponse
 import com.chimera.network.CloudSaveResult
@@ -688,6 +690,53 @@ class SaveSlotSelectViewModelTest {
 
         // Assert
         assertThat(emittedSlots).isEmpty()
+    }
+
+    @Test
+    fun `saveSlots_includesLastSceneTitleFromMostRecentInstance()`() = runTest(testDispatcher) {
+        // Arrange
+        val slotId = 1L
+        val slotEntities = listOf(
+            SaveSlotEntity(
+                id = slotId,
+                slotIndex = 0,
+                playerName = "Player 1",
+                isEmpty = false
+            )
+        )
+        val slotsFlow = MutableStateFlow(slotEntities)
+        whenever(saveSlotDao.observeAll()) doReturn slotsFlow
+        whenever(sceneInstanceDao.getBySlot(slotId)) doReturn listOf(
+            SceneInstanceEntity(
+                id = 1L,
+                saveSlotId = slotId,
+                sceneId = "older_scene",
+                npcId = "npc",
+                startedAt = 1000L
+            ),
+            SceneInstanceEntity(
+                id = 2L,
+                saveSlotId = slotId,
+                sceneId = "recent_scene",
+                npcId = "npc",
+                startedAt = 2000L
+            )
+        )
+        whenever(sceneLoader.getScene("recent_scene")) doReturn SceneContract(
+            sceneId = "recent_scene",
+            sceneTitle = "The Recent Path",
+            npcId = "npc",
+            npcName = "Guide"
+        )
+
+        val viewModel = buildViewModel()
+
+        // Act
+        val emittedSlots = viewModel.saveSlots.first()
+
+        // Assert
+        assertThat(emittedSlots).hasSize(1)
+        assertThat(emittedSlots[0].lastSceneTitle).isEqualTo("The Recent Path")
     }
 
     @Test

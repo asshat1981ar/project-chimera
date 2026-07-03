@@ -76,7 +76,7 @@ import com.chimera.ui.theme.VoidGreen
 @Composable
 fun DialogueSceneScreen(
     sceneId: String,
-    onSceneComplete: () -> Unit,
+    onSceneComplete: (nextSceneId: String?) -> Unit,
     onTriggerDuel: (opponentId: String) -> Unit = {},
     viewModel: DialogueSceneViewModel = hiltViewModel()
 ) {
@@ -86,6 +86,14 @@ fun DialogueSceneScreen(
     LaunchedEffect(uiState.triggerDuelWith) {
         uiState.triggerDuelWith?.let { opponentId ->
             onTriggerDuel(opponentId)
+        }
+    }
+
+    // One-shot scene completion events: a non-null value means navigate to that scene
+    // (typically a cinematic), null means return to the previous screen.
+    LaunchedEffect(Unit) {
+        viewModel.sceneCompleteEvent.collect { nextSceneId ->
+            onSceneComplete(nextSceneId)
         }
     }
 
@@ -127,7 +135,7 @@ fun DialogueSceneScreen(
         if (uiState.isCinematic) {
             CinematicHeader(
                 sceneTitle = uiState.sceneTitle,
-                onClose = onSceneComplete
+                onClose = { onSceneComplete(null) }
             )
         } else {
             // Standard dialogue header
@@ -143,7 +151,7 @@ fun DialogueSceneScreen(
                 ) {
                     IconButton(
                         modifier = Modifier.testTag("btn_back_scene"),
-                        onClick = onSceneComplete
+                        onClick = { onSceneComplete(null) }
                     ) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Leave scene", tint = FadedBone)
                     }
