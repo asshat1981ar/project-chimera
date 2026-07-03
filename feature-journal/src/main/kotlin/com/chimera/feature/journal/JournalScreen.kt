@@ -19,6 +19,7 @@ import androidx.compose.material3.Badge
 import com.chimera.ui.components.ManuscriptCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import com.chimera.ui.components.ParchmentInputField
 import androidx.compose.material3.ScrollableTabRow
@@ -34,6 +35,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chimera.database.entity.JournalEntryEntity
 import com.chimera.database.entity.VowEntity
+import com.chimera.model.QuestObjectiveStatus
+import com.chimera.model.QuestStatus
+import com.chimera.model.QuestWithObjectives
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -112,10 +116,10 @@ fun JournalScreen(
         }
 
         // Content
-        if (uiState.selectedTab == JournalTab.VOWS) {
-            VowList(vows = uiState.vows)
-        } else {
-            EntryList(
+        when (uiState.selectedTab) {
+            JournalTab.VOWS -> VowList(vows = uiState.vows)
+            JournalTab.QUESTS -> QuestList(quests = uiState.quests)
+            else -> EntryList(
                 entries = uiState.entries,
                 onEntryClick = { viewModel.markRead(it.id) },
                 searchQuery = uiState.searchQuery
@@ -299,6 +303,132 @@ private fun VowCard(vow: VowEntity) {
                 style = MaterialTheme.typography.bodySmall,
                 color = FadedBone
             )
+        }
+    }
+}
+
+
+@Composable
+private fun QuestList(quests: List<QuestWithObjectives>) {
+    if (quests.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                "No active quests.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = DimAsh
+            )
+            Text(
+                "Seek out word of troubles worth your blade.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = DimAsh
+            )
+        }
+        return
+    }
+
+    LazyColumn(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(quests, key = { it.quest.id }) { questWithObjectives ->
+            QuestCard(questWithObjectives = questWithObjectives)
+        }
+    }
+}
+
+@Composable
+private fun QuestCard(questWithObjectives: QuestWithObjectives) {
+    val quest = questWithObjectives.quest
+    val statusColor = when (quest.status) {
+        QuestStatus.ACTIVE -> EmberGold
+        QuestStatus.COMPLETED -> VoidGreen
+        QuestStatus.FAILED -> HollowCrimson
+        QuestStatus.CHANGED -> FadedBone
+    }
+
+    val requiredObjectives = questWithObjectives.objectives.filter { it.isRequired }
+    val completedCount = requiredObjectives.count { it.status == QuestObjectiveStatus.COMPLETED }
+    val totalSteps = quest.totalSteps.coerceAtLeast(requiredObjectives.size).coerceAtLeast(1)
+    val progress = (quest.currentStep.toFloat() / totalSteps.toFloat()).coerceIn(0f, 1f)
+
+    ManuscriptCard(
+        modifier = Modifier.testTag("card_quest_${quest.id}"),
+        fillColor = MaterialTheme.colorScheme.surface,
+        borderColor = statusColor.copy(alpha = 0.4f),
+        borderWidth = 1.dp,
+        contentPadding = 16.dp
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = quest.title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = quest.status.name.replaceFirstChar { it.uppercase() },
+                style = MaterialTheme.typography.labelMedium,
+                color = statusColor
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = quest.description,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            color = FadedBone
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        LinearProgressIndicator(
+            progress = progress,
+            modifier = Modifier.fillMaxWidth(),
+            color = statusColor,
+            trackColor = FadedBone.copy(alpha = 0.2f)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Progress: $completedCount / ${requiredObjectives.size} objectives",
+            style = MaterialTheme.typography.labelSmall,
+            color = FadedBone
+        )
+        if (questWithObjectives.objectives.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            questWithObjectives.objectives.forEach { objective ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val objectiveColor = when (objective.status) {
+                        QuestObjectiveStatus.COMPLETED -> VoidGreen
+                        QuestObjectiveStatus.FAILED -> HollowCrimson
+                        else -> FadedBone
+                    }
+                    Text(
+                        text = "• ${objective.title}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = objectiveColor,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (!objective.isRequired) {
+                        Text(
+                            text = "Optional",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = DimAsh
+                        )
+                    }
+                }
+            }
         }
     }
 }
