@@ -30,14 +30,14 @@ import com.chimera.model.SceneContract
 import com.chimera.data.ChimeraPreferences
 import com.chimera.domain.usecase.ChapterProgressionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -106,9 +106,11 @@ class DialogueSceneViewModel @Inject constructor(
     val uiState: StateFlow<DialogueUiState> = _uiState.asStateFlow()
 
     /** One-shot events signalling the scene is finished. Value is the next scene to enter
-     *  (e.g. a cinematic), or null if the player should simply return to the previous screen. */
-    private val _sceneCompleteEvent = MutableSharedFlow<String?>(extraBufferCapacity = 1)
-    val sceneCompleteEvent: SharedFlow<String?> = _sceneCompleteEvent.asSharedFlow()
+     *  (e.g. a cinematic), or null if the player should simply return to the previous screen.
+     *  A Channel is used so an event emitted while no collector is active (e.g. during a
+     *  configuration change) is buffered and delivered once collection resumes. */
+    private val _sceneCompleteEvent = Channel<String?>(Channel.BUFFERED)
+    val sceneCompleteEvent: Flow<String?> = _sceneCompleteEvent.receiveAsFlow()
 
     private val turnResults = mutableListOf<DialogueTurnResult>()
     private var recentMemories = mutableListOf<MemoryShard>()
@@ -174,6 +176,7 @@ class DialogueSceneViewModel @Inject constructor(
                 val charState = loadCharacterState(slotId)
                 val portraitResName = characterDao.getById(contract.npcId)?.portraitResName
                 recentMemories = memoryShardDao.getTopMemories(slotId, contract.npcId, 5)
+                    .orEmpty()
                     .map { it.toModel() }
                     .toMutableList()
 
@@ -365,7 +368,7 @@ class DialogueSceneViewModel @Inject constructor(
                     }
                     // If a cinematic transition is warranted, navigate to it instead of popping.
                     val cinematicSceneId = chapterProgressionUseCase.getCinematicTransition()
-                    _sceneCompleteEvent.emit(cinematicSceneId)
+                    _sceneCompleteEvent.send(cinematicSceneId)
                 }
             } catch (e: Exception) {
                 Log.e("DialogueVM", "Failed to process turn", e)
@@ -434,7 +437,7 @@ class DialogueSceneViewModel @Inject constructor(
                 }
 
                 // Mark the bridge tag complete via chapter progression use case
-                contract.onCompleteTag?.let { tag ->
+                contract.onCompleteTag?.let {
                     chapterProgressionUseCase.markCinematicComplete(sceneId)
                 }
 
@@ -445,7 +448,7 @@ class DialogueSceneViewModel @Inject constructor(
 
                 // Chain into the next cinematic if one is queued (e.g. act2_finale -> act3_opening).
                 val nextSceneId = chapterProgressionUseCase.getCinematicTransition()
-                _sceneCompleteEvent.emit(nextSceneId)
+                _sceneCompleteEvent.send(nextSceneId)
             } catch (e: Exception) {
                 Log.e("DialogueVM", "Failed to complete cinematic scene", e)
             }

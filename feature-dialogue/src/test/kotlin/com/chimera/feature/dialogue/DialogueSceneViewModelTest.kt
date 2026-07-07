@@ -23,7 +23,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -43,7 +43,7 @@ import org.mockito.kotlin.wheneverBlocking
 @OptIn(ExperimentalCoroutinesApi::class)
 class DialogueSceneViewModelTest {
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     private val orchestrator: DialogueOrchestrator = mock()
     private val gameSessionManager: GameSessionManager = mock()
@@ -68,6 +68,7 @@ class DialogueSceneViewModelTest {
         wheneverBlocking { sceneInstanceDao.insert(org.mockito.kotlin.any()) } doReturn 1L
         wheneverBlocking { sceneInstanceDao.completeScene(org.mockito.kotlin.any(), org.mockito.kotlin.any(), org.mockito.kotlin.any(), org.mockito.kotlin.any()) } doAnswer { }
         wheneverBlocking { dialogueTurnDao.insert(org.mockito.kotlin.any()) } doReturn 0L
+        wheneverBlocking { memoryShardDao.getTopMemories(org.mockito.kotlin.any(), org.mockito.kotlin.any(), org.mockito.kotlin.any()) } doReturn emptyList()
         wheneverBlocking { chapterProgressionUseCase.invoke() } doReturn "prologue"
         wheneverBlocking { chapterProgressionUseCase.getCinematicTransition() } doReturn null
         wheneverBlocking { chapterProgressionUseCase.markCinematicComplete(org.mockito.kotlin.any()) } doAnswer { }

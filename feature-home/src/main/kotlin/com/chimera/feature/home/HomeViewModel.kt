@@ -49,9 +49,6 @@ class HomeViewModel @Inject constructor(
 
     /** Tracks the last chapter tag seen so we can detect advances. */
     private var lastKnownChapterTag: String? = null
-    /** True once the current transition has been shown, so a single advance
-     *  does not re-fire the interstitial on recomposition or config change. */
-    private var pendingTransitionConsumed = false
     private val _pendingActTransition = MutableStateFlow<String?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -91,14 +88,12 @@ class HomeViewModel @Inject constructor(
                     "act3_begun"
                 )
                 if (lastKnownChapterTag != chapterTag) {
-                    pendingTransitionConsumed = false
                     if (
                         lastKnownChapterTag != null &&
                         chapterTag != "prologue" &&
                         !isBridgeTag
                     ) {
                         _pendingActTransition.value = chapterTag
-                        pendingTransitionConsumed = true
                     }
                     lastKnownChapterTag = chapterTag
                 }
