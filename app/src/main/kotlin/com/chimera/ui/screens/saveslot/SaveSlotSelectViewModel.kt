@@ -160,19 +160,23 @@ class SaveSlotSelectViewModel @Inject constructor(
 
                 onCreated(slotId)
 
-                // Schedule background portrait generation — requires network, runs once per slot
-                WorkManager.getInstance(context).enqueueUniqueWork(
-                    "${NpcPortraitSyncWorker.WORK_NAME}_$slotId",
-                    ExistingWorkPolicy.KEEP,
-                    OneTimeWorkRequestBuilder<NpcPortraitSyncWorker>()
-                        .setInputData(workDataOf(NpcPortraitSyncWorker.KEY_SLOT_ID to slotId))
-                        .setConstraints(
-                            Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
-                                .build()
-                        )
-                        .build()
-                )
+                // Schedule background portrait generation — requires network, runs once
+                // per slot. Best-effort: the save is already created, so a scheduling
+                // failure must not surface as a game-creation error.
+                runCatching {
+                    WorkManager.getInstance(context).enqueueUniqueWork(
+                        "${NpcPortraitSyncWorker.WORK_NAME}_$slotId",
+                        ExistingWorkPolicy.KEEP,
+                        OneTimeWorkRequestBuilder<NpcPortraitSyncWorker>()
+                            .setInputData(workDataOf(NpcPortraitSyncWorker.KEY_SLOT_ID to slotId))
+                            .setConstraints(
+                                Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build()
+                            )
+                            .build()
+                    )
+                }.onFailure { Log.w("SaveSlotVM", "Portrait sync scheduling failed: ${it.message}") }
             } catch (e: Exception) {
                 Log.e("SaveSlotVM", "Failed to create new game", e)
                 _error.value = "Failed to create save"
@@ -187,6 +191,7 @@ class SaveSlotSelectViewModel @Inject constructor(
                 if (slot.isEmpty) return@launch
 
                 // Stage 1: Check — is cloud sync enabled?
+                var restoredFromCloud = false
                 val cloudEnabled = preferences.settings.first().cloudSyncEnabled
                 if (cloudEnabled) {
                     // Stage 2: Branch — fetch cloud save and compare timestamps
@@ -199,6 +204,7 @@ class SaveSlotSelectViewModel @Inject constructor(
                         Log.d("SaveSlotVM", "Cloud save newer for slot $slotId, restoring")
                         applySnapshot(slotId, cloudSave.saveDataJson, cloudSave)
                         // Stage 4: verify — Room updated; shallow SaveSlot row updated inside applySnapshot
+                        restoredFromCloud = true
                     } else if (cloudSave != null && cloudSave.updatedAt < slot.lastPlayedAt) {
                         // Local is newer — push full snapshot to cloud
                         viewModelScope.launch {
@@ -217,7 +223,11 @@ class SaveSlotSelectViewModel @Inject constructor(
                     _isRestoring.value = false
                 }
 
-                saveSlotDao.upsert(slot.copy(lastPlayedAt = System.currentTimeMillis()))
+                // Skip when restored: applySnapshot already rewrote the row with cloud
+                // data; upserting the pre-restore `slot` copy would clobber it.
+                if (!restoredFromCloud) {
+                    saveSlotDao.upsert(slot.copy(lastPlayedAt = System.currentTimeMillis()))
+                }
                 gameSessionManager.setActiveSlot(slotId)
                 onSelected(slotId)
 

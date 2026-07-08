@@ -25,6 +25,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.chimera.ui.theme.ChimeraSpacing
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import kotlinx.coroutines.delay
@@ -67,7 +68,7 @@ fun SplashScreen(
                 color = EmberGold,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(ChimeraSpacing.small))
             Text(
                 text = "Ashes of the Hollow King",
                 style = MaterialTheme.typography.headlineSmall,

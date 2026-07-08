@@ -70,7 +70,7 @@ Keep domain logic as framework-light Kotlin where possible.
 
 ## Commands
 
-Run all commands from the repository root:
+Run all commands from the repository root (or Termux home for deployment):
 
 ```bash
 ./gradlew assembleMockDebug      # Debug build (offline AI)
@@ -79,6 +79,8 @@ Run all commands from the repository root:
 ./gradlew :chimera-core:test     # Core engine tests (no Android)
 ./gradlew detekt                 # Static analysis
 ./gradlew clean build            # Full clean build
+bash ~/deploy.sh                 # (Termux Host) Build locally inside PRoot and deploy via Shizuku/rish
+bash ~/deploy-ci.sh              # (Termux Host) Download latest APK from GitHub Actions and deploy via Shizuku/rish
 ```
 
 Only document commands that are verified in the current repo.

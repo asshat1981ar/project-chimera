@@ -27,21 +27,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chimera.ui.components.GothicOutlinedButton
+import com.chimera.ui.theme.AbyssBlack
+import com.chimera.ui.theme.ChimeraSpacing
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
+import com.chimera.ui.theme.MutedEmber
 import com.chimera.ui.util.ChapterDisplayStrings
 import kotlinx.coroutines.delay
-
-private val SceneBackground = Color(0xFF0D0B0B)
-private val DividerColor = Color(0xFF8B6C24) // muted ember gold
 
 /** Full-screen act-transition interstitial. Fades in, shows act title + flavour quote, then
  *  waits for the player to tap Continue before navigating to HOME. */
@@ -71,7 +70,7 @@ fun ActTransitionScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(SceneBackground)
+            .background(AbyssBlack)
             .statusBarsPadding()
             .navigationBarsPadding(),
         contentAlignment = Alignment.Center
@@ -81,7 +80,7 @@ fun ActTransitionScreen(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 40.dp)
+                .padding(horizontal = ChimeraSpacing.xxl)
         ) {
 
             // Act number label — small caps style, letter-spaced
@@ -101,18 +100,18 @@ fun ActTransitionScreen(
                 )
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(ChimeraSpacing.medium))
 
             // Divider above title
             AnimatedVisibility(visible = showTitle, enter = fadeIn(tween(600))) {
                 Divider(
                     modifier = Modifier.width(56.dp),
-                    color = DividerColor,
+                    color = MutedEmber,
                     thickness = 1.dp
                 )
             }
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(ChimeraSpacing.medium))
 
             // Main act title
             AnimatedVisibility(
@@ -126,7 +125,7 @@ fun ActTransitionScreen(
                         fontWeight = FontWeight.Bold,
                         fontSize = 26.sp
                     ),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
                 )
             }
@@ -137,12 +136,12 @@ fun ActTransitionScreen(
             AnimatedVisibility(visible = showTitle, enter = fadeIn(tween(600))) {
                 Divider(
                     modifier = Modifier.width(56.dp),
-                    color = DividerColor,
+                    color = MutedEmber,
                     thickness = 1.dp
                 )
             }
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(ChimeraSpacing.xl))
 
             // Flavour quote
             AnimatedVisibility(
@@ -161,10 +160,10 @@ fun ActTransitionScreen(
                         textAlign = TextAlign.Center
                     )
                     if (quoteSrc.isNotBlank()) {
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(ChimeraSpacing.small))
                         Text(
                             text = "— $quoteSrc",
-                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                            style = MaterialTheme.typography.labelSmall,
                             color = DimAsh,
                             textAlign = TextAlign.Center
                         )
@@ -172,7 +171,7 @@ fun ActTransitionScreen(
                 }
             }
 
-            Spacer(Modifier.height(56.dp))
+            Spacer(Modifier.height(ChimeraSpacing.xxl))
 
             // Continue button
             AnimatedVisibility(

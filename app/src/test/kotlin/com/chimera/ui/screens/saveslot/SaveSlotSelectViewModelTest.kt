@@ -37,6 +37,7 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -203,8 +204,8 @@ class SaveSlotSelectViewModelTest {
         viewModel.createNewGame(testSlotIndex, "   ") { }
         advanceUntilIdle()
 
-        // Assert
-        verifyNoInteractions(saveSlotDao)
+        // Assert — observeAll() is called at construction, so only check writes
+        verify(saveSlotDao, never()).upsert(any())
         verifyNoInteractions(characterDao)
     }
 
@@ -286,8 +287,8 @@ class SaveSlotSelectViewModelTest {
         viewModel.deleteSave(testSlotId)
         advanceUntilIdle()
 
-        // Assert
-        verifyNoInteractions(saveSlotDao)
+        // Assert — getById/observeAll are legitimate reads; no writes may happen
+        verify(saveSlotDao, never()).upsert(any())
         verifyNoInteractions(characterDao)
     }
 
@@ -353,6 +354,8 @@ class SaveSlotSelectViewModelTest {
         )
         whenever(saveSlotDao.getById(testSlotId)) doReturn existingSlot
         whenever(saveSlotDao.upsert(any())) doReturn testSlotId
+        whenever(cloudSaveRepository.downloadSave(testSlotId)) doReturn
+                CloudSaveResult.Failure("offline")
 
         var selectedSlotId: Long? = null
         val viewModel = buildViewModel()
@@ -665,11 +668,12 @@ class SaveSlotSelectViewModelTest {
         )
         val slotsFlow = MutableStateFlow(slotEntities)
         whenever(saveSlotDao.observeAll()) doReturn slotsFlow
+        whenever(sceneInstanceDao.getBySlot(any())) doReturn emptyList()
 
         val viewModel = buildViewModel()
 
-        // Act
-        val emittedSlots = viewModel.saveSlots.first()
+        // Act — skip the stateIn initial emptyList; wait for the mapped emission
+        val emittedSlots = viewModel.saveSlots.first { it.isNotEmpty() }
 
         // Assert
         assertThat(emittedSlots).hasSize(2)
@@ -731,8 +735,8 @@ class SaveSlotSelectViewModelTest {
 
         val viewModel = buildViewModel()
 
-        // Act
-        val emittedSlots = viewModel.saveSlots.first()
+        // Act — skip the stateIn initial emptyList; wait for the mapped emission
+        val emittedSlots = viewModel.saveSlots.first { it.isNotEmpty() }
 
         // Assert
         assertThat(emittedSlots).hasSize(1)

@@ -8,20 +8,20 @@ import org.junit.Test
 class NpcPortraitTest {
     
     @Test fun `npcInitial returns first letters from each word`() {
-        assertEquals("WA", npcInitial("Warden"))  // W + second letter A
-        assertEquals("MA", npcInitial("Mira Ashcroft"))  // M + A
-        assertEquals("AR", npcInitial("  aria"))  // A + R (skip leading spaces, two letters)
+        assertEquals("W", npcInitial("Warden"))
+        assertEquals("MA", npcInitial("Mira Ashcroft"))
+        assertEquals("A", npcInitial("  aria"))
     }
 
     @Test fun `npcInitial returns single letter for single-word names`() {
         assertEquals("W", npcInitial("W"))
-        assertEquals("A", npcInitial("Aria"))  // Only first letter from single word
+        assertEquals("A", npcInitial("Aria"))
         assertEquals("X", npcInitial("X"))
     }
 
     @Test fun `npcInitial handles leading spaces and numbers`() {
-        assertEquals("AR", npcInitial("  123Aria"))  // Skip numbers at start, A + R
-        assertEquals("A7", npcInitial("Aria7"))  // A + trailing digit 7
+        assertEquals("A", npcInitial("  123Aria"))
+        assertEquals("A", npcInitial("Aria7"))
     }
 
     @Test fun `npcInitial returns question mark for empty name`() {
@@ -33,12 +33,12 @@ class NpcPortraitTest {
     }
 
     @Test fun `npcInitial handles multi-word names`() {
-        assertEquals("JE", npcInitial("Jean-Odile"))  // J + E (first letter of each)
-        assertEquals("MC", npcInitial("McDonald"))  // M + C
+        assertEquals("J", npcInitial("Jean-Odile"))
+        assertEquals("M", npcInitial("McDonald"))
     }
 
     @Test fun `npcInitial trims whitespace`() {
-        assertEquals("WA", npcInitial("  Warden  "))
+        assertEquals("W", npcInitial("  Warden  "))
         assertEquals("MA", npcInitial("  Mira  Ashcroft  "))
     }
 

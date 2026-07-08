@@ -14,11 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,12 +28,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.ui.components.ChimeraAlertDialog
+import com.chimera.ui.components.ChimeraLoadingIndicator
 import com.chimera.ui.components.GothicButton
 import com.chimera.ui.components.ManuscriptCard
 import com.chimera.ui.components.ParchmentInputField
+import com.chimera.ui.theme.ChimeraSpacing
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
-import com.chimera.ui.theme.HollowCrimson
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -53,10 +52,10 @@ fun SaveSlotSelectScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(ChimeraSpacing.xl),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(ChimeraSpacing.xxl))
 
             Text(
                 text = "Choose Your Path",
@@ -65,10 +64,10 @@ fun SaveSlotSelectScreen(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(ChimeraSpacing.xl))
 
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(ChimeraSpacing.regular),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(slots, key = { it.slotIndex }) { slot ->
@@ -101,15 +100,10 @@ fun SaveSlotSelectScreen(
                     .background(MaterialTheme.colorScheme.background.copy(alpha = 0.75f)),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator(color = EmberGold, strokeWidth = 3.dp)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        "Restoring from cloud…",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = FadedBone
-                    )
-                }
+                ChimeraLoadingIndicator(
+                    label = "Restoring from cloud…",
+                    contentDescription = "Restoring save data from cloud"
+                )
             }
         }
     }
@@ -127,38 +121,18 @@ fun SaveSlotSelectScreen(
 
     // Delete confirmation dialog
     showDeleteDialog?.let { slot ->
-        AlertDialog(
+        ChimeraAlertDialog(
             onDismissRequest = { showDeleteDialog = null },
-            title = {
-                Text(
-                    "Destroy this save forever?",
-                    style = MaterialTheme.typography.titleMedium
-                )
+            title = "Destroy this save forever?",
+            text = "The journey of ${slot.playerName} will be lost.",
+            confirmText = "Destroy",
+            onConfirm = {
+                viewModel.deleteSave(slot.id)
+                showDeleteDialog = null
             },
-            text = {
-                Text(
-                    "The journey of ${slot.playerName} will be lost.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.deleteSave(slot.id)
-                        showDeleteDialog = null
-                    }
-                ) {
-                    Text("Destroy", color = HollowCrimson)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = null }) {
-                    Text("Keep", color = FadedBone)
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            dismissText = "Keep",
+            onDismiss = { showDeleteDialog = null },
+            confirmIsDestructive = true
         )
     }
 }
@@ -193,7 +167,7 @@ private fun SaveSlotCard(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(ChimeraSpacing.micro))
             Text(
                 text = "Slot ${slot.slotIndex + 1}",
                 style = MaterialTheme.typography.bodySmall,
@@ -206,7 +180,7 @@ private fun SaveSlotCard(
                 style = MaterialTheme.typography.titleLarge,
                 color = EmberGold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(ChimeraSpacing.small))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -221,7 +195,7 @@ private fun SaveSlotCard(
                 )
             }
             slot.lastSceneTitle?.let { lastScene ->
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(ChimeraSpacing.micro))
                 Text(
                     text = "Last: $lastScene",
                     style = MaterialTheme.typography.bodySmall,
@@ -241,38 +215,22 @@ private fun NewGameDialog(
 ) {
     var name by remember { mutableStateOf("") }
 
-    AlertDialog(
+    ChimeraAlertDialog(
         onDismissRequest = onDismiss,
-        title = {
-            Text(
-                "Enter your name",
-                style = MaterialTheme.typography.titleMedium
-            )
-        },
-        text = {
-            ParchmentInputField(
-                value = name,
-                onValueChange = { if (it.length <= 24) name = it },
-                singleLine = true,
-                placeholder = "Wanderer"
-            )
-        },
-        confirmButton = {
-            GothicButton(
-                onClick = { onConfirm(name) },
-                enabled = name.isNotBlank()
-            ) {
-                Text("Begin")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = FadedBone)
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        titleContentColor = MaterialTheme.colorScheme.onSurface
-    )
+        title = "Enter your name",
+        confirmText = "Begin",
+        onConfirm = { onConfirm(name) },
+        dismissText = "Cancel",
+        onDismiss = onDismiss,
+        confirmEnabled = name.isNotBlank()
+    ) {
+        ParchmentInputField(
+            value = name,
+            onValueChange = { if (it.length <= 24) name = it },
+            singleLine = true,
+            placeholder = "Wanderer"
+        )
+    }
 }
 
 private fun formatPlaytime(seconds: Long): String {

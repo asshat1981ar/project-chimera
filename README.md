@@ -99,7 +99,27 @@ OPENROUTER_API_KEY=your_openrouter_api_key_here
 adb install app/build/outputs/apk/devDebug/app-dev-debug.apk
 ```
 
-### 4. Verify AI Connection
+### 4. Deploying via Termux + Shizuku (rish)
+
+If you are developing directly on your Android device using **Termux** and have **Shizuku** running, you have two routes to compile and install the APK:
+
+#### Route A: Local Compilation (Slow)
+If you want to compile your local changes directly on the device:
+```bash
+# Exit the PRoot container to your Termux host, then run:
+bash ~/deploy.sh
+```
+This logs into your Debian PRoot container, builds the APK locally (takes ~10 mins), and installs/launches it via Shizuku.
+
+#### Route B: GitHub Actions Download (Fast & Recommended)
+If you want to pull a pre-built APK compiled in the cloud:
+```bash
+# Exit the PRoot container to your Termux host, then run:
+bash ~/deploy-ci.sh
+```
+This fetches the recent CI/CD workflow runs from your GitHub repository using the `gh` CLI, downloads the selected artifact (debug, beta, demo, release), and instantly installs/launches it via Shizuku.
+
+### 5. Verify AI Connection
 
 Open Settings in the app. The "AI Provider" indicator shows:
 - **AI: Connected (Gemini)** - Cloud AI active

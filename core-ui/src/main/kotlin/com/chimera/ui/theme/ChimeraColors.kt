@@ -37,6 +37,10 @@ val ManaBlue = Color(0xFF5C7CBA)
 // ── Overlay ──
 val ShadowVeil = Color(0xCC000000)
 
+// ── Cinematic / act-transition ──
+val AbyssBlack = Color(0xFF0D0B0B)
+val MutedEmber = Color(0xFF8B6C24)
+
 // ── Backward compatibility aliases ──
 val HollowCrimson = Oxblood
 val HollowCrimsonLight = OxbloodLight

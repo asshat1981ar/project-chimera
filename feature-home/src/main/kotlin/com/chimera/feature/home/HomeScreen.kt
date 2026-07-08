@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Badge
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,10 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chimera.model.ObjectivePrimaryAction
+import com.chimera.ui.components.ChimeraLoadingIndicator
 import com.chimera.ui.components.GothicButton
 import com.chimera.ui.components.ManuscriptCard
 import com.chimera.ui.components.ObjectiveHudAction
 import com.chimera.ui.components.QuestObjectiveHudCard
+import com.chimera.ui.theme.ChimeraSpacing
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -43,7 +44,7 @@ import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
 
 // File-level Modifier constants for reusable chains
-private val FillMaxSizeWithPadding = Modifier.fillMaxSize().padding(horizontal = 24.dp)
+private val FillMaxSizeWithPadding = Modifier.fillMaxSize().padding(horizontal = ChimeraSpacing.xl)
 private val DefaultOnActTransition: (String) -> Unit = {}
 
 @Composable
@@ -64,19 +65,18 @@ fun HomeScreen(
     }
 
     if (uiState.isLoading) {
-        Column(
+        ChimeraLoadingIndicator(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) { CircularProgressIndicator(color = EmberGold) }
+            contentDescription = "Loading home"
+        )
         return
     }
 
     LazyColumn(
         modifier = FillMaxSizeWithPadding,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(ChimeraSpacing.regular)
     ) {
-        item { Spacer(modifier = Modifier.height(32.dp)) }
+        item { Spacer(modifier = Modifier.height(ChimeraSpacing.xl)) }
 
         // ── Greeting + chapter ───────────────────────────────────────────────
         item {
@@ -88,7 +88,7 @@ fun HomeScreen(
                     style = MaterialTheme.typography.headlineMedium,
                     color = EmberGold
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(ChimeraSpacing.micro))
                 Text(
                     text = uiState.chapterTitle,
                     style = MaterialTheme.typography.bodyMedium,
@@ -134,7 +134,7 @@ fun HomeScreen(
                 fillColor = MaterialTheme.colorScheme.surface,
                 borderColor = HollowCrimson.copy(alpha = 0.5f),
                 borderWidth = 1.dp,
-                contentPadding = 24.dp
+                contentPadding = ChimeraSpacing.large
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -143,14 +143,14 @@ fun HomeScreen(
                         tint = EmberGold,
                         modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(ChimeraSpacing.small))
                     Text(
                         "Continue Your Journey",
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(ChimeraSpacing.small))
 
                 uiState.continueSceneTitle?.let { sceneTitle ->
                     Text(
@@ -174,7 +174,7 @@ fun HomeScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(ChimeraSpacing.regular))
 
                 GothicButton(
                     onClick = {
@@ -186,7 +186,7 @@ fun HomeScreen(
                         .testTag("btn_enter_hollow")
                 ) {
                     Text("Enter the Hollow")
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(ChimeraSpacing.small))
                     Icon(
                         Icons.Default.KeyboardArrowRight,
                         contentDescription = null,
@@ -206,7 +206,7 @@ fun HomeScreen(
                 contentPadding = 0.dp
             ) {
                 Row(
-                    modifier = Modifier.padding(20.dp).fillMaxWidth(),
+                    modifier = Modifier.padding(ChimeraSpacing.large).fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -217,7 +217,7 @@ fun HomeScreen(
                             tint = HollowCrimson,
                             modifier = Modifier.size(18.dp)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(ChimeraSpacing.small))
                         Text(
                             "Active Vows",
                             style = MaterialTheme.typography.titleMedium,
@@ -235,13 +235,17 @@ fun HomeScreen(
                         text = "No vows sworn yet. Your choices will forge them.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = FadedBone,
-                        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                        modifier = Modifier.padding(
+                            start = ChimeraSpacing.large,
+                            end = ChimeraSpacing.large,
+                            bottom = ChimeraSpacing.large
+                        )
                     )
                 }
             }
         }
 
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { Spacer(modifier = Modifier.height(ChimeraSpacing.regular)) }
     }
 }
 

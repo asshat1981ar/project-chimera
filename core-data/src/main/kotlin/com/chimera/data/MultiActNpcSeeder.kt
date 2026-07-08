@@ -12,18 +12,16 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Multi-act NPC seeder.
+ * Multi-act NPC seeder — the canonical seeder for new game creation.
  *
- * The original [NpcSeeder] only reads `npcs.json` (Act 1 NPCs). This class
- * additionally seeds NPCs from `act2_npcs.json` and `act3_npcs.json` so that
- * Kael, Seren, Dara, Rook, and the Living Corruption are available from the
- * database on new game creation.
+ * Seeds NPCs from `npcs.json` (Act 1), `act2_npcs.json`, and `act3_npcs.json`
+ * so that Kael, Seren, Dara, Rook, and the Living Corruption are available
+ * from the database on new game creation. Each NPC's `portraitResName` is
+ * populated from `portrait_manifest.json` (characterId → drawable name),
+ * falling back to the value in the NPC JSON when unmapped.
  *
  * De-duplication is handled by Room's [OnConflictStrategy.REPLACE] strategy —
  * re-seeding an existing slot is safe and idempotent.
- *
- * Inject this in place of (or alongside) [NpcSeeder]. The original [NpcSeeder]
- * is preserved for backward compatibility.
  */
 @Singleton
 class MultiActNpcSeeder @Inject constructor(
@@ -45,6 +43,7 @@ class MultiActNpcSeeder @Inject constructor(
      * Idempotent — safe to call on an existing slot.
      */
     suspend fun seedNpcsForSlot(slotId: Long) {
+        val portraitMap = loadPortraitManifest()
         val allNpcs = npcFiles.flatMap { parseFile(it) }
 
         // De-duplicate by ID — last writer wins (acts 2 & 3 first, act 1 last
@@ -59,7 +58,7 @@ class MultiActNpcSeeder @Inject constructor(
                 title = npc.title,
                 role = npc.role,
                 isPlayerCharacter = false,
-                portraitResName = npc.portraitResName
+                portraitResName = portraitMap[npc.id] ?: npc.portraitResName
             )
         }
         characterDao.upsertAll(characters)
@@ -88,6 +87,21 @@ class MultiActNpcSeeder @Inject constructor(
             emptyList()
         }
 
+    /**
+     * Loads the portrait manifest from assets and returns a map of characterId -> drawableName.
+     * Missing or malformed manifest degrades to an empty map (letter-avatar fallback in UI).
+     */
+    private fun loadPortraitManifest(): Map<String, String> =
+        try {
+            val manifestText = context.assets.open("portrait_manifest.json")
+                .bufferedReader()
+                .use { it.readText() }
+            val manifest = json.decodeFromString<PortraitManifest>(manifestText)
+            manifest.portraits.associateBy({ it.characterId }, { it.drawableName })
+        } catch (e: Exception) {
+            emptyMap()
+        }
+
     @Serializable
     private data class NpcJson(
         val id: String,
@@ -97,5 +111,16 @@ class MultiActNpcSeeder @Inject constructor(
         val initialDisposition: Float = 0f,
         val archetype: String? = null,
         val portraitResName: String? = null
+    )
+
+    @Serializable
+    private data class PortraitManifest(
+        val portraits: List<PortraitEntry>
+    )
+
+    @Serializable
+    private data class PortraitEntry(
+        val characterId: String,
+        val drawableName: String
     )
 }

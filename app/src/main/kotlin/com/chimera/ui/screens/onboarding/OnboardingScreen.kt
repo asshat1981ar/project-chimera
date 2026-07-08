@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.chimera.data.ChimeraPreferences
 import com.chimera.ui.components.GothicButton
 import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.theme.ChimeraSpacing
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
@@ -44,7 +45,7 @@ fun OnboardingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(ChimeraSpacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -54,7 +55,7 @@ fun OnboardingScreen(
             color = EmberGold,
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(ChimeraSpacing.small))
         Text(
             "Ashes of the Hollow King",
             style = MaterialTheme.typography.headlineSmall,
@@ -62,7 +63,7 @@ fun OnboardingScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(ChimeraSpacing.xl))
 
         Text(
             "Your words shape the world. NPCs remember your choices, " +
@@ -73,16 +74,16 @@ fun OnboardingScreen(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(ChimeraSpacing.xl))
 
         ManuscriptCard(
             fillColor = MaterialTheme.colorScheme.surface,
             borderColor = MaterialTheme.colorScheme.outlineVariant,
             borderWidth = 1.dp,
-            contentPadding = 20.dp
+            contentPadding = ChimeraSpacing.large
         ) {
             Text("Accessibility", style = MaterialTheme.typography.titleMedium, color = EmberGold)
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(ChimeraSpacing.medium))
 
             Text("Text Size: ${(textScale * 100).toInt()}%", style = MaterialTheme.typography.bodyMedium)
             Slider(
@@ -92,7 +93,7 @@ fun OnboardingScreen(
                 colors = SliderDefaults.colors(thumbColor = EmberGold, activeTrackColor = HollowCrimson)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(ChimeraSpacing.small))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -108,7 +109,7 @@ fun OnboardingScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(ChimeraSpacing.xl))
 
         GothicButton(
             onClick = {

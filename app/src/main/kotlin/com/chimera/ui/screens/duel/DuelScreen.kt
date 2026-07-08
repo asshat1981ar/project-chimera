@@ -38,9 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chimera.core.engine.CombatEngine
+import com.chimera.ui.components.ChimeraLoadingIndicator
 import com.chimera.ui.components.GothicButton
 import com.chimera.ui.components.GothicOutlinedButton
 import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.theme.ChimeraSpacing
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
@@ -55,16 +57,17 @@ fun DuelScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     if (uiState.isLoading) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = EmberGold)
-        }
+        ChimeraLoadingIndicator(
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = "Loading duel"
+        )
         return
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = ChimeraSpacing.regular, vertical = ChimeraSpacing.medium)
             .verticalScroll(rememberScrollState())
     ) {
         // ── Header ────────────────────────────────────────────────────────────
@@ -75,7 +78,7 @@ fun DuelScreen(
             IconButton(onClick = onDuelComplete) {
                 Icon(Icons.Default.ArrowBack, "Leave", tint = FadedBone)
             }
-            Spacer(Modifier.width(6.dp))
+            Spacer(Modifier.width(ChimeraSpacing.small))
             Column {
                 Text("COMBAT", style = MaterialTheme.typography.labelSmall, color = EmberGold)
                 Text(uiState.opponentName,
@@ -83,14 +86,14 @@ fun DuelScreen(
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(ChimeraSpacing.regular))
 
         // ── Resolve bars ──────────────────────────────────────────────────────
         ManuscriptCard(
             fillColor = MaterialTheme.colorScheme.surface,
             borderColor = DimAsh.copy(alpha = 0.3f),
             borderWidth = 0.5.dp,
-            contentPadding = 14.dp
+            contentPadding = ChimeraSpacing.medium
         ) {
             ResolveRow(
                     label       = "${uiState.opponentName}'s Resolve",
@@ -98,14 +101,14 @@ fun DuelScreen(
                     max         = CombatEngine.MAX_RESOLVE,
                     activeColor = HollowCrimson
                 )
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(ChimeraSpacing.small))
                 ResolveRow(
                     label       = "Your Resolve",
                     current     = uiState.playerResolve,
                     max         = CombatEngine.MAX_RESOLVE,
                     activeColor = VoidGreen
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(ChimeraSpacing.small))
                 Text(
                     "Exchange ${uiState.rollCount} / ${CombatEngine.MAX_ROLLS}",
                     style = MaterialTheme.typography.labelSmall,
@@ -115,7 +118,7 @@ fun DuelScreen(
                 )
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(ChimeraSpacing.large))
 
         // ── Phase content (animated transitions) ─────────────────────────────
         AnimatedContent(
@@ -148,14 +151,14 @@ private fun IntentPhase(
             style = MaterialTheme.typography.titleMedium,
             color = EmberGold
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(ChimeraSpacing.medium))
 
         if (uiState.availableIntents.isEmpty()) {
             Text("No intents available.", style = MaterialTheme.typography.bodyMedium, color = DimAsh)
         } else {
             uiState.availableIntents.forEach { intent ->
                 IntentCard(intent = intent, onClick = { onIntentSelected(intent) })
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(ChimeraSpacing.small))
             }
         }
     }
@@ -176,7 +179,7 @@ private fun IntentCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp),
+                .padding(vertical = ChimeraSpacing.tiny),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment     = Alignment.CenterVertically
         ) {
@@ -184,7 +187,7 @@ private fun IntentCard(
                 Text(intent.label, style = MaterialTheme.typography.titleSmall, color = EmberGold)
                 Text(intent.description, style = MaterialTheme.typography.bodySmall, color = DimAsh)
             }
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(ChimeraSpacing.medium))
             Text(bonusText, style = MaterialTheme.typography.titleMedium, color = bonusColor)
         }
     }
@@ -229,14 +232,14 @@ private fun ResolvingPhase(
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(ChimeraSpacing.regular))
 
         // Band label
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(bandBg, shape = MaterialTheme.shapes.medium)
-                .padding(vertical = 10.dp, horizontal = 16.dp),
+                .padding(vertical = ChimeraSpacing.medium, horizontal = ChimeraSpacing.regular),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -246,14 +249,14 @@ private fun ResolvingPhase(
             )
         }
 
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(ChimeraSpacing.medium))
 
         // Narrative
         ManuscriptCard(
             fillColor = MaterialTheme.colorScheme.surface,
             borderColor = DimAsh.copy(alpha = 0.25f),
             borderWidth = 0.5.dp,
-            contentPadding = 16.dp
+            contentPadding = ChimeraSpacing.regular
         ) {
             Text(
                 text = result.narrative,
@@ -262,7 +265,7 @@ private fun ResolvingPhase(
             )
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(ChimeraSpacing.large))
 
         GothicButton(
             onClick  = onContinue,
@@ -287,14 +290,14 @@ private fun CompletePhase(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(ChimeraSpacing.small))
         Text(
             if (won) "Victory" else "Defeat",
             style = MaterialTheme.typography.displaySmall,
             color = accentColor
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(ChimeraSpacing.medium))
 
         Text(
             if (won) "${uiState.opponentName} yields. The encounter is over."
@@ -304,7 +307,7 @@ private fun CompletePhase(
             textAlign = TextAlign.Center
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(ChimeraSpacing.small))
 
         uiState.log.lastOrNull()?.let { last ->
             Text(last.narrative, style = MaterialTheme.typography.bodyMedium,

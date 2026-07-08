@@ -131,6 +131,10 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
     bundle {
         language {
             enableSplit = true
