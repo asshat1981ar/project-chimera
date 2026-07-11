@@ -1,0 +1,11 @@
+# local.properties.example
+# Copy this file to local.properties and fill in your keys.
+# local.properties is gitignored and MUST NEVER be committed.
+
+# OpenAI API Key (for AI dialogue features)
+API_KEY_OPENAI=your_openai_key_here
+
+# Google Gemini API Key (for AI features)
+API_KEY_GEMINI=your_gemini_key_here
+
+# Any other third-party keys go here
