@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.ai.AudioProvider
 import com.chimera.ai.DialogueOrchestrator
+import com.chimera.data.AnalyticsTracker
 import com.chimera.data.GameSessionManager
 import com.chimera.data.SceneLoader
 import com.chimera.database.dao.CharacterDao
@@ -98,7 +99,8 @@ class DialogueSceneViewModel @Inject constructor(
     private val vowDao: VowDao,
     private val audioProvider: AudioProvider,
     private val preferences: ChimeraPreferences,
-    private val chapterProgressionUseCase: ChapterProgressionUseCase
+    private val chapterProgressionUseCase: ChapterProgressionUseCase,
+    private val analyticsTracker: AnalyticsTracker
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
@@ -303,6 +305,7 @@ class DialogueSceneViewModel @Inject constructor(
                     if (existing != null && existing.role != "COMPANION") {
                         characterDao.upsert(existing.copy(role = "COMPANION"))
                     }
+                    analyticsTracker.logEvent("companion_recruited", mapOf("npc_id" to contract.npcId))
                 }
 
                 val npcLine = DialogueLine(
@@ -351,6 +354,10 @@ class DialogueSceneViewModel @Inject constructor(
                         id = sceneInstanceId,
                         turnCount = turnResults.size,
                         usedFallback = orchestrator.isFallbackActive
+                    )
+                    analyticsTracker.logEvent(
+                        "scene_complete",
+                        mapOf("scene_id" to sceneId, "npc_id" to contract.npcId)
                     )
                     generateJournalEntry(slotId)
                     generateVows(slotId)

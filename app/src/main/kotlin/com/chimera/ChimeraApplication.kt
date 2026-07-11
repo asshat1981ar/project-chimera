@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Trace
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.chimera.data.CrashReporter
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class ChimeraApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject lateinit var crashReporter: CrashReporter
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -34,6 +36,7 @@ class ChimeraApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        crashReporter.initialize()
         beginStartupTrace("ChimeraApplication.onCreate")
         startupTraceActive = true
     }

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.detekt)
+    alias(libs.plugins.google.services) apply false
 }
 
 subprojects {

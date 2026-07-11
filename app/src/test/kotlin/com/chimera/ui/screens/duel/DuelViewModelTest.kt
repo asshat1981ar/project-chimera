@@ -3,6 +3,7 @@ package com.chimera.ui.screens.duel
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import com.chimera.core.engine.CombatEngine
+import com.chimera.data.AnalyticsTracker
 import com.chimera.data.GameSessionManager
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
@@ -44,6 +45,7 @@ class DuelViewModelTest {
     private lateinit var journalEntryDao: JournalEntryDao
     private lateinit var gameSessionManager: GameSessionManager
     private lateinit var savedStateHandle: SavedStateHandle
+    private val analyticsTracker: AnalyticsTracker = mock()
     private val testDispatcher = StandardTestDispatcher()
 
     private val testOpponentId = "test-opponent"
@@ -115,7 +117,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -139,7 +142,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -160,7 +164,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -183,7 +188,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -208,7 +214,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -242,7 +249,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -269,7 +277,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -311,7 +320,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -342,7 +352,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -379,7 +390,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -409,7 +421,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -432,7 +445,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -465,7 +479,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -482,7 +497,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()
@@ -511,7 +527,8 @@ class DuelViewModelTest {
             characterDao = characterDao,
             characterStateDao = characterStateDao,
             journalEntryDao = journalEntryDao,
-            gameSessionManager = gameSessionManager
+            gameSessionManager = gameSessionManager,
+            analyticsTracker = analyticsTracker
         )
 
         advanceUntilIdle()

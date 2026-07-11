@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.core.engine.CombatEngine
+import com.chimera.data.AnalyticsTracker
 import com.chimera.data.GameSessionManager
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
@@ -62,7 +63,8 @@ class DuelViewModel @Inject constructor(
     private val characterDao: CharacterDao,
     private val characterStateDao: CharacterStateDao,
     private val journalEntryDao: JournalEntryDao,
-    private val gameSessionManager: GameSessionManager
+    private val gameSessionManager: GameSessionManager,
+    private val analyticsTracker: AnalyticsTracker
 ) : ViewModel() {
 
     private val opponentId: String = savedStateHandle["opponentId"] ?: "warden"
@@ -170,6 +172,10 @@ class DuelViewModel @Inject constructor(
                 )
             )
             characterStateDao.adjustDisposition(opponentId, if (won) 0.05f else -0.05f)
+            analyticsTracker.logEvent(
+                "duel_outcome",
+                mapOf("opponent_id" to opponentId, "won" to won.toString(), "roll_count" to state.rollCount.toString())
+            )
         }
     }
 
