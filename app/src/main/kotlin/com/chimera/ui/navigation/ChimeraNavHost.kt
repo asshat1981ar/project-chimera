@@ -2,7 +2,6 @@ package com.chimera.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -91,7 +90,7 @@ fun ChimeraNavHost(
                     },
                     onNavigateToMap = {
                         navController.navigate(ChimeraRoutes.MAP) {
-                            popUpTo(navController.graph.findStartDestination().id) {
+                            popUpTo(ChimeraRoutes.HOME) {
                                 saveState = true
                             }
                             launchSingleTop = true
@@ -100,7 +99,7 @@ fun ChimeraNavHost(
                     },
                     onNavigateToJournal = {
                         navController.navigate(ChimeraRoutes.JOURNAL) {
-                            popUpTo(navController.graph.findStartDestination().id) {
+                            popUpTo(ChimeraRoutes.HOME) {
                                 saveState = true
                             }
                             launchSingleTop = true

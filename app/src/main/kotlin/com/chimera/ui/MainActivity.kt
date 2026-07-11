@@ -59,7 +59,7 @@ fun ChimeraApp(preferences: ChimeraPreferences) {
                         currentDestination = currentDestination,
                         onNavigate = { destination ->
                             navController.navigate(destination.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
+                                popUpTo(ChimeraRoutes.HOME) {
                                     saveState = true
                                 }
                                 launchSingleTop = true
