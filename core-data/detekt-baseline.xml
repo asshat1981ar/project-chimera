@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Accept the loss", moraleDelta = -0.05f, outcome = "Rations are shorter now. Nobody says anything, but the tension is palpable.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Block it out", moraleDelta = -0.02f, outcome = "You stuff cloth in your ears. The song fades. But something feels lost.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Drive them away", moraleDelta = -0.06f, outcome = "The stranger staggers back into the dark. Their cries echo for a long time.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Follow the melody", moraleDelta = 0.03f, outcome = "The song leads to a carved alcove with faded murals of the Hollow King's court. You learn something about the past.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Gather the group close", moraleDelta = 0.03f, outcome = "You form a tight circle. Someone starts talking softly. By the time the fire returns, you've grown closer.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Give them space", moraleDelta = 0.01f, outcome = "They nod when you look over, grateful for the privacy. Some wounds heal alone.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Hum along", moraleDelta = 0.06f, outcome = "The melody harmonizes with your voice. For a moment, the Hollow feels less hostile. Everyone sleeps peacefully.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Investigate alone", moraleDelta = -0.05f, outcome = "You find nothing but old bones. The tension lingers.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Let them sort it out", moraleDelta = -0.08f, outcome = "The argument escalates before burning out. The silence afterwards is heavy.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Mediate the dispute", moraleDelta = 0.05f, outcome = "You broker an uneasy peace. Both parties nod grudgingly.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Question them first", moraleDelta = 0f, outcome = "They mutter about shadows with teeth before passing out. You learn nothing useful.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Reach for the crown", moraleDelta = -0.03f, outcome = "The crown burns. You wake gasping, your hand tingling. Power has a price.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Relight it immediately", moraleDelta = -0.01f, outcome = "The fire catches again, but the shadows seem thicker now. No one sleeps well.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Set a trap for tonight", moraleDelta = 0.04f, outcome = "The trap works. Whatever it was won't be back. The group sleeps easier.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Share your own story", moraleDelta = 0.08f, outcome = "Your tale of the road draws the party closer together.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Side with one party", moraleDelta = -0.03f, outcome = "One companion looks grateful. The other turns cold.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Sit beside them and listen", moraleDelta = 0.07f, outcome = "They share a memory from before the Hollow -- painful, but real. The bond between you deepens.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Tell them to focus on the mission", moraleDelta = -0.04f, outcome = "They stiffen and turn away. The distance between you grows colder.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Tend their wounds", moraleDelta = 0.06f, outcome = "The stranger's breathing steadies. By morning, they vanish -- leaving behind a small token of thanks.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Track the thief", moraleDelta = 0.02f, outcome = "You follow the tracks to a nest of hollow-rats. You recover most of the supplies and find a curious artifact.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Try to speak back", moraleDelta = 0.02f, outcome = "The figure tilts its head. For a heartbeat, you see sorrow in hollow eyes. Then you wake.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Turn away", moraleDelta = 0.01f, outcome = "The figure watches you go. You wake feeling strangely lighter, as if a burden was almost placed on you.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Use the light to forage", moraleDelta = 0.03f, outcome = "You find useful herbs nearby. A small but welcome gain.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Wait in the dark", moraleDelta = -0.04f, outcome = "Minutes stretch into hours. When the fire finally reignites on its own, everyone is shaken.")</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$narrative = "A companion sits apart from the group, staring into the embers. Something weighs on them. They look like they want to talk."</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$narrative = "A melody drifts from the ruins -- hauntingly beautiful, wordless, ancient. It seems to come from the stones themselves."</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$narrative = "Dawn reveals that something raided the supplies overnight. Tracks lead toward the ruins -- small, clawed, deliberate."</ID>
+    <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$narrative = "You dream of a crowned figure on a throne of ash. He speaks without words, and you understand: 'Find what was taken. Return what was broken.'"</ID>
+    <ID>NewLineAtEndOfFile:QuestRepository.kt$com.chimera.data.repository.QuestRepository.kt</ID>
+    <ID>SwallowedException:MultiActMapNodeLoader.kt$MultiActMapNodeLoader$e: Exception</ID>
+    <ID>SwallowedException:MultiActNpcSeeder.kt$MultiActNpcSeeder$e: Exception</ID>
+    <ID>SwallowedException:NpcSeeder.kt$NpcSeeder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MultiActMapNodeLoader.kt$MultiActMapNodeLoader$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MultiActNpcSeeder.kt$MultiActNpcSeeder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:NpcSeeder.kt$NpcSeeder$e: Exception</ID>
+    <ID>TooManyFunctions:QuestRepository.kt$QuestRepository</ID>
+    <ID>UnusedParameter:DialogueRepository.kt$DialogueRepository$bridgeTag: String</ID>
+    <ID>UnusedPrivateProperty:SceneLoader.kt$SceneLoader$private val cinematicSceneFiles = listOf("act1_finale.json", "act2_finale.json", "act3_opening.json")</ID>
+    <ID>UseCheckOrError:GameSessionManager.kt$GameSessionManager$throw IllegalStateException("No active save slot")</ID>
+  </CurrentIssues>
+</SmellBaseline>

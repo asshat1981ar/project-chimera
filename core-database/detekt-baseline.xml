@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>MaxLineLength:EntityMappers.kt$type = try { QuestObjectiveType.valueOf(type.uppercase().replace(" ", "_")) } catch (_: Exception) { QuestObjectiveType.COMPLETE_SCENE }</ID>
+    <ID>MaxLineLength:InventoryDao.kt$InventoryDao$@Query("UPDATE inventory_items SET quantity = quantity - :amount WHERE save_slot_id = :slotId AND item_id = :itemId AND quantity &gt;= :amount")</ID>
+    <ID>TooGenericExceptionCaught:Converters.kt$Converters$e: Exception</ID>
+    <ID>TooManyFunctions:ChimeraGameDatabase.kt$ChimeraGameDatabase : RoomDatabase</ID>
+    <ID>TooManyFunctions:DatabaseModule.kt$DatabaseModule</ID>
+    <ID>TooManyFunctions:EntityMappers.kt$com.chimera.database.mapper.EntityMappers.kt</ID>
+    <ID>TooManyFunctions:QuestObjectiveDao.kt$QuestObjectiveDao</ID>
+  </CurrentIssues>
+</SmellBaseline>

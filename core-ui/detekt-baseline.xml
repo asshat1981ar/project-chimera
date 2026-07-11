@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:SceneVisuals.kt$SceneVisuals$fun forScene(sceneId: String): SceneVisualConfig</ID>
+    <ID>ImplicitDefaultLocale:SharedComponents.kt$String.format("%.0f", delta * 100)</ID>
+    <ID>LongParameterList:CharacterSheet.kt$( name: String, title: String, stats: List&lt;Pair&lt;String, Float&gt;&gt;, modifier: Modifier = Modifier, cardFillColor: Color = CharacterSheetDefaults.cardFillColor, cardBorderColor: Color = CharacterSheetDefaults.cardBorderColor, cardElevation: Dp = CharacterSheetDefaults.cardElevation, statBarHeight: Dp = CharacterSheetDefaults.statBarHeight, nameStyle: TextStyle = CharacterSheetDefaults.nameStyle, titleStyle: TextStyle = CharacterSheetDefaults.titleStyle, statLabelStyle: TextStyle = CharacterSheetDefaults.statLabelStyle, onStatClick: ((String) -&gt; Unit)? = null )</ID>
+    <ID>LongParameterList:ChimeraAlertDialog.kt$( onDismissRequest: () -&gt; Unit, title: String, confirmText: String, onConfirm: () -&gt; Unit, modifier: Modifier = Modifier, dismissText: String? = null, onDismiss: (() -&gt; Unit)? = null, confirmIsDestructive: Boolean = false, confirmEnabled: Boolean = true, content: @Composable () -&gt; Unit )</ID>
+    <ID>LongParameterList:ChimeraAlertDialog.kt$( onDismissRequest: () -&gt; Unit, title: String, text: String, confirmText: String, onConfirm: () -&gt; Unit, modifier: Modifier = Modifier, dismissText: String? = null, onDismiss: (() -&gt; Unit)? = null, confirmIsDestructive: Boolean = false, confirmEnabled: Boolean = true )</ID>
+    <ID>LongParameterList:CodexJournal.kt$( entry: CodexEntry, modifier: Modifier = Modifier, cardFillColor: Color = CodexJournalDefaults.cardFillColor, cardBorderColor: Color = CodexJournalDefaults.cardBorderColor, cardElevation: Dp = CodexJournalDefaults.cardElevation, titleStyle: TextStyle = CodexJournalDefaults.titleStyle, categoryStyle: TextStyle = CodexJournalDefaults.categoryStyle, bodyStyle: TextStyle = CodexJournalDefaults.bodyStyle )</ID>
+    <ID>LongParameterList:CombatHUD.kt$( healthFraction: Float, manaFraction: Float, staminaFraction: Float, onActionClick: (String) -&gt; Unit, modifier: Modifier = Modifier, actions: List&lt;String&gt; = CombatHUDDefaults.actions, healthBarFillColor: Color = CombatHUDDefaults.healthBarFillColor, manaBarFillColor: Color = CombatHUDDefaults.manaBarFillColor, staminaBarFillColor: Color = CombatHUDDefaults.staminaBarFillColor, trackColor: Color = CombatHUDDefaults.trackColor, barHeight: Dp = CombatHUDDefaults.barHeight, labelStyle: TextStyle = CombatHUDDefaults.labelStyle )</ID>
+    <ID>LongParameterList:CraftingStation.kt$( recipe: CraftingRecipe, onCraftClick: () -&gt; Unit, modifier: Modifier = Modifier, progressFillColor: Color = CraftingStationDefaults.progressFillColor, progressTrackColor: Color = CraftingStationDefaults.progressTrackColor, cardElevation: Dp = CraftingStationDefaults.cardElevation, recipeNameStyle: TextStyle = CraftingStationDefaults.recipeNameStyle, ingredientStyle: TextStyle = CraftingStationDefaults.ingredientStyle )</ID>
+    <ID>LongParameterList:GothicBottomNav.kt$( items: List&lt;GothicNavItem&gt;, selectedIndex: Int, onItemSelected: (Int) -&gt; Unit, modifier: Modifier = Modifier, containerColor: Color = GothicBottomNavDefaults.containerColor, selectedColor: Color = GothicBottomNavDefaults.selectedColor, unselectedColor: Color = GothicBottomNavDefaults.unselectedColor, indicatorColor: Color = GothicBottomNavDefaults.indicatorColor )</ID>
+    <ID>LongParameterList:HeraldicMapNode.kt$( label: String, state: MapNodeState, modifier: Modifier = Modifier, nodeSize: Dp = HeraldicMapNodeDefaults.nodeSize, discoveredColor: Color = HeraldicMapNodeDefaults.discoveredColor, undiscoveredColor: Color = HeraldicMapNodeDefaults.undiscoveredColor, currentColor: Color = HeraldicMapNodeDefaults.currentColor, borderColor: Color = HeraldicMapNodeDefaults.borderColor, labelStyle: TextStyle = HeraldicMapNodeDefaults.labelStyle )</ID>
+    <ID>LongParameterList:IlluminatedDialogueBubble.kt$( text: String, modifier: Modifier = Modifier, speakerName: String = "", fillColor: Color = ParchmentLight, borderColor: Color = Oxblood, borderWidth: Dp = IlluminatedDialogueBubbleDefaults.borderWidth, cornerRadius: Dp = IlluminatedDialogueBubbleDefaults.cornerRadius, contentPadding: Dp = IlluminatedDialogueBubbleDefaults.contentPadding, speakerStyle: TextStyle = IlluminatedDialogueBubbleDefaults.speakerStyle, bodyStyle: TextStyle = IlluminatedDialogueBubbleDefaults.bodyStyle, showIlluminatedInitial: Boolean = true )</ID>
+    <ID>LongParameterList:InventoryGrid.kt$( items: List&lt;InventoryItem?&gt;, modifier: Modifier = Modifier, columns: Int = InventoryGridDefaults.columns, slotSize: Dp = InventoryGridDefaults.slotSize, filledColor: Color = ParchmentLight, emptyColor: Color = InventoryGridDefaults.emptySlotColor, borderColor: Color = InventoryGridDefaults.slotBorderColor, onItemClick: ((InventoryItem) -&gt; Unit)? = null )</ID>
+    <ID>LongParameterList:ManuscriptCard.kt$( modifier: Modifier = Modifier, illuminatedText: String = "", fillColor: Color = ParchmentLight, borderColor: Color = Oxblood, borderWidth: Dp = ManuscriptCardDefaults.borderWidth, cornerRadius: Dp = ManuscriptCardDefaults.cornerRadius, elevation: Dp = ManuscriptCardDefaults.elevation, contentPadding: Dp = ManuscriptCardDefaults.contentPadding, content: @Composable ColumnScope.() -&gt; Unit )</ID>
+    <ID>LongParameterList:ManuscriptStatBar.kt$( fraction: Float, modifier: Modifier = Modifier, label: String = "", fillColor: Color = AgedGold, trackColor: Color = Iron, height: Dp = ManuscriptStatBarDefaults.height, cornerRadius: Dp = ManuscriptStatBarDefaults.cornerRadius, labelStyle: TextStyle = ManuscriptStatBarDefaults.labelStyle, animated: Boolean = true )</ID>
+    <ID>LongParameterList:NpcPortrait.kt$( npcId: String, npcName: String, disposition: Float = 0f, archetype: String? = null, portraitResName: String? = null, size: Dp = 48.dp, modifier: Modifier = Modifier, contentDescription: String? = null )</ID>
+    <ID>LongParameterList:ParchmentInputField.kt$( value: String, onValueChange: (String) -&gt; Unit, label: String? = null, modifier: Modifier = Modifier, placeholder: String? = null, singleLine: Boolean = true, maxLines: Int = if (singleLine) 1 else 5, enabled: Boolean = true, readOnly: Boolean = false, visualTransformation: VisualTransformation = VisualTransformation.None, trailingIcon: @Composable (() -&gt; Unit)? = null )</ID>
+    <ID>MayBeConst:InventoryGrid.kt$InventoryGridDefaults$val columns = 4</ID>
+    <ID>NewLineAtEndOfFile:AtmosphereOverlayTest.kt$com.chimera.ui.components.AtmosphereOverlayTest.kt</ID>
+    <ID>NewLineAtEndOfFile:AtmospherePaletteTest.kt$com.chimera.ui.theme.AtmospherePaletteTest.kt</ID>
+    <ID>NewLineAtEndOfFile:CharacterSheet.kt$com.chimera.ui.components.CharacterSheet.kt</ID>
+    <ID>NewLineAtEndOfFile:CharacterSheetTest.kt$com.chimera.ui.components.CharacterSheetTest.kt</ID>
+    <ID>NewLineAtEndOfFile:ChimeraColorsTest.kt$com.chimera.ui.theme.ChimeraColorsTest.kt</ID>
+    <ID>NewLineAtEndOfFile:ChimeraSpacing.kt$com.chimera.ui.theme.ChimeraSpacing.kt</ID>
+    <ID>NewLineAtEndOfFile:ChimeraTypographyTest.kt$com.chimera.ui.theme.ChimeraTypographyTest.kt</ID>
+    <ID>NewLineAtEndOfFile:CodexJournal.kt$com.chimera.ui.components.CodexJournal.kt</ID>
+    <ID>NewLineAtEndOfFile:CodexJournalTest.kt$com.chimera.ui.components.CodexJournalTest.kt</ID>
+    <ID>NewLineAtEndOfFile:CombatHUD.kt$com.chimera.ui.components.CombatHUD.kt</ID>
+    <ID>NewLineAtEndOfFile:CombatHUDTest.kt$com.chimera.ui.components.CombatHUDTest.kt</ID>
+    <ID>NewLineAtEndOfFile:CraftingStation.kt$com.chimera.ui.components.CraftingStation.kt</ID>
+    <ID>NewLineAtEndOfFile:CraftingStationTest.kt$com.chimera.ui.components.CraftingStationTest.kt</ID>
+    <ID>NewLineAtEndOfFile:FiligreeDecoration.kt$com.chimera.ui.components.FiligreeDecoration.kt</ID>
+    <ID>NewLineAtEndOfFile:GothicBottomNav.kt$com.chimera.ui.components.GothicBottomNav.kt</ID>
+    <ID>NewLineAtEndOfFile:GothicBottomNavTest.kt$com.chimera.ui.components.GothicBottomNavTest.kt</ID>
+    <ID>NewLineAtEndOfFile:GothicButton.kt$com.chimera.ui.components.GothicButton.kt</ID>
+    <ID>NewLineAtEndOfFile:GothicFonts.kt$com.chimera.ui.theme.GothicFonts.kt</ID>
+    <ID>NewLineAtEndOfFile:GothicFontsTest.kt$com.chimera.ui.theme.GothicFontsTest.kt</ID>
+    <ID>NewLineAtEndOfFile:HeraldicMapNode.kt$com.chimera.ui.components.HeraldicMapNode.kt</ID>
+    <ID>NewLineAtEndOfFile:HeraldicMapNodeTest.kt$com.chimera.ui.components.HeraldicMapNodeTest.kt</ID>
+    <ID>NewLineAtEndOfFile:IlluminatedDialogueBubble.kt$com.chimera.ui.components.IlluminatedDialogueBubble.kt</ID>
+    <ID>NewLineAtEndOfFile:IlluminatedDialogueBubbleTest.kt$com.chimera.ui.components.IlluminatedDialogueBubbleTest.kt</ID>
+    <ID>NewLineAtEndOfFile:IlluminatedInitial.kt$com.chimera.ui.components.IlluminatedInitial.kt</ID>
+    <ID>NewLineAtEndOfFile:IlluminatedInitialTest.kt$com.chimera.ui.components.IlluminatedInitialTest.kt</ID>
+    <ID>NewLineAtEndOfFile:InventoryGrid.kt$com.chimera.ui.components.InventoryGrid.kt</ID>
+    <ID>NewLineAtEndOfFile:InventoryGridTest.kt$com.chimera.ui.components.InventoryGridTest.kt</ID>
+    <ID>NewLineAtEndOfFile:ManuscriptCard.kt$com.chimera.ui.components.ManuscriptCard.kt</ID>
+    <ID>NewLineAtEndOfFile:ManuscriptCardTest.kt$com.chimera.ui.components.ManuscriptCardTest.kt</ID>
+    <ID>NewLineAtEndOfFile:ManuscriptStatBar.kt$com.chimera.ui.components.ManuscriptStatBar.kt</ID>
+    <ID>NewLineAtEndOfFile:ManuscriptStatBarTest.kt$com.chimera.ui.components.ManuscriptStatBarTest.kt</ID>
+    <ID>NewLineAtEndOfFile:ParchmentInputField.kt$com.chimera.ui.components.ParchmentInputField.kt</ID>
+    <ID>UnusedParameter:CharacterSheet.kt$onStatClick: ((String) -&gt; Unit)? = null</ID>
+    <ID>UnusedParameter:CodexJournal.kt$onEntryClick: ((CodexEntry) -&gt; Unit)? = null</ID>
+    <ID>UnusedParameter:InventoryGrid.kt$onItemClick: ((InventoryItem) -&gt; Unit)? = null</ID>
+    <ID>UnusedParameter:NpcPortrait.kt$contentDescription: String? = null</ID>
+    <ID>UnusedParameter:NpcPortrait.kt$portraitResName: String? = null</ID>
+    <ID>UnusedPrivateProperty:ChimeraIcons.kt$val stroke = Stroke(width = 1.5f, cap = StrokeCap.Round)</ID>
+  </CurrentIssues>
+</SmellBaseline>

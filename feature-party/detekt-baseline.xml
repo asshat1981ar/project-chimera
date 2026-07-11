@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongMethod:FactionStandingRow.kt$@Composable fun FactionStandingRow( faction: FactionStateEntity, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PartyScreen.kt$@Composable private fun CompanionDetail( member: PartyMember, onClose: () -&gt; Unit )</ID>
+    <ID>MaxLineLength:RelationshipTrendGraph.kt$val y = padding + (RelationshipTrendGraphDefaults.Y_OFFSET - (snapshot.disposition + RelationshipTrendGraphDefaults.Y_OFFSET) / RelationshipTrendGraphDefaults.Y_SCALE) * graphHeight</ID>
+    <ID>MayBeConst:RelationshipTrendGraph.kt$RelationshipTrendGraphDefaults$val POSITIVE_THRESHOLD = 0.2f</ID>
+    <ID>UnusedPrivateMember:ArchetypeBadge.kt$@Preview(showBackground = true) @Composable private fun ArchetypeBadgePreview()</ID>
+    <ID>UnusedPrivateMember:FeedbackLoopSummary.kt$@Preview(showBackground = true) @Composable private fun FeedbackLoopSummaryPreview()</ID>
+  </CurrentIssues>
+</SmellBaseline>

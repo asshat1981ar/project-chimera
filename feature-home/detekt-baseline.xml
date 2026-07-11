@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:HomeScreen.kt$@Composable fun HomeScreen( onEnterScene: (String) -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onActTransition: (String) -&gt; Unit = DefaultOnActTransition, viewModel: HomeViewModel = hiltViewModel() )</ID>
+    <ID>ForbiddenComment:HomeScreen.kt$/* TODO: navigate to journal */</ID>
+    <ID>ForbiddenComment:HomeScreen.kt$/* TODO: navigate to map */</ID>
+    <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( onEnterScene: (String) -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onActTransition: (String) -&gt; Unit = DefaultOnActTransition, viewModel: HomeViewModel = hiltViewModel() )</ID>
+    <ID>UnusedParameter:HomeScreen.kt$onNavigateToSettings: () -&gt; Unit</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ConstructorParameterNaming:GroqAdapter.kt$GroqAdapter.ChatRequest$val max_tokens: Int = 300</ID>
+    <ID>ConstructorParameterNaming:OpenRouterAdapter.kt$OpenRouterAdapter.ChatRequest$val max_tokens: Int = 300</ID>
+    <ID>CyclomaticComplexMethod:FakeDialogueProvider.kt$FakeDialogueProvider$override suspend fun generateTurn( contract: SceneContract, playerInput: PlayerInput, characterState: CharacterState, recentMemories: List&lt;MemoryShard&gt;, turnHistory: List&lt;DialogueTurnResult&gt; ): DialogueTurnResult</ID>
+    <ID>LongMethod:FakeDialogueProvider.kt$FakeDialogueProvider$override suspend fun generateTurn( contract: SceneContract, playerInput: PlayerInput, characterState: CharacterState, recentMemories: List&lt;MemoryShard&gt;, turnHistory: List&lt;DialogueTurnResult&gt; ): DialogueTurnResult</ID>
+    <ID>MaxLineLength:DialogueResponseParserTest.kt$DialogueResponseParserTest$val json = """{"npcLine":"Let me tell you about the escape route out of here.","emotion":"neutral","relationshipDelta":0.0,"flags":[],"memoryCandidates":[]}"""</ID>
+    <ID>MaxLineLength:DialogueResponseParserTest.kt$DialogueResponseParserTest$val json = """{"npcLine":"Many memories.","emotion":"warm","relationshipDelta":0.0,"flags":[],"memoryCandidates":["a","b","c","d","e"]}"""</ID>
+    <ID>MaxLineLength:DialogueResponseParserTest.kt$DialogueResponseParserTest$val json = """{"npcLine":"Talk about escape route freely.","emotion":"neutral","relationshipDelta":0.0,"flags":[],"memoryCandidates":[]}"""</ID>
+    <ID>MaxLineLength:DialogueResponseParserTest.kt$DialogueResponseParserTest$val json = """{"npcLine":"The king identity is known to few.","emotion":"neutral","relationshipDelta":0.0,"flags":[],"memoryCandidates":[]}"""</ID>
+    <ID>MaxLineLength:DialogueResponseParserTest.kt$DialogueResponseParserTest${</ID>
+    <ID>MaxLineLength:FakeDialogueProvider.kt$FakeDialogueProvider$npcLine = "Your words carry weight with me, more than you might know. The Hollow tests everyone, but perhaps together we can endure it."</ID>
+    <ID>MaxLineLength:PromptAssembler.kt$PromptAssembler$appendLine("""{"npcLine":"your dialogue","emotion":"one_word_emotion","relationshipDelta":0.0,"flags":[],"memoryCandidates":[]}""")</ID>
+    <ID>SwallowedException:PortraitGenerationService.kt$PortraitGenerationService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DialogueOrchestrator.kt$DialogueOrchestrator$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DialogueResponseParser.kt$DialogueResponseParser$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GeminiAdapter.kt$GeminiAdapter$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GroqAdapter.kt$GroqAdapter$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:OpenRouterAdapter.kt$OpenRouterAdapter$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PortraitGenerationService.kt$PortraitGenerationService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ProviderRouter.kt$ProviderRouter$e: Exception</ID>
+    <ID>TooGenericExceptionThrown:GeminiAdapter.kt$GeminiAdapter$throw Exception("Empty Gemini response")</ID>
+    <ID>TooGenericExceptionThrown:GeminiAdapter.kt$GeminiAdapter$throw Exception("Failed to parse Gemini output")</ID>
+    <ID>TooGenericExceptionThrown:GroqAdapter.kt$GroqAdapter$throw Exception("Empty Groq response")</ID>
+    <ID>TooGenericExceptionThrown:GroqAdapter.kt$GroqAdapter$throw Exception("Failed to parse Groq output")</ID>
+    <ID>TooGenericExceptionThrown:OpenRouterAdapter.kt$OpenRouterAdapter$throw Exception("Empty OpenRouter response")</ID>
+    <ID>TooGenericExceptionThrown:OpenRouterAdapter.kt$OpenRouterAdapter$throw Exception("Failed to parse OpenRouter output")</ID>
+    <ID>TooGenericExceptionThrown:ProviderRouter.kt$ProviderRouter$throw Exception("All cloud providers failed for intents")</ID>
+    <ID>TooGenericExceptionThrown:ProviderRouter.kt$ProviderRouter$throw Exception("All cloud providers failed")</ID>
+    <ID>TooGenericExceptionThrown:ProviderRouterTest.kt$ProviderRouterTest.&lt;no name provided&gt;$throw Exception("Intents failed")</ID>
+    <ID>TooGenericExceptionThrown:ProviderRouterTest.kt$ProviderRouterTest.&lt;no name provided&gt;$throw Exception("Provider failed")</ID>
+    <ID>TooGenericExceptionThrown:ProviderRouterTest.kt$ProviderRouterTest.&lt;no name provided&gt;$throw Exception("Should not be called")</ID>
+    <ID>UnusedPrivateProperty:FakeDialogueProviderTest.kt$FakeDialogueProviderTest$private val coldState = CharacterState("warden", 1, dispositionToPlayer = -0.5f)</ID>
+  </CurrentIssues>
+</SmellBaseline>

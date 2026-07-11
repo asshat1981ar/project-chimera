@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>UnusedPrivateMember:SubmitDialogueTurnUseCaseTest.kt$SubmitDialogueTurnUseCaseTest$private fun fakeMemoryShard(summary: String = "Test memory")</ID>
+  </CurrentIssues>
+</SmellBaseline>

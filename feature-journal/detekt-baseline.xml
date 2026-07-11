@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongMethod:JournalScreen.kt$@Composable fun JournalScreen( viewModel: JournalViewModel = hiltViewModel() )</ID>
+    <ID>LongMethod:JournalScreen.kt$@Composable private fun QuestCard(questWithObjectives: QuestWithObjectives)</ID>
+    <ID>SwallowedException:JournalViewModel.kt$JournalViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:JournalViewModel.kt$JournalViewModel$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>

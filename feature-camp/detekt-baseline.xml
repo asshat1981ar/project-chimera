@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongMethod:CampScreen.kt$@Composable fun CampScreen( onNavigateToInventory: () -&gt; Unit = {}, onNavigateToCrafting: () -&gt; Unit = {}, viewModel: CampViewModel = hiltViewModel() )</ID>
+    <ID>LongMethod:CampScreen.kt$@Composable private fun CompanionCard(data: CompanionCardData)</ID>
+    <ID>LongMethod:CraftingScreen.kt$@Composable fun CraftingScreen( onBack: () -&gt; Unit, viewModel: CraftingViewModel = hiltViewModel() )</ID>
+    <ID>LongMethod:InventoryScreen.kt$@Composable fun InventoryScreen( onBack: () -&gt; Unit, viewModel: InventoryViewModel = hiltViewModel() )</ID>
+    <ID>MaxLineLength:CraftingScreen.kt$border = BorderStroke(1.dp, if (isSelected) EmberGold.copy(alpha = 0.6f) else MaterialTheme.colorScheme.outlineVariant)</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -93,6 +93,7 @@ android {
             initWith(getByName("debug"))
             applicationIdSuffix = ".demo"
             buildConfigField("Boolean", "DEMO_MODE", "true")
+            matchingFallbacks += listOf("debug")
         }
         create("beta") {
             initWith(getByName("debug"))

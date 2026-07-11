@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongMethod:SettingsScreen.kt$@Composable fun SettingsScreen( onBack: () -&gt; Unit = {}, onNavigateToFactionStanding: () -&gt; Unit = {}, viewModel: SettingsViewModel = hiltViewModel() )</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ConstructorParameterNaming:RelationshipArchetypeEngine.kt$RelationshipArchetypeEngine.Variable$@Volatile private var _value: Float</ID>
+    <ID>UnusedParameter:CombatEngine.kt$CombatEngine$intent: IntentCard</ID>
+    <ID>UseCheckOrError:DuelEngine.kt$DuelEngine$throw IllegalStateException("Duel is already over")</ID>
+  </CurrentIssues>
+</SmellBaseline>
