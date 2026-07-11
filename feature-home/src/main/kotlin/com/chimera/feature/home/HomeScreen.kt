@@ -51,6 +51,8 @@ private val DefaultOnActTransition: (String) -> Unit = {}
 fun HomeScreen(
     onEnterScene: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToMap: () -> Unit,
+    onNavigateToJournal: () -> Unit,
     onActTransition: (String) -> Unit = DefaultOnActTransition,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -117,8 +119,8 @@ fun HomeScreen(
                             ObjectivePrimaryAction.CONTINUE_SCENE -> {
                                 uiState.continueSceneId?.let(onEnterScene)
                             }
-                            ObjectivePrimaryAction.OPEN_MAP -> { /* TODO: navigate to map */ }
-                            ObjectivePrimaryAction.VIEW_JOURNAL -> { /* TODO: navigate to journal */ }
+                            ObjectivePrimaryAction.OPEN_MAP -> onNavigateToMap()
+                            ObjectivePrimaryAction.VIEW_JOURNAL -> onNavigateToJournal()
                             ObjectivePrimaryAction.NONE -> { }
                         }
                     },

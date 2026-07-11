@@ -88,6 +88,24 @@ fun ChimeraNavHost(
                     onNavigateToSettings = {
                         navController.navigate(ChimeraRoutes.SETTINGS)
                     },
+                    onNavigateToMap = {
+                        navController.navigate(ChimeraRoutes.MAP) {
+                            popUpTo(ChimeraRoutes.HOME) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onNavigateToJournal = {
+                        navController.navigate(ChimeraRoutes.JOURNAL) {
+                            popUpTo(ChimeraRoutes.HOME) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
                     onActTransition = { actTag ->
                         navController.navigate(ChimeraRoutes.actTransition(actTag))
                     }
