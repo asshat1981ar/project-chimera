@@ -1,0 +1,55 @@
+name: CI
+
+# Scope note: this workflow intentionally does NOT build the APK or run unit
+# tests — android.yml and build-deploy.yml already do both of those on every
+# push/PR to main, and running them a third time here just triples CI cost
+# for no extra signal. The one gap those workflows leave is a *blocking*
+# detekt gate: detekt-check.yml only runs on manual workflow_dispatch. This
+# workflow fills that gap and nothing else.
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-detekt-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detekt:
+    name: Detekt (blocking)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: true
+
+      - name: Grant Gradle execute permission
+        run: chmod +x gradlew
+
+      - name: Run Detekt
+        run: ./gradlew detekt --no-daemon
+        # No continue-on-error: detekt.yml sets maxIssues: 0, so this is
+        # meant to fail the build on any finding, not just report one.
+
+      - name: Upload Detekt Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-reports-${{ github.run_number }}
+          path: '**/build/reports/detekt/'
+          retention-days: 14
