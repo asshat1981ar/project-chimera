@@ -31,6 +31,9 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.android)
 
+    // Play Billing -- for the "Support the Hollow" settings row. See BillingManager.
+    implementation(libs.billing.ktx)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")

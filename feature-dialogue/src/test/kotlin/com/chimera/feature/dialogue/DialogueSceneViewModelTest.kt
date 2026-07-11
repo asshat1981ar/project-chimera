@@ -3,6 +3,7 @@ package com.chimera.feature.dialogue
 import androidx.lifecycle.SavedStateHandle
 import com.chimera.ai.AudioProvider
 import com.chimera.ai.DialogueOrchestrator
+import com.chimera.data.AnalyticsTracker
 import com.chimera.data.AppSettings
 import com.chimera.data.ChimeraPreferences
 import com.chimera.data.GameSessionManager
@@ -59,6 +60,7 @@ class DialogueSceneViewModelTest {
     private val audioProvider: AudioProvider = mock()
     private val preferences: ChimeraPreferences = mock()
     private val chapterProgressionUseCase: ChapterProgressionUseCase = mock()
+    private val analyticsTracker: AnalyticsTracker = mock()
 
     @Before
     fun setUp() {
@@ -95,7 +97,8 @@ class DialogueSceneViewModelTest {
         vowDao = vowDao,
         audioProvider = audioProvider,
         preferences = preferences,
-        chapterProgressionUseCase = chapterProgressionUseCase
+        chapterProgressionUseCase = chapterProgressionUseCase,
+        analyticsTracker = analyticsTracker
     )
 
     @Test

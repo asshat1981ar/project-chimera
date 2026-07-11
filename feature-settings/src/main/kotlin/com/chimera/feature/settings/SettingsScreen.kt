@@ -28,13 +28,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.billingclient.api.ProductDetails
 import com.chimera.data.AiMode
+import com.chimera.ui.components.GothicButton
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
+import android.app.Activity
 
 @Composable
 fun SettingsScreen(
@@ -43,6 +47,8 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
+    val supporterProducts by viewModel.availableSupporterProducts.collectAsStateWithLifecycle()
+    val activity = LocalContext.current as? Activity
 
     Column(
         modifier = Modifier
@@ -141,6 +147,21 @@ fun SettingsScreen(
                 checked = settings.analyticsOptIn,
                 onToggle = viewModel::setAnalyticsOptIn
             )
+        }
+
+        // Support section -- hidden entirely until real products exist in Play Console
+        if (supporterProducts.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            SettingsSection("Support the Hollow") {
+                supporterProducts.forEach { product ->
+                    SupporterProductRow(
+                        product = product,
+                        onPurchase = {
+                            activity?.let { viewModel.purchaseSupporterProduct(it, product) }
+                        }
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -250,6 +271,30 @@ private fun SettingsNavItem(
             contentDescription = "Navigate to faction standing",
             tint = FadedBone
         )
+    }
+}
+
+@Composable
+private fun SupporterProductRow(
+    product: ProductDetails,
+    onPurchase: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(product.title, style = MaterialTheme.typography.bodyLarge)
+            product.oneTimePurchaseOfferDetails?.formattedPrice?.let { price ->
+                Text(price, style = MaterialTheme.typography.bodySmall, color = FadedBone)
+            }
+        }
+        GothicButton(onClick = onPurchase) {
+            Text("Support")
+        }
     }
 }
 

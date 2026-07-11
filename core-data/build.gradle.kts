@@ -26,6 +26,14 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
 
+    // Firebase Analytics -- harmless to include unused; only activates once the app module's
+    // google-services.json is present. See AnalyticsTracker.
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics.ktx)
+
+    // Play Billing -- see BillingManager.
+    implementation(libs.billing.ktx)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")

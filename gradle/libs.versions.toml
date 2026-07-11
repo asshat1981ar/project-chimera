@@ -24,6 +24,9 @@ hilt-work = "1.2.0"
 espresso = "3.5.1"
 androidx-test-ext = "1.1.5"
 detekt = "1.23.4"
+google-services = "4.4.2"
+firebase-bom = "33.7.0"
+billing = "7.1.1"
 
 [libraries]
 # Gradle plugins (for build-logic convention plugins)
@@ -100,6 +103,14 @@ work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "w
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-work" }
 hilt-work-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-work" }
 
+# Firebase (Crashlytics + Analytics) -- inert until google-services.json is present, see README
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }
+firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+
+# Play Billing -- inert until real product IDs exist in Play Console, see README
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billing" }
+
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -108,3 +119,4 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

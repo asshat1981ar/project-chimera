@@ -2,9 +2,11 @@ package com.chimera.feature.settings
 
 import com.chimera.data.AiMode
 import com.chimera.data.AppSettings
+import com.chimera.data.BillingManager
 import com.chimera.data.ChimeraPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -26,11 +28,13 @@ class SettingsViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private val preferences: ChimeraPreferences = mock()
+    private val billingManager: BillingManager = mock()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         whenever(preferences.settings).thenReturn(flowOf(AppSettings()))
+        whenever(billingManager.availableProducts).thenReturn(MutableStateFlow(emptyList()))
     }
 
     @After
@@ -39,7 +43,8 @@ class SettingsViewModelTest {
     }
 
     private fun buildViewModel() = SettingsViewModel(
-        preferences = preferences
+        preferences = preferences,
+        billingManager = billingManager
     )
 
     @Test

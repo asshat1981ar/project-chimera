@@ -7,6 +7,14 @@ plugins {
     id("kotlin-parcelize")
 }
 
+// Firebase Crashlytics/Analytics are inert scaffolding until a real Firebase project's
+// google-services.json is dropped in app/ -- see README's "Monetization & Analytics" section.
+// Applying the google-services plugin without that file present would fail the build, so it's
+// only applied once the file actually exists.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.chimera"
     compileSdk = 34
@@ -213,6 +221,16 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
+
+    // Firebase Crashlytics/Analytics -- harmless to include unused; only activates once
+    // google-services.json is present (see the conditional plugin application above).
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.crashlytics.ktx)
+
+    // Play Billing -- harmless to include unused; only returns real products once they exist
+    // in Play Console (see BillingManager).
+    implementation(libs.billing.ktx)
 
     // DataStore
     implementation(libs.datastore.preferences)
