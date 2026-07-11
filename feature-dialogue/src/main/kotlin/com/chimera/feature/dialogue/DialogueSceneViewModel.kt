@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.ai.AudioProvider
 import com.chimera.ai.DialogueOrchestrator
+import com.chimera.core.engine.RelationshipArchetypeEngine
 import com.chimera.data.GameSessionManager
 import com.chimera.data.SceneLoader
 import com.chimera.database.dao.CharacterDao
@@ -98,7 +99,8 @@ class DialogueSceneViewModel @Inject constructor(
     private val vowDao: VowDao,
     private val audioProvider: AudioProvider,
     private val preferences: ChimeraPreferences,
-    private val chapterProgressionUseCase: ChapterProgressionUseCase
+    private val chapterProgressionUseCase: ChapterProgressionUseCase,
+    private val archetypeEngine: RelationshipArchetypeEngine
 ) : ViewModel() {
 
     private val sceneId: String = savedStateHandle["sceneId"] ?: ""
@@ -119,6 +121,25 @@ class DialogueSceneViewModel @Inject constructor(
 
     companion object {
         private const val MAX_TURN_HISTORY = 20
+        private const val ARCHETYPE_PLAYER_ID = "player"
+        private const val ARCHETYPE_DELTA_THRESHOLD = 0.1f
+    }
+
+    /**
+     * Maps a dialogue turn's outcome onto the coarse interaction vocabulary the
+     * [RelationshipArchetypeEngine] understands. The AI/fallback dialogue layer doesn't emit an
+     * explicit interaction type, so this is a heuristic derived from the turn's relationship
+     * delta and flags rather than the player's literal word choice.
+     */
+    private fun toNpcInteraction(result: DialogueTurnResult): RelationshipArchetypeEngine.NPCInteraction {
+        val type = when {
+            result.flags.contains("recruit_companion") -> RelationshipArchetypeEngine.InteractionType.HELP
+            result.relationshipDelta >= ARCHETYPE_DELTA_THRESHOLD -> RelationshipArchetypeEngine.InteractionType.PERSUADE
+            result.relationshipDelta <= -ARCHETYPE_DELTA_THRESHOLD -> RelationshipArchetypeEngine.InteractionType.THREATEN
+            else -> RelationshipArchetypeEngine.InteractionType.BARGAIN
+        }
+        val intensity = kotlin.math.abs(result.relationshipDelta).coerceIn(0.2f, 1f)
+        return RelationshipArchetypeEngine.NPCInteraction(type = type, intensity = intensity)
     }
 
     /** Speaks an NPC line if voiceEnabled in settings. Sets isSpeaking flag around TTS call. */
@@ -296,6 +317,9 @@ class DialogueSceneViewModel @Inject constructor(
                     characterStateDao.adjustDisposition(contract.npcId, result.relationshipDelta)
                     cachedCharState = null
                 }
+                archetypeEngine.processInteraction(
+                    contract.npcId, ARCHETYPE_PLAYER_ID, toNpcInteraction(result)
+                )
 
                 // Companion recruitment: promote NPC role to COMPANION
                 if (result.flags.contains("recruit_companion")) {

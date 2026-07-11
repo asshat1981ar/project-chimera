@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chimera.core.engine.CombatEngine
+import com.chimera.core.engine.RelationshipArchetypeEngine
 import com.chimera.data.GameSessionManager
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
@@ -62,7 +63,8 @@ class DuelViewModel @Inject constructor(
     private val characterDao: CharacterDao,
     private val characterStateDao: CharacterStateDao,
     private val journalEntryDao: JournalEntryDao,
-    private val gameSessionManager: GameSessionManager
+    private val gameSessionManager: GameSessionManager,
+    private val archetypeEngine: RelationshipArchetypeEngine
 ) : ViewModel() {
 
     private val opponentId: String = savedStateHandle["opponentId"] ?: "warden"
@@ -170,7 +172,20 @@ class DuelViewModel @Inject constructor(
                 )
             )
             characterStateDao.adjustDisposition(opponentId, if (won) 0.05f else -0.05f)
+            archetypeEngine.processInteraction(
+                opponentId,
+                ARCHETYPE_PLAYER_ID,
+                RelationshipArchetypeEngine.NPCInteraction(
+                    type = if (won) RelationshipArchetypeEngine.InteractionType.PERSUADE
+                           else RelationshipArchetypeEngine.InteractionType.THREATEN,
+                    intensity = 0.6f
+                )
+            )
         }
+    }
+
+    private companion object {
+        const val ARCHETYPE_PLAYER_ID = "player"
     }
 
     private fun loadIntentsFile(): IntentsFile {

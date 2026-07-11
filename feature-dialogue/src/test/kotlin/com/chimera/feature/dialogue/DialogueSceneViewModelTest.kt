@@ -3,6 +3,7 @@ package com.chimera.feature.dialogue
 import androidx.lifecycle.SavedStateHandle
 import com.chimera.ai.AudioProvider
 import com.chimera.ai.DialogueOrchestrator
+import com.chimera.core.engine.RelationshipArchetypeEngine
 import com.chimera.data.AppSettings
 import com.chimera.data.ChimeraPreferences
 import com.chimera.data.GameSessionManager
@@ -17,6 +18,7 @@ import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.dao.VowDao
 import com.chimera.domain.usecase.ChapterProgressionUseCase
 import com.chimera.model.CinematicLine
+import com.chimera.model.DialogueTurnResult
 import com.chimera.model.SceneContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -59,6 +61,7 @@ class DialogueSceneViewModelTest {
     private val audioProvider: AudioProvider = mock()
     private val preferences: ChimeraPreferences = mock()
     private val chapterProgressionUseCase: ChapterProgressionUseCase = mock()
+    private val archetypeEngine = RelationshipArchetypeEngine()
 
     @Before
     fun setUp() {
@@ -95,7 +98,8 @@ class DialogueSceneViewModelTest {
         vowDao = vowDao,
         audioProvider = audioProvider,
         preferences = preferences,
-        chapterProgressionUseCase = chapterProgressionUseCase
+        chapterProgressionUseCase = chapterProgressionUseCase,
+        archetypeEngine = archetypeEngine
     )
 
     @Test
@@ -151,5 +155,46 @@ class DialogueSceneViewModelTest {
         )
         assertEquals(1, emitted.size)
         assertEquals(nextSceneId, emitted[0])
+    }
+
+    @Test
+    fun submitTypedInput_feedsTheRelationshipArchetypeEngine() = runTest(testDispatcher) {
+        val slotId = 1L
+        val sceneId = "elena_market"
+        val npcId = "elena"
+        whenever(gameSessionManager.activeSlotId).thenReturn(MutableStateFlow(slotId))
+        whenever(sceneLoader.getScene(sceneId)).thenReturn(
+            SceneContract(
+                sceneId = sceneId,
+                sceneTitle = "The Market Stall",
+                npcId = npcId,
+                npcName = "Elena"
+            )
+        )
+        archetypeEngine.initializeArchetype(
+            RelationshipArchetypeEngine.ArchetypeType.SHIFTING_THE_BURDEN, npcId, "player"
+        )
+        wheneverBlocking {
+            orchestrator.generateTurn(
+                org.mockito.kotlin.any(), org.mockito.kotlin.any(), org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(), org.mockito.kotlin.any()
+            )
+        } doReturn DialogueTurnResult(npcLine = "You've let me down again.", relationshipDelta = -0.2f)
+        wheneverBlocking {
+            orchestrator.generateIntents(org.mockito.kotlin.any(), org.mockito.kotlin.any(), org.mockito.kotlin.any())
+        } doReturn listOf("Farewell.")
+
+        val viewModel = buildViewModel(savedStateHandle = SavedStateHandle(mapOf("sceneId" to sceneId)))
+        advanceUntilIdle()
+
+        val stabilityBefore = archetypeEngine.getStabilityReport().values.single()
+        viewModel.submitTypedInput("You're on your own with the stall from now on.")
+        advanceUntilIdle()
+
+        val stabilityAfter = archetypeEngine.getStabilityReport().values.single()
+        assertTrue(
+            "expected the archetype engine's simulated state to move after a dialogue turn",
+            stabilityAfter != stabilityBefore
+        )
     }
 }

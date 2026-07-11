@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":core-data"))
     implementation(project(":core-ai"))
     implementation(project(":domain"))
+    implementation(project(":chimera-core"))
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)

@@ -1,6 +1,8 @@
 package com.chimera.data
 
 import android.content.Context
+import android.util.Log
+import com.chimera.core.engine.RelationshipArchetypeEngine
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.entity.CharacterEntity
@@ -27,9 +29,15 @@ import javax.inject.Singleton
 class MultiActNpcSeeder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val characterDao: CharacterDao,
-    private val characterStateDao: CharacterStateDao
+    private val characterStateDao: CharacterStateDao,
+    private val archetypeEngine: RelationshipArchetypeEngine
 ) {
     private val json = Json { ignoreUnknownKeys = true }
+
+    companion object {
+        private const val TAG = "MultiActNpcSeeder"
+        private const val DEFAULT_PLAYER_ID = "player"
+    }
 
     /** NPC source files in load order. Act 1 listed last so it wins on conflict. */
     private val npcFiles = listOf(
@@ -72,7 +80,23 @@ class MultiActNpcSeeder @Inject constructor(
                     activeArchetype = npc.archetype
                 )
             )
+            npc.archetype?.let { initializeArchetypeFor(npc.id, it) }
         }
+    }
+
+    /**
+     * Starts the live [RelationshipArchetypeEngine] simulation for an NPC whose static
+     * archetype label was seeded above. Safe to call repeatedly (e.g. re-seeding an
+     * existing slot) -- initializeArchetype just replaces the prior in-memory instance.
+     */
+    private suspend fun initializeArchetypeFor(npcId: String, archetypeLabel: String) {
+        val type = try {
+            RelationshipArchetypeEngine.ArchetypeType.valueOf(archetypeLabel)
+        } catch (e: IllegalArgumentException) {
+            Log.w(TAG, "Unknown archetype label '$archetypeLabel' for NPC $npcId -- skipping", e)
+            return
+        }
+        archetypeEngine.initializeArchetype(type, npcId, DEFAULT_PLAYER_ID)
     }
 
     // -------------------------------------------------------------------------

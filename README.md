@@ -11,12 +11,12 @@ A deterministic NPC simulation SDK powering a narrative RPG for Android. NPCs ev
 ```
 chimera-core          Pure Kotlin simulation engine (zero Android deps)
                       ├── RelationshipArchetypeEngine (systems thinking feedback loops)
-                      ├── DuelEngine (stance-based ritual combat)
+                      ├── CombatEngine (Intent Card + d20 + Resolve-bar duel resolution)
                       ├── GameStateMachine (deterministic state transitions)
                       └── GameEventBus (observable event system)
 
 core-model            Domain data classes (SaveSlot, Character, SceneContract, etc.)
-core-database         Room persistence (13 entities, 13 DAOs, DB v7)
+core-database         Room persistence (14 entities, 14 DAOs, DB v9)
 core-data             Repositories + services (save, character, dialogue, journal, camp)
 core-network          Ktor HTTP client factory
 core-ai               Optional AI adapter (Gemini, Groq, OpenRouter + authored fallback)
@@ -30,8 +30,8 @@ app                   Android entry point, navigation, DI
 
 The `chimera-core` module contains the deterministic simulation layer with zero Android dependencies:
 
-- **RelationshipArchetypeEngine**: Four systems archetypes (Shifting the Burden, Escalation, Growth & Underinvestment, Fixes That Fail) with multi-variable feedback loops and delayed consequences
-- **DuelEngine**: Stance-based ritual combat (strike/ward/feint) with omen resources and resolve attrition
+- **RelationshipArchetypeEngine**: Four systems archetypes (Shifting the Burden, Escalation, Growth & Underinvestment, Fixes That Fail) with multi-variable feedback loops and delayed consequences. Each NPC's archetype is initialized from its seed data at NPC creation (`MultiActNpcSeeder`) and fed live interactions from both dialogue turns and duels, so the Party screen's relationship dynamics panel reflects an evolving simulation rather than a static label.
+- **CombatEngine**: Duel resolution via Intent Cards + a single d20 roll (modified by the card's stat bonus and NPC disposition) against a 3-segment Resolve bar, capped at 3 rolls.
 - **GameStateMachine**: Canonical game phase transitions (menu -> scene -> camp -> duel)
 
 All simulation logic is inspectable, deterministic, and unit-testable without UI.

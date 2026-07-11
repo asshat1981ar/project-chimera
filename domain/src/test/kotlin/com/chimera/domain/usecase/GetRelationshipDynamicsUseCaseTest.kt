@@ -58,4 +58,25 @@ class GetRelationshipDynamicsUseCaseTest {
         assertTrue(result.feedbackLoops.contains("Quick fixes ↑"))
         assertTrue(result.feedbackLoops.contains("Root cause ↓"))
     }
+
+    @Test
+    fun returnsGrowthAndUnderinvestmentArchetypeData() {
+        // Regression guard: GROWTH_AND_UNDERINVESTMENT used to be unimplemented in
+        // RelationshipArchetypeEngine.initializeArchetype and would never actually reach here
+        // in production, but the use case itself must not special-case it away.
+        //
+        // Uses the real enum constant rather than mock<ArchetypeType>(): Mockito's enum mocking
+        // does not change which `when` branch an enum `when` matches on, so a mocked
+        // ArchetypeType with a stubbed .name still resolves feedback loops for whichever
+        // constant the mock happens to proxy underneath.
+        val archetype = RelationshipArchetypeEngine.ArchetypeType.GROWTH_AND_UNDERINVESTMENT
+        whenever(archetypeEngine.getActiveArchetypes()).thenReturn(mapOf("elena_player" to archetype))
+        whenever(archetypeEngine.getStabilityReport()).thenReturn(mapOf("elena_player" to 0.6f))
+
+        val result = useCase("elena")
+
+        assertEquals("GROWTH AND UNDERINVESTMENT", result.activeArchetype)
+        assertTrue(result.feedbackLoops.contains("Growth potential ↓"))
+        assertTrue(result.feedbackLoops.contains("Investment ↓"))
+    }
 }
