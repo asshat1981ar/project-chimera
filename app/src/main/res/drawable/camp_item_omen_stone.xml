@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera camp item: omen_stone.
+     Upright seer stone, Tarnished gold omen-rune glow; restrained single accent per style bible. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="128dp"
+    android:height="128dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+    <path android:fillColor="#17151e" android:fillAlpha="0.65"
+        android:pathData="M26,102 A38,11 0 1 0 102,102 A38,11 0 1 0 26,102 Z" />
+    <path android:fillColor="#1a1d22"
+        android:pathData="M46,44 L64,34 L82,44 L82,96 L64,104 L46,96 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M46,44 L64,52 L64,104 L46,96 Z" />
+    <path android:fillColor="#454c55"
+        android:pathData="M64,52 L82,44 L82,96 L64,104 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M46,44 L64,34 L82,44 L64,52 Z" />
+    <path android:fillColor="#98a2ad" android:fillAlpha="0.4"
+        android:pathData="M46,44 L64,34 L65.5,35 L48,44.8 Z" />
+    <path android:fillColor="#b3913a" android:fillAlpha="0.25"
+        android:pathData="M48,72 A16,20 0 1 0 80,72 A16,20 0 1 0 48,72 Z" />
+    <path android:fillColor="#e3c46b" android:fillAlpha="0.85"
+        android:pathData="M64,60 L69,70 L64,86 L59,70 Z" />
+    <path android:fillColor="#e3c46b" android:fillAlpha="0.5"
+        android:pathData="M60.5,72 A3.5,5 0 1 0 67.5,72 A3.5,5 0 1 0 60.5,72 Z" />
+</vector>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera UI chrome: ui_seal_rare.
+     Rarity seal - shape glyph carries the read (never color-only, ROADMAP D). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    <path android:fillColor="#1565C0"
+        android:pathData="M2,16 A14,14 0 1 0 30,16 A14,14 0 1 0 2,16 Z" />
+    <path android:fillColor="#2196F3" android:fillAlpha="0.85"
+        android:pathData="M5.5,16 A10.5,10.5 0 1 0 26.5,16 A10.5,10.5 0 1 0 5.5,16 Z" />
+    <path android:fillColor="#1565C0"
+        android:pathData="M8.5,16 A7.5,7.5 0 1 0 23.5,16 A7.5,7.5 0 1 0 8.5,16 Z" />
+    <path android:fillColor="#0B2A4A"
+        android:pathData="M16,10.5 L19.5,16 L16,21.5 L12.5,16 Z" />
+    <path android:fillColor="#2196F3" android:fillAlpha="0.5"
+        android:pathData="M5,12 A14,14 0 0 1 16,2 L16,3.4 A12.6,12.6 0 0 0 6.4,12.6 Z" />
+</vector>

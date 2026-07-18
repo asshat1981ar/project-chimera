@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera combat sprite: player / strike stance / WOUNDED.
+     Overhead ritual-combat figure, blood-wash overlay, cold steel ramp with single restrained accent (DuelEngine stance art). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="180dp"
+    android:height="180dp"
+    android:viewportWidth="180"
+    android:viewportHeight="180">
+    <path android:fillColor="#17151e" android:fillAlpha="0.65"
+        android:pathData="M38,138 A52,15 0 1 0 142,138 A52,15 0 1 0 38,138 Z" />
+    <path android:fillColor="#1a1d22"
+        android:pathData="M56,112 A34,22 0 1 0 124,112 A34,22 0 1 0 56,112 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M74,96 A22,18 0 1 0 118,96 A22,18 0 1 0 74,96 Z" />
+    <path android:fillColor="#454c55"
+        android:pathData="M83,84 A13,11 0 1 0 109,84 A13,11 0 1 0 83,84 Z" />
+    <path android:fillColor="#98a2ad" android:fillAlpha="0.35"
+        android:pathData="M87,80 A5,4 0 1 0 97,80 A5,4 0 1 0 87,80 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M118,74 L126,78 L104,30 L96,26 Z" />
+    <path android:fillColor="#98a2ad"
+        android:pathData="M118,74 L121,75.5 L99,27.5 L96,26 Z" />
+    <path android:fillColor="#b3913a" android:fillAlpha="0.8"
+        android:pathData="M108,66 A4,4 0 1 0 116,66 A4,4 0 1 0 108,66 Z" />
+    <path android:fillColor="#4A1010" android:fillAlpha="0.35"
+        android:pathData="M0,0 L180,0 L180,180 L0,180 Z" />
+    <path android:fillColor="#6b2020" android:fillAlpha="0.5"
+        android:pathData="M72,120 A12,7 0 1 0 96,120 A12,7 0 1 0 72,120 Z" />
+    <path android:fillColor="#6b2020" android:fillAlpha="0.4"
+        android:pathData="M95,128 A7,4 0 1 0 109,128 A7,4 0 1 0 95,128 Z" />
+</vector>
