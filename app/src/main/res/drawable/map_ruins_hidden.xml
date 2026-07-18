@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera map node: ruins / HIDDEN quest state.
+     Same geometry as active; no accent ramp. A dark scrim sinks the whole
+     marker toward Abyss neutrals and a faint cold mist implies the unknown. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+
+    <!-- Ground shadow -->
+    <path android:fillColor="#17151e" android:fillAlpha="0.65"
+        android:pathData="M18,74 A30,11 0 1 0 78,74 A30,11 0 1 0 18,74 Z" />
+
+    <!-- Rubble -->
+    <path android:fillColor="#262230"
+        android:pathData="M14,66 L20,63 L24,66 L18,69 Z" />
+    <path android:fillColor="#17151e"
+        android:pathData="M72,64 L78,61 L84,64 L78,67 Z" />
+
+    <!-- Left pillar -->
+    <path android:fillColor="#1a1d22"
+        android:pathData="M30,33 L38,29 L38,64 L30,68 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M20,30 L30,33 L30,68 L20,66 Z" />
+    <path android:fillColor="#454c55"
+        android:pathData="M20,30 L28,26 L38,29 L30,33 Z" />
+    <path android:fillColor="#17151e"
+        android:pathData="M24,28 L27,27 L26,30 Z" />
+
+    <!-- Right pillar -->
+    <path android:fillColor="#17151e"
+        android:pathData="M68,47 L76,43 L76,66 L68,70 Z" />
+    <path android:fillColor="#262230"
+        android:pathData="M58,44 L68,47 L68,70 L58,68 Z" />
+    <path android:fillColor="#3a3547"
+        android:pathData="M58,44 L66,40 L76,43 L68,47 Z" />
+
+    <!-- Fallen lintel -->
+    <path android:fillColor="#1a1d22"
+        android:pathData="M30,60 L36,65 L36,72 L30,66 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M36,65 L68,59 L68,66 L36,72 Z" />
+    <path android:fillColor="#454c55"
+        android:pathData="M30,60 L62,54 L68,59 L36,65 Z" />
+
+    <!-- Cracks -->
+    <path android:fillColor="#0b0a0f" android:fillAlpha="0.7"
+        android:pathData="M23,38 L24,38 L26,45 L24,51 L27,58 L26,58 L23,51 L25,45 Z" />
+    <path android:fillColor="#0b0a0f" android:fillAlpha="0.5"
+        android:pathData="M44,58 L45,58 L49,61 L54,60 L54,61 L49,62 Z" />
+
+    <!-- HIDDEN treatment: cold mist wisp between pillars -->
+    <path android:fillColor="#6a7380" android:fillAlpha="0.12"
+        android:pathData="M32,60 A16,5 0 1 0 64,60 A16,5 0 1 0 32,60 Z" />
+
+    <!-- Dark scrim sinks the whole marker (unrevealed) -->
+    <path android:fillColor="#0b0a0f" android:fillAlpha="0.3"
+        android:pathData="M0,0 L96,0 L96,96 L0,96 Z" />
+</vector>
