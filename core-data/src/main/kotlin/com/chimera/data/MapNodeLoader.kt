@@ -8,6 +8,11 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * v2 (2026-07-14, WU-03): passes through the optional `nodeType` JSON field
+ * for the map sprite system. JSON files without the field keep loading
+ * unchanged (defaults to null -> display layer uses its default family).
+ */
 @Serializable
 private data class MapNodeJson(
     val id: String,
@@ -17,7 +22,8 @@ private data class MapNodeJson(
     val sceneId: String? = null,
     val connectedTo: List<String> = emptyList(),
     val xFraction: Float = 0.5f,
-    val yFraction: Float = 0.5f
+    val yFraction: Float = 0.5f,
+    val nodeType: String? = null
 )
 
 @Singleton
@@ -43,6 +49,7 @@ class MapNodeLoader @Inject constructor(
         sceneId = sceneId,
         connectedTo = connectedTo,
         xFraction = xFraction,
-        yFraction = yFraction
+        yFraction = yFraction,
+        nodeType = nodeType
     )
 }

@@ -25,6 +25,9 @@ import javax.inject.Singleton
  *
  * The original [MapNodeLoader] is left intact for backward compat; inject
  * [MultiActMapNodeLoader] wherever multi-act support is needed.
+ *
+ * v2 (2026-07-14, WU-03): passes through the optional `nodeType` JSON field
+ * for the map sprite system. JSON without the field loads unchanged.
  */
 @Singleton
 class MultiActMapNodeLoader @Inject constructor(
@@ -114,7 +117,8 @@ class MultiActMapNodeLoader @Inject constructor(
             sceneId = sceneId,
             connectedTo = connectedTo,
             xFraction = xFraction,
-            yFraction = yFraction
+            yFraction = yFraction,
+            nodeType = nodeType
         )
     }
 
@@ -131,6 +135,7 @@ class MultiActMapNodeLoader @Inject constructor(
         val sceneId: String? = null,
         val connectedTo: List<String> = emptyList(),
         val xFraction: Float = 0.5f,
-        val yFraction: Float = 0.5f
+        val yFraction: Float = 0.5f,
+        val nodeType: String? = null
     )
 }
