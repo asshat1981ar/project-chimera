@@ -4,7 +4,12 @@ import android.app.Application
 import android.os.Trace
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.chimera.core.data.sprites.SpriteManifest
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -15,11 +20,18 @@ import javax.inject.Inject
  *
  * IMPORTANT: Do NOT call WorkManager.initialize() anywhere else — the on-demand
  * initializer picks up Configuration.Provider automatically.
+ *
+ * v2 (2026-07-14, WU-04): initializes the sprite manifest off the main thread
+ * at startup. Non-blocking: screens resolving sprites before initialization
+ * completes simply get null and render their legacy fallbacks.
  */
 @HiltAndroidApp
 class ChimeraApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject lateinit var spriteManifest: SpriteManifest
+
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -36,6 +48,11 @@ class ChimeraApplication : Application(), Configuration.Provider {
         super.onCreate()
         beginStartupTrace("ChimeraApplication.onCreate")
         startupTraceActive = true
+
+        // Sprite manifest: load off the main thread; idempotent, fail-soft.
+        applicationScope.launch {
+            spriteManifest.initialize()
+        }
     }
 
     /**
