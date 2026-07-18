@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera map node: ruins / ACTIVE quest state.
+     Style: 3/4 overhead, key light upper-left. Ramps: Abyss neutrals + Cold stone
+     base, Tarnished gold accent (focal glow only). Rings are drawn by
+     QuestStateRing at runtime - not baked here. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+
+    <!-- Ground shadow (soft ellipse, Abyss step 2) -->
+    <path android:fillColor="#17151e" android:fillAlpha="0.65"
+        android:pathData="M18,74 A30,11 0 1 0 78,74 A30,11 0 1 0 18,74 Z" />
+
+    <!-- Rubble -->
+    <path android:fillColor="#262230"
+        android:pathData="M14,66 L20,63 L24,66 L18,69 Z" />
+    <path android:fillColor="#17151e"
+        android:pathData="M72,64 L78,61 L84,64 L78,67 Z" />
+
+    <!-- Left pillar: shaded side, front, lit top -->
+    <path android:fillColor="#1a1d22"
+        android:pathData="M30,33 L38,29 L38,64 L30,68 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M20,30 L30,33 L30,68 L20,66 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M20,30 L28,26 L38,29 L30,33 Z" />
+    <path android:fillColor="#17151e"
+        android:pathData="M24,28 L27,27 L26,30 Z" />
+
+    <!-- Right pillar (farther, darker) -->
+    <path android:fillColor="#17151e"
+        android:pathData="M68,47 L76,43 L76,66 L68,70 Z" />
+    <path android:fillColor="#262230"
+        android:pathData="M58,44 L68,47 L68,70 L58,68 Z" />
+    <path android:fillColor="#454c55"
+        android:pathData="M58,44 L66,40 L76,43 L68,47 Z" />
+
+    <!-- Fallen lintel: end cap, front, lit top -->
+    <path android:fillColor="#1a1d22"
+        android:pathData="M30,60 L36,65 L36,72 L30,66 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M36,65 L68,59 L68,66 L36,72 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M30,60 L62,54 L68,59 L36,65 Z" />
+
+    <!-- Cracks -->
+    <path android:fillColor="#0b0a0f" android:fillAlpha="0.7"
+        android:pathData="M23,38 L24,38 L26,45 L24,51 L27,58 L26,58 L23,51 L25,45 Z" />
+    <path android:fillColor="#0b0a0f" android:fillAlpha="0.5"
+        android:pathData="M44,58 L45,58 L49,61 L54,60 L54,61 L49,62 Z" />
+
+    <!-- ACTIVE accent: gold wisp glow between the pillars, tight falloff -->
+    <path android:fillColor="#b3913a" android:fillAlpha="0.22"
+        android:pathData="M39,55 A9,9 0 1 0 57,55 A9,9 0 1 0 39,55 Z" />
+    <path android:fillColor="#e3c46b" android:fillAlpha="0.45"
+        android:pathData="M43,55 A5,5 0 1 0 53,55 A5,5 0 1 0 43,55 Z" />
+    <path android:fillColor="#e3c46b" android:fillAlpha="0.95"
+        android:pathData="M45.5,55 A2.5,2.5 0 1 0 50.5,55 A2.5,2.5 0 1 0 45.5,55 Z" />
+
+    <!-- Gold edge-catch on inner pillar faces -->
+    <path android:fillColor="#b3913a" android:fillAlpha="0.5"
+        android:pathData="M30,50 L31,50 L31,64 L30,64.5 Z" />
+    <path android:fillColor="#b3913a" android:fillAlpha="0.4"
+        android:pathData="M58,50 L59,50.3 L59,66 L58,65.5 Z" />
+
+    <!-- Rune mark on lintel front -->
+    <path android:fillColor="#e3c46b" android:fillAlpha="0.8"
+        android:pathData="M50,61.5 L51.5,60.8 L53,61.5 L51.5,62.2 Z" />
+</vector>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera map node: ruins / FAILED quest state.
+     Dried blood ramp: scorched ground, smoldering ember core, blood-dark
+     cracks. The one warm-hostile read on the map. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+
+    <!-- Ground shadow -->
+    <path android:fillColor="#17151e" android:fillAlpha="0.65"
+        android:pathData="M18,74 A30,11 0 1 0 78,74 A30,11 0 1 0 18,74 Z" />
+
+    <!-- Scorch on the ground -->
+    <path android:fillColor="#1c0d0d" android:fillAlpha="0.8"
+        android:pathData="M38,66 A10,3.5 0 1 0 58,66 A10,3.5 0 1 0 38,66 Z" />
+
+    <!-- Rubble -->
+    <path android:fillColor="#262230"
+        android:pathData="M14,66 L20,63 L24,66 L18,69 Z" />
+    <path android:fillColor="#17151e"
+        android:pathData="M72,64 L78,61 L84,64 L78,67 Z" />
+
+    <!-- Left pillar -->
+    <path android:fillColor="#1a1d22"
+        android:pathData="M30,33 L38,29 L38,64 L30,68 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M20,30 L30,33 L30,68 L20,66 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M20,30 L28,26 L38,29 L30,33 Z" />
+    <path android:fillColor="#17151e"
+        android:pathData="M24,28 L27,27 L26,30 Z" />
+
+    <!-- Right pillar -->
+    <path android:fillColor="#17151e"
+        android:pathData="M68,47 L76,43 L76,66 L68,70 Z" />
+    <path android:fillColor="#262230"
+        android:pathData="M58,44 L68,47 L68,70 L58,68 Z" />
+    <path android:fillColor="#454c55"
+        android:pathData="M58,44 L66,40 L76,43 L68,47 Z" />
+
+    <!-- Fallen lintel -->
+    <path android:fillColor="#1a1d22"
+        android:pathData="M30,60 L36,65 L36,72 L30,66 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M36,65 L68,59 L68,66 L36,72 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M30,60 L62,54 L68,59 L36,65 Z" />
+
+    <!-- Blood-dark cracks (replace neutral cracks) -->
+    <path android:fillColor="#3a1515" android:fillAlpha="0.9"
+        android:pathData="M23,38 L24,38 L26,45 L24,51 L27,58 L26,58 L23,51 L25,45 Z" />
+    <path android:fillColor="#3a1515" android:fillAlpha="0.85"
+        android:pathData="M40,60 L42,60 L41.5,66 L40.5,66 Z" />
+
+    <!-- FAILED accent: smoldering ember between the pillars -->
+    <path android:fillColor="#6b2020" android:fillAlpha="0.3"
+        android:pathData="M41,56 A7,7 0 1 0 55,56 A7,7 0 1 0 41,56 Z" />
+    <path android:fillColor="#9c3a2e" android:fillAlpha="0.55"
+        android:pathData="M44,56 A4,4 0 1 0 52,56 A4,4 0 1 0 44,56 Z" />
+    <path android:fillColor="#c96a4a" android:fillAlpha="0.9"
+        android:pathData="M46.2,56 A1.8,1.8 0 1 0 49.8,56 A1.8,1.8 0 1 0 46.2,56 Z" />
+
+    <!-- Warm edge-catch on inner faces -->
+    <path android:fillColor="#6b2020" android:fillAlpha="0.5"
+        android:pathData="M30,50 L31,50 L31,64 L30,64.5 Z" />
+    <path android:fillColor="#6b2020" android:fillAlpha="0.4"
+        android:pathData="M58,50 L59,50.3 L59,66 L58,65.5 Z" />
+</vector>

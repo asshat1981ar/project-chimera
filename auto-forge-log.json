@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2026-07-14T00:00:00Z",
+    "gap_signal": "tool_failure",
+    "secondary_signals": ["complexity"],
+    "gap_description": "Workspace Linux VM failed to start (3 attempts), blocking base64 decode of Drive connector payloads",
+    "remedy_type": "procedure",
+    "remedy_name": "manual-base64-decode-fallback",
+    "patch_strategy": "companion",
+    "status": "deployed",
+    "original_task": "Download UI sprite development assets from Google Drive"
+  },
+  {
+    "timestamp": "2026-07-14T00:00:00Z",
+    "gap_signal": "inability",
+    "secondary_signals": [],
+    "gap_description": "Drive Sprite folder missing PortraitExpression.kt and MapNodeState.kt referenced by downloaded Compose code",
+    "remedy_type": "full_implementation",
+    "remedy_name": "missing-sprite-model-enums",
+    "patch_strategy": "new_build",
+    "status": "deployed",
+    "original_task": "Complete the core-model sprites package so the Drive asset drop compiles"
+  }
+]

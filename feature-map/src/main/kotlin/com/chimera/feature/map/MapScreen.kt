@@ -3,6 +3,7 @@ package com.chimera.feature.map
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -42,6 +44,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.core.model.sprites.EmptySpriteResolver
+import com.chimera.core.model.sprites.SpriteResolver
+import com.chimera.core.ui.sprites.MapNodeSprite
+import com.chimera.feature.map.MapNodeSpriteAdapter.mostSignificantStatus
 import com.chimera.model.MapNode
 import com.chimera.model.QuestObjectiveStatus
 import com.chimera.ui.theme.AshBlack
@@ -51,10 +57,22 @@ import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
 
+/**
+ * v2 (2026-07-14, Workstream H Phase 0.5 / WU-01): sprite-wired map screen.
+ *
+ * Each node marker now renders through [MapNodeSprite] when [spriteResolver]
+ * has an asset for the node's (type, state); otherwise the legacy lettered
+ * circle renders unchanged — zero visual regression when assets are absent
+ * (resolver defaults to [EmptySpriteResolver] until app wiring lands, WU-04).
+ *
+ * Simulation contract unchanged: this screen only reads MapViewModel state and
+ * sends select/clear intents; sprites are a pure display projection.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     onEnterScene: (String) -> Unit = {},
+    spriteResolver: SpriteResolver = EmptySpriteResolver,
     viewModel: MapViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -112,13 +130,13 @@ fun MapScreen(
                 MapNodeMarker(
                     node = node,
                     isSelected = uiState.selectedNode?.id == node.id,
+                    spriteResolver = spriteResolver,
                     onClick = { viewModel.selectNode(node) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
 
             // Fog placeholders — faint "?" dots for unrevealed nodes connected to revealed ones
-            // Uses base node positions from the ViewModel's exposed fogAdjacentNodes
             viewModel.fogAdjacentPositions(uiState.nodes).forEach { (xFrac, yFrac) ->
                 FogNodePlaceholder(
                     xFraction = xFrac,
@@ -164,6 +182,7 @@ private fun MapConnections(nodes: List<MapNode>) {
 private fun MapNodeMarker(
     node: MapNode,
     isSelected: Boolean,
+    spriteResolver: SpriteResolver,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -187,30 +206,34 @@ private fun MapNodeMarker(
                     .width(80.dp)
             ) {
                 Box {
-                    Surface(
-                        shape = CircleShape,
-                        color = when {
-                            isSelected -> EmberGold
-                            node.isCompleted -> VoidGreen.copy(alpha = 0.7f)
-                            node.isUnlocked -> HollowCrimson.copy(alpha = 0.8f)
-                            else -> DimAsh.copy(alpha = 0.4f)
-                        },
-                        border = BorderStroke(
-                            2.dp,
-                            if (isSelected) EmberGold else Color.Transparent
-                        ),
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = if (node.isUnlocked) node.name.first().toString() else "?",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = if (node.isUnlocked) MaterialTheme.colorScheme.onSurface else DimAsh
-                            )
-                        }
+                    // Sprite path: render the ink-wash node sprite when an asset
+                    // exists for this node's (type, state); legacy circle otherwise.
+                    val displayState = remember(node) { MapNodeSpriteAdapter.displayState(node) }
+                    val nodeType = remember(node) { MapNodeSpriteAdapter.displayNodeType(node) }
+                    val hasSprite = remember(node, spriteResolver) {
+                        spriteResolver.resolveMapNode(nodeType, displayState) != null
                     }
 
-                    // Rumor heat badge
+                    if (hasSprite) {
+                        MapNodeSprite(
+                            nodeType = nodeType,
+                            state = displayState,
+                            resolver = spriteResolver,
+                            size = 40.dp,
+                            modifier = Modifier.border(
+                                width = 2.dp,
+                                color = if (isSelected) EmberGold else Color.Transparent,
+                                shape = CircleShape
+                            )
+                        )
+                    } else {
+                        LegacyNodeCircle(
+                            node = node,
+                            isSelected = isSelected
+                        )
+                    }
+
+                    // Rumor heat badge (both paths)
                     if (node.rumorCount > 0) {
                         Badge(
                             containerColor = EmberGold,
@@ -220,12 +243,15 @@ private fun MapNodeMarker(
                         }
                     }
 
-                    // Quest marker indicator
-                    node.questMarkers.mostSignificantStatus()?.let { status ->
-                        QuestMarkerDot(
-                            status = status,
-                            modifier = Modifier.align(Alignment.BottomEnd)
-                        )
+                    // Legacy quest marker dot only when the sprite (which carries
+                    // its own QuestStateRing) is not rendering.
+                    if (!hasSprite) {
+                        node.questMarkers.mostSignificantStatus()?.let { status ->
+                            QuestMarkerDot(
+                                status = status,
+                                modifier = Modifier.align(Alignment.BottomEnd)
+                            )
+                        }
                     }
                 }
 
@@ -237,6 +263,39 @@ private fun MapNodeMarker(
                     maxLines = 2
                 )
             }
+        }
+    }
+}
+
+/**
+ * Pre-sprite node rendering, unchanged from v1. Kept as the guaranteed
+ * fallback so screens never regress when assets are missing.
+ */
+@Composable
+private fun LegacyNodeCircle(
+    node: MapNode,
+    isSelected: Boolean
+) {
+    Surface(
+        shape = CircleShape,
+        color = when {
+            isSelected -> EmberGold
+            node.isCompleted -> VoidGreen.copy(alpha = 0.7f)
+            node.isUnlocked -> HollowCrimson.copy(alpha = 0.8f)
+            else -> DimAsh.copy(alpha = 0.4f)
+        },
+        border = BorderStroke(
+            2.dp,
+            if (isSelected) EmberGold else Color.Transparent
+        ),
+        modifier = Modifier.size(32.dp)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = if (node.isUnlocked) node.name.first().toString() else "?",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (node.isUnlocked) MaterialTheme.colorScheme.onSurface else DimAsh
+            )
         }
     }
 }
@@ -301,7 +360,6 @@ private fun NodeDetailSheet(
 
 /**
  * Renders a faint fog-of-war placeholder at [xFraction]/[yFraction] of the canvas.
- * Shows location without revealing name — exploration tension without dead-end confusion.
  */
 @Composable
 private fun FogNodePlaceholder(
@@ -312,13 +370,11 @@ private fun FogNodePlaceholder(
     Canvas(modifier = modifier) {
         val cx = size.width * xFraction
         val cy = size.height * yFraction
-        // Outer dim ring
         drawCircle(
             color = Color.White.copy(alpha = 0.06f),
             radius = 22f,
             center = Offset(cx, cy)
         )
-        // Inner dot
         drawCircle(
             color = Color.White.copy(alpha = 0.12f),
             radius = 10f,
@@ -328,23 +384,8 @@ private fun FogNodePlaceholder(
 }
 
 /**
- * Returns the most visually significant quest status for a node.
- * Priority: FAILED > ACTIVE/HIDDEN > COMPLETED/OPTIONAL_COMPLETED.
- */
-private fun List<com.chimera.model.MapQuestMarker>.mostSignificantStatus(): QuestObjectiveStatus? {
-    if (isEmpty()) return null
-    return when {
-        any { it.status == QuestObjectiveStatus.FAILED } -> QuestObjectiveStatus.FAILED
-        any { it.status == QuestObjectiveStatus.ACTIVE || it.status == QuestObjectiveStatus.HIDDEN } ->
-            QuestObjectiveStatus.ACTIVE
-        any { it.status == QuestObjectiveStatus.COMPLETED || it.status == QuestObjectiveStatus.OPTIONAL_COMPLETED } ->
-            QuestObjectiveStatus.COMPLETED
-        else -> firstOrNull()?.status
-    }
-}
-
-/**
- * Small colored dot indicating a quest state on a map node.
+ * Small colored dot indicating a quest state on a map node (legacy path).
+ * Status priority logic now lives in MapNodeSpriteAdapter (shared with sprites).
  */
 @Composable
 private fun QuestMarkerDot(

@@ -1,0 +1,261 @@
+{
+  "version": "1.0.0",
+  "style": "gothic_manuscript_inkwash",
+  "generated": "2026-07-13",
+  "total_assets": 194,
+  "categories": [
+    {
+      "category": "NPC_PORTRAIT",
+      "description": "NPC character portraits with expression variants",
+      "entries": [
+        {
+          "id": "npc_elara_neutral",
+          "baseName": "npc_elara_neutral",
+          "npcId": "elara",
+          "expression": "neutral",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 128, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "npc_elara_hostile",
+          "baseName": "npc_elara_hostile",
+          "npcId": "elara",
+          "expression": "hostile",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 128, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "npc_thorne_neutral",
+          "baseName": "npc_thorne_neutral",
+          "npcId": "thorne",
+          "expression": "neutral",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 128, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "npc_thorne_oathbound",
+          "baseName": "npc_thorne_oathbound",
+          "npcId": "thorne",
+          "expression": "oathbound",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 128, "density": "XHDPI"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "NPC_TOKEN",
+      "description": "Overhead map tokens for NPCs",
+      "entries": [
+        {
+          "id": "npc_elara_token",
+          "baseName": "npc_elara_token",
+          "npcId": "elara",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 64, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "npc_thorne_token",
+          "baseName": "npc_thorne_token",
+          "npcId": "thorne",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 64, "density": "XHDPI"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "COMBAT_PLAYER",
+      "description": "Player combat stance sprites",
+      "entries": [
+        {
+          "id": "combat_player_strike",
+          "baseName": "combat_player_strike",
+          "stance": "strike",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 180, "density": "XHDPI"},
+            {"suffix": "_wounded", "resolution": 180, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "combat_player_ward",
+          "baseName": "combat_player_ward",
+          "stance": "ward",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 180, "density": "XHDPI"},
+            {"suffix": "_wounded", "resolution": 180, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "combat_player_feint",
+          "baseName": "combat_player_feint",
+          "stance": "feint",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 180, "density": "XHDPI"},
+            {"suffix": "_wounded", "resolution": 180, "density": "XHDPI"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "MAP_NODE",
+      "description": "Map node sprites by type and quest state",
+      "entries": [
+        {
+          "id": "map_ruins_active",
+          "baseName": "map_ruins_active",
+          "nodeType": "ruins",
+          "state": "active",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 96, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "map_ruins_hidden",
+          "baseName": "map_ruins_hidden",
+          "nodeType": "ruins",
+          "state": "hidden",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 96, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "map_ruins_completed",
+          "baseName": "map_ruins_completed",
+          "nodeType": "ruins",
+          "state": "completed",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 96, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "map_ruins_failed",
+          "baseName": "map_ruins_failed",
+          "nodeType": "ruins",
+          "state": "failed",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 96, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "map_ruins_blocked",
+          "baseName": "map_ruins_blocked",
+          "nodeType": "ruins",
+          "state": "blocked",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 96, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "map_ruins_neutral",
+          "baseName": "map_ruins_neutral",
+          "nodeType": "ruins",
+          "state": "neutral",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 96, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "map_shrine_active",
+          "baseName": "map_shrine_active",
+          "nodeType": "shrine",
+          "state": "active",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 96, "density": "XHDPI"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "CAMP_ITEM",
+      "description": "Inventory and crafting item sprites",
+      "entries": [
+        {
+          "id": "camp_item_herb_bundle",
+          "baseName": "camp_item_herb_bundle",
+          "itemId": "herb_bundle",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 128, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "camp_item_iron_ingot",
+          "baseName": "camp_item_iron_ingot",
+          "itemId": "iron_ingot",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 128, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "camp_item_omen_stone",
+          "baseName": "camp_item_omen_stone",
+          "itemId": "omen_stone",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 128, "density": "XHDPI"}
+          ]
+        }
+      ]
+    },
+    {
+      "category": "SHARED_UI",
+      "description": "Shared UI chrome and decorative elements",
+      "entries": [
+        {
+          "id": "ui_frame_gold",
+          "baseName": "ui_frame_gold",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 512, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "ui_seal_common",
+          "baseName": "ui_seal_common",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 32, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "ui_seal_rare",
+          "baseName": "ui_seal_rare",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 32, "density": "XHDPI"}
+          ]
+        },
+        {
+          "id": "ui_seal_legendary",
+          "baseName": "ui_seal_legendary",
+          "transparent": true,
+          "variants": [
+            {"suffix": "", "resolution": 32, "density": "XHDPI"}
+          ]
+        }
+      ]
+    }
+  ]
+}

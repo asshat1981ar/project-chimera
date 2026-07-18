@@ -1,13 +1,16 @@
 package com.chimera.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.chimera.core.ui.sprites.LocalSpriteLoader
 import com.chimera.feature.camp.CampScreen
 import com.chimera.feature.dialogue.DialogueSceneScreen
 import com.chimera.ui.screens.duel.DuelScreen
@@ -25,178 +28,191 @@ import com.chimera.feature.settings.SettingsScreen
 import com.chimera.ui.screens.acttransition.ActTransitionScreen
 import com.chimera.ui.screens.splash.SplashScreen
 
+/**
+ * v2 (2026-07-14, WU-04): sprite runtime wiring.
+ * [SpriteRuntimeViewModel] supplies the app-wide SpriteResolver + SpriteLoader;
+ * the loader is provided via [LocalSpriteLoader] so every ChimeraSprite shares
+ * one LRU cache, and the resolver flows to the sprite-wired screens
+ * (MapScreen, DialogueSceneScreen). All other destinations are unchanged.
+ */
 @Composable
 fun ChimeraNavHost(
     navController: NavHostController,
     preferences: ChimeraPreferences,
     modifier: Modifier = Modifier
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = ChimeraRoutes.SPLASH,
-        modifier = modifier
-    ) {
-        composable(ChimeraRoutes.SPLASH) {
-            val settings by preferences.settings.collectAsState(
-                initial = com.chimera.data.AppSettings()
-            )
-            SplashScreen(
-                onFinished = {
-                    val dest = if (settings.tutorialComplete) {
-                        ChimeraRoutes.SAVE_SLOT_SELECT
-                    } else {
-                        ChimeraRoutes.ONBOARDING
-                    }
-                    navController.navigate(dest) {
-                        popUpTo(ChimeraRoutes.SPLASH) { inclusive = true }
-                    }
-                }
-            )
-        }
+    val spriteRuntime: SpriteRuntimeViewModel = hiltViewModel()
 
-        composable(ChimeraRoutes.ONBOARDING) {
-            OnboardingScreen(
-                preferences = preferences,
-                onComplete = {
-                    navController.navigate(ChimeraRoutes.SAVE_SLOT_SELECT) {
-                        popUpTo(ChimeraRoutes.ONBOARDING) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(ChimeraRoutes.SAVE_SLOT_SELECT) {
-            SaveSlotSelectScreen(
-                onSlotSelected = { slotId ->
-                    navController.navigate(ChimeraRoutes.GAME_GRAPH) {
-                        popUpTo(ChimeraRoutes.SAVE_SLOT_SELECT) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        // Game navigation graph
-        navigation(
-            startDestination = ChimeraRoutes.HOME,
-            route = ChimeraRoutes.GAME_GRAPH
+    CompositionLocalProvider(LocalSpriteLoader provides spriteRuntime.loader) {
+        NavHost(
+            navController = navController,
+            startDestination = ChimeraRoutes.SPLASH,
+            modifier = modifier
         ) {
-            composable(ChimeraRoutes.HOME) {
-                HomeScreen(
-                    onEnterScene = { sceneId ->
-                        navController.navigate(ChimeraRoutes.dialogue(sceneId))
-                    },
-                    onNavigateToSettings = {
-                        navController.navigate(ChimeraRoutes.SETTINGS)
-                    },
-                    onActTransition = { actTag ->
-                        navController.navigate(ChimeraRoutes.actTransition(actTag))
-                    }
+            composable(ChimeraRoutes.SPLASH) {
+                val settings by preferences.settings.collectAsState(
+                    initial = com.chimera.data.AppSettings()
                 )
-            }
-
-            composable(ChimeraRoutes.MAP) {
-                MapScreen(
-                    onEnterScene = { sceneId ->
-                        navController.navigate(ChimeraRoutes.dialogue(sceneId))
-                    }
-                )
-            }
-
-            composable(ChimeraRoutes.CAMP) {
-                CampScreen(
-                    onNavigateToInventory = {
-                        navController.navigate(ChimeraRoutes.INVENTORY)
-                    },
-                    onNavigateToCrafting = {
-                        navController.navigate(ChimeraRoutes.CRAFTING)
-                    }
-                )
-            }
-
-            composable(ChimeraRoutes.INVENTORY) {
-                com.chimera.feature.camp.InventoryScreen(
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
-            composable(ChimeraRoutes.CRAFTING) {
-                com.chimera.feature.camp.CraftingScreen(
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
-            composable(ChimeraRoutes.JOURNAL) {
-                JournalScreen()
-            }
-
-            composable(ChimeraRoutes.PARTY) {
-                PartyScreen()
-            }
-
-            composable(ChimeraRoutes.SETTINGS) {
-                SettingsScreen(
-                    onBack = { navController.popBackStack() },
-                    onNavigateToFactionStanding = {
-                        navController.navigate(ChimeraRoutes.FACTION_STANDING)
-                    }
-                )
-            }
-
-            composable(ChimeraRoutes.FACTION_STANDING) {
-                FactionStandingScreen(
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
-            composable(
-                route = ChimeraRoutes.DIALOGUE,
-                arguments = listOf(
-                    navArgument("sceneId") { type = NavType.StringType }
-                )
-            ) { backStackEntry ->
-                val sceneId = backStackEntry.arguments?.getString("sceneId") ?: return@composable
-                DialogueSceneScreen(
-                    sceneId = sceneId,
-                    onSceneComplete = { nextSceneId ->
-                        if (nextSceneId != null) {
-                            navController.popBackStack()
-                            navController.navigate(ChimeraRoutes.dialogue(nextSceneId))
+                SplashScreen(
+                    onFinished = {
+                        val dest = if (settings.tutorialComplete) {
+                            ChimeraRoutes.SAVE_SLOT_SELECT
                         } else {
-                            navController.popBackStack()
+                            ChimeraRoutes.ONBOARDING
                         }
-                    },
-                    onTriggerDuel = { opponentId ->
-                        navController.navigate(ChimeraRoutes.duel(opponentId))
+                        navController.navigate(dest) {
+                            popUpTo(ChimeraRoutes.SPLASH) { inclusive = true }
+                        }
                     }
                 )
             }
 
-            composable(
-                route = ChimeraRoutes.DUEL,
-                arguments = listOf(
-                    navArgument("opponentId") { type = NavType.StringType }
-                )
-            ) { backStackEntry ->
-                DuelScreen(
-                    onDuelComplete = { navController.popBackStack() }
-                )
-            }
-
-            composable(
-                route = ChimeraRoutes.ACT_TRANSITION,
-                arguments = listOf(
-                    navArgument("actTag") { type = NavType.StringType }
-                )
-            ) { backStackEntry ->
-                val actTag = backStackEntry.arguments?.getString("actTag") ?: "act1"
-                ActTransitionScreen(
-                    actTag = actTag,
-                    onContinue = {
-                        navController.navigate(ChimeraRoutes.HOME) {
-                            popUpTo(ChimeraRoutes.ACT_TRANSITION) { inclusive = true }
+            composable(ChimeraRoutes.ONBOARDING) {
+                OnboardingScreen(
+                    preferences = preferences,
+                    onComplete = {
+                        navController.navigate(ChimeraRoutes.SAVE_SLOT_SELECT) {
+                            popUpTo(ChimeraRoutes.ONBOARDING) { inclusive = true }
                         }
                     }
                 )
+            }
+
+            composable(ChimeraRoutes.SAVE_SLOT_SELECT) {
+                SaveSlotSelectScreen(
+                    onSlotSelected = { slotId ->
+                        navController.navigate(ChimeraRoutes.GAME_GRAPH) {
+                            popUpTo(ChimeraRoutes.SAVE_SLOT_SELECT) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            // Game navigation graph
+            navigation(
+                startDestination = ChimeraRoutes.HOME,
+                route = ChimeraRoutes.GAME_GRAPH
+            ) {
+                composable(ChimeraRoutes.HOME) {
+                    HomeScreen(
+                        onEnterScene = { sceneId ->
+                            navController.navigate(ChimeraRoutes.dialogue(sceneId))
+                        },
+                        onNavigateToSettings = {
+                            navController.navigate(ChimeraRoutes.SETTINGS)
+                        },
+                        onActTransition = { actTag ->
+                            navController.navigate(ChimeraRoutes.actTransition(actTag))
+                        }
+                    )
+                }
+
+                composable(ChimeraRoutes.MAP) {
+                    MapScreen(
+                        onEnterScene = { sceneId ->
+                            navController.navigate(ChimeraRoutes.dialogue(sceneId))
+                        },
+                        spriteResolver = spriteRuntime.resolver
+                    )
+                }
+
+                composable(ChimeraRoutes.CAMP) {
+                    CampScreen(
+                        onNavigateToInventory = {
+                            navController.navigate(ChimeraRoutes.INVENTORY)
+                        },
+                        onNavigateToCrafting = {
+                            navController.navigate(ChimeraRoutes.CRAFTING)
+                        }
+                    )
+                }
+
+                composable(ChimeraRoutes.INVENTORY) {
+                    com.chimera.feature.camp.InventoryScreen(
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(ChimeraRoutes.CRAFTING) {
+                    com.chimera.feature.camp.CraftingScreen(
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(ChimeraRoutes.JOURNAL) {
+                    JournalScreen()
+                }
+
+                composable(ChimeraRoutes.PARTY) {
+                    PartyScreen()
+                }
+
+                composable(ChimeraRoutes.SETTINGS) {
+                    SettingsScreen(
+                        onBack = { navController.popBackStack() },
+                        onNavigateToFactionStanding = {
+                            navController.navigate(ChimeraRoutes.FACTION_STANDING)
+                        }
+                    )
+                }
+
+                composable(ChimeraRoutes.FACTION_STANDING) {
+                    FactionStandingScreen(
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = ChimeraRoutes.DIALOGUE,
+                    arguments = listOf(
+                        navArgument("sceneId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val sceneId = backStackEntry.arguments?.getString("sceneId") ?: return@composable
+                    DialogueSceneScreen(
+                        sceneId = sceneId,
+                        onSceneComplete = { nextSceneId ->
+                            if (nextSceneId != null) {
+                                navController.popBackStack()
+                                navController.navigate(ChimeraRoutes.dialogue(nextSceneId))
+                            } else {
+                                navController.popBackStack()
+                            }
+                        },
+                        onTriggerDuel = { opponentId ->
+                            navController.navigate(ChimeraRoutes.duel(opponentId))
+                        },
+                        spriteResolver = spriteRuntime.resolver
+                    )
+                }
+
+                composable(
+                    route = ChimeraRoutes.DUEL,
+                    arguments = listOf(
+                        navArgument("opponentId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    DuelScreen(
+                        onDuelComplete = { navController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = ChimeraRoutes.ACT_TRANSITION,
+                    arguments = listOf(
+                        navArgument("actTag") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val actTag = backStackEntry.arguments?.getString("actTag") ?: "act1"
+                    ActTransitionScreen(
+                        actTag = actTag,
+                        onContinue = {
+                            navController.navigate(ChimeraRoutes.HOME) {
+                                popUpTo(ChimeraRoutes.ACT_TRANSITION) { inclusive = true }
+                            }
+                        }
+                    )
+                }
             }
         }
     }
