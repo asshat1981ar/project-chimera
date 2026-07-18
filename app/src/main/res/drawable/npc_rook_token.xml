@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera NPC overhead token: rook.
+     3/4 overhead marker, key light upper-left; ring band and hood use the NPC portrait ramp. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path android:fillColor="#17151e" android:fillAlpha="0.65"
+        android:pathData="M10,50 A22,7 0 1 0 54,50 A22,7 0 1 0 10,50 Z" />
+    <path android:fillColor="#0b0a0f"
+        android:pathData="M11,32 A21,21 0 1 0 53,32 A21,21 0 1 0 11,32 Z" />
+    <path android:fillColor="#303030"
+        android:pathData="M13,32 A19,19 0 1 0 51,32 A19,19 0 1 0 13,32 Z" />
+    <path android:fillColor="#1a1d22"
+        android:pathData="M16,32 A16,16 0 1 0 48,32 A16,16 0 1 0 16,32 Z" />
+    <path android:fillColor="#5C5C5C"
+        android:pathData="M20.5,41 A11.5,6.5 0 1 0 43.5,41 A11.5,6.5 0 1 0 20.5,41 Z" />
+    <path android:fillColor="#303030"
+        android:pathData="M24.5,32 A7.5,7 0 1 0 39.5,32 A7.5,7 0 1 0 24.5,32 Z" />
+    <path android:fillColor="#0b0a0f" android:fillAlpha="0.8"
+        android:pathData="M28,35.5 A4,2.6 0 1 0 36,35.5 A4,2.6 0 1 0 28,35.5 Z" />
+    <path android:fillColor="#9B9B9B" android:fillAlpha="0.8"
+        android:pathData="M26.6,29.5 A2.4,2 0 1 0 31.4,29.5 A2.4,2 0 1 0 26.6,29.5 Z" />
+    <path android:fillColor="#9B9B9B" android:fillAlpha="0.45"
+        android:pathData="M14.5,29 A20,20 0 0 1 33,12.2 L33,13.8 A18.4,18.4 0 0 0 16,29.6 Z" />
+</vector>

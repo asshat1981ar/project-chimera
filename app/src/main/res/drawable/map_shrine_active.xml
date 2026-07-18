@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera map node: shrine / ACTIVE quest state.
+     Votive flame lit in the offering bowl: Tarnished gold glow, edge-catches on inner column faces, rune mark on the altar front. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <path android:fillColor="#17151e" android:fillAlpha="0.65"
+        android:pathData="M18,74 A30,11 0 1 0 78,74 A30,11 0 1 0 18,74 Z" />
+    <path android:fillColor="#262230"
+        android:pathData="M14,66 L20,63 L24,66 L18,69 Z" />
+    <path android:fillColor="#17151e"
+        android:pathData="M72,64 L78,61 L84,64 L78,67 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M28,62 L48,68 L48,74 L28,68 Z" />
+    <path android:fillColor="#1a1d22"
+        android:pathData="M48,68 L68,62 L68,68 L48,74 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M28,62 L48,56 L68,62 L48,68 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M34,57 L48,61.5 L48,66 L34,61.5 Z" />
+    <path android:fillColor="#1a1d22"
+        android:pathData="M48,61.5 L62,57 L62,61.5 L48,66 Z" />
+    <path android:fillColor="#454c55"
+        android:pathData="M34,57 L48,52.5 L62,57 L48,61.5 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M42,48 L48,50.5 L48,57.5 L42,55 Z" />
+    <path android:fillColor="#1a1d22"
+        android:pathData="M48,50.5 L54,48 L54,55 L48,57.5 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M42,48 L48,45.5 L54,48 L48,50.5 Z" />
+    <path android:fillColor="#0b0a0f"
+        android:pathData="M44,46.8 A4,1.9 0 1 0 52,46.8 A4,1.9 0 1 0 44,46.8 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M36,34 L39,35.5 L39,54 L36,52.5 Z" />
+    <path android:fillColor="#1a1d22"
+        android:pathData="M39,35.5 L42,34 L42,53 L39,54 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M36,34 L39,32.5 L42,34 L39,35.5 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M54,34 L57,35.5 L57,54 L54,52.5 Z" />
+    <path android:fillColor="#1a1d22"
+        android:pathData="M57,35.5 L60,34 L60,53 L57,54 Z" />
+    <path android:fillColor="#454c55"
+        android:pathData="M54,34 L57,32.5 L60,34 L57,35.5 Z" />
+    <path android:fillColor="#2c3138"
+        android:pathData="M36,34 Q42,26 48,22 Q54,26 60,34 L60,37 Q54,29 48,25.5 Q42,29 36,37 Z" />
+    <path android:fillColor="#6a7380"
+        android:pathData="M36,34 Q42,26 48,22 L48,23.6 Q42.6,27.4 37.2,34.7 Z" />
+    <path android:fillColor="#17151e"
+        android:pathData="M47,23 L48,21.6 L49,23 L48,24.4 Z" />
+    <path android:fillColor="#b3913a" android:fillAlpha="0.22"
+        android:pathData="M39,45.5 A9,6 0 1 0 57,45.5 A9,6 0 1 0 39,45.5 Z" />
+    <path android:fillColor="#e3c46b" android:fillAlpha="0.45"
+        android:pathData="M43,45.8 A5,3.4 0 1 0 53,45.8 A5,3.4 0 1 0 43,45.8 Z" />
+    <path android:fillColor="#e3c46b" android:fillAlpha="0.95"
+        android:pathData="M45.6,45.5 A2.4,1.6 0 1 0 50.4,45.5 A2.4,1.6 0 1 0 45.6,45.5 Z" />
+    <path android:fillColor="#b3913a" android:fillAlpha="0.5"
+        android:pathData="M39,40 L40,40.3 L40,53 L39,52.7 Z" />
+    <path android:fillColor="#b3913a" android:fillAlpha="0.4"
+        android:pathData="M54,40 L55,40.3 L55,53 L54,52.7 Z" />
+    <path android:fillColor="#e3c46b" android:fillAlpha="0.8"
+        android:pathData="M46.8,52.5 L48,51.7 L49.2,52.5 L48,53.3 Z" />
+</vector>
