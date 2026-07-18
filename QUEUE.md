@@ -2,32 +2,33 @@
 > Mirrors state in GRAPH.md. Session state also in task_plan.md/progress.md (planning-with-files).
 
 ## 🔴 Ready (pick these up)
-### High Priority
-- [ ] WU-05 (cont.) shrine node family + NPC tokens ×12 — vector drawables per style bible
-- [ ] GitHub push via Chrome upload pages (user request; IN PROGRESS, interrupted 2026-07-14) —
-      PROGRESS: user signed in as asshat1981ar ✓; upload strategy validated: /upload/<branch>/<dir>
-      pages + file_upload tool (needs `ref` from read_page — find tool is rate-limited, avoid).
-      File input on upload page = #upload-manifest-files-input. Branch name: `sprite-asset-drop`
-      (no slash — upload URLs can't disambiguate). Commit rounds by target dir (~12): root planning
-      files → docs/sprites → core-model sprites → core-data sprites → core-ui sprites+theme →
-      feature-map → feature-dialogue → app assets (manifest json) → app res/drawable (6 ruins
-      vector XMLs) → app navigation + Application.kt → scripts. First round (8 root files) creates
-      the branch via the commit dialog.
-      BLOCKED AT: Chrome extension disconnected again right before read_page→file_upload of round 1.
-      RESUME: reconnect extension → read_page(interactive) on /upload/main → file_upload(ref, 8 root
-      files) → commit dialog → "Create a new branch" = sprite-asset-drop.
-      NOTE: account 5h usage window near-exhausted (find tool 429). Be economical; state is durable.
-- [ ] WU-04 App-root wiring — SpriteModule.kt (Hilt) + manifest init + LocalSpriteLoader provider — source: GRAPH.md (∥ WU-02)
-
 ### Medium Priority
-- [ ] WU-05 (cont.) NPC tokens ×12, portraits, camp items, UI chrome as vector drawables — source: user approved chimera-game-art; style bible = plugin ramps (supersedes ink-wash per user call)
-- [ ] WU-05 (cont.) shrine node family ×6 states — completes MAP_NODE manifest coverage beyond ruins
+- [ ] WU-05 (cont.) combat screen wiring — DuelScreen → CombatStanceSprite (art shipped 2026-07-19;
+      GRAPH out_of_scope_v1, now unblocked on the asset side)
+- [ ] WU-05 (cont.) camp/inventory sprite wiring — InventoryItemSprite + camp_item_* art into
+      InventoryScreen/CraftingScreen cells
+- [ ] FogNodePlaceholder → fog sprite (map/connections family) — v2 backlog
 
 ## 🔵 Blocked
-- [ ] WU-06 Gate run (detekt/tests/assemble) — blocked by: no repo checkout, workspace VM down — escalation: connect repo folder OR grant GitHub write for CI-driven verification
-- [ ] GitHub push — blocked by: 403 read-only integration — escalation: grant Claude GitHub App write access
+- [ ] WU-06 Gate run (detekt/tests/assemble) — blocked by: no Android SDK in agent sandboxes —
+      escalation: CI workflow (android.yml) runs the full gate suite on PR;
+      or Termux device per README deploy scripts
 
 ## ✅ Done
+- [x] WU-05 sprite asset completion — 2026-07-19 — shrine node family ×6 states, NPC tokens ×12
+      (portrait-ramp keyed), camp items ×3 (herb_bundle/iron_ingot/omen_stone), UI chrome ×4
+      (frame_gold, seal common/rare/legendary), combat stances ×3 + wounded variants ×3 —
+      31 vector drawables per style bible (3/4 overhead, upper-left key, state accent ramps);
+      rendered preview self-check passed against ruins family
+- [x] Sprite manifest v1.1.0 — 2026-07-19 — 109 entries, 100% drawable-backed; NPC_PORTRAIT
+      now covers all 12 NPCs × 6 expressions (fixes elara/thorne sample drift; expression
+      variants share base portrait art + tint/ink-wash); COMBAT_PLAYER wounded variants are
+      explicit IDs (fixes resolveCombatStance(wounded=true) manifest miss)
+- [x] nodeType JSON tagging — 2026-07-19 — The Broken Shrine (act1), Ember Sanctum (act2),
+      Drowned Temple (act3) tagged "shrine"; activates the shrine family on the map
+- [x] ROADMAP C dialogue telemetry — 2026-07-19 — DialogueToneRing + MemoryRuneChip (core-ui)
+      wired into DialogueSceneScreen header; pure disposition projections, thresholds aligned
+      with PortraitExpression.fromDisposition; JUnit tests incl. expression/rune consistency
 - [x] WU-04 app-root wiring — 2026-07-14 — SpriteModule.kt (Hilt binds SpriteManifest→SpriteResolver), SpriteRuntimeViewModel.kt (resolver+loader bridge, zero MainActivity changes), ChimeraNavHost v2 (LocalSpriteLoader provider + resolver into Map/Dialogue destinations), ChimeraApplication v2 (off-main-thread manifest init, fail-soft). ALL FOUR sprite code paths now connected end-to-end
 - [x] WU-02 dialogue portrait wiring — 2026-07-14 — DialogueSceneScreen.kt v2: header portrait prefers NpcPortraitSprite with expression driven live by PortraitExpression.fromDisposition(uiState.npcDisposition); legacy NpcPortrait (disposition ring + drawn fallback) untouched on resolver miss; spriteResolver param defaults to EmptySpriteResolver so nav call sites compile unchanged
 - [x] WU-03 nodeType plumbing — 2026-07-14 — MapNode.kt v2 (optional nodeType, default null), MapNodeLoader v2 + MultiActMapNodeLoader v2 (JSON passthrough, old JSON loads unchanged), adapter v2 (explicit field > name heuristic > default; unknown families degrade to legacy rendering). Content task discovered: tag act1/2/3_map.json nodes with nodeType
