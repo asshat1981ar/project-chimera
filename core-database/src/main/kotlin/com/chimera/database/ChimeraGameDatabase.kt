@@ -10,6 +10,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.chimera.database.converter.Converters
 import com.chimera.database.dao.CharacterDao
+import com.chimera.database.dao.CharacterEquipmentDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.CraftingRecipeDao
 import com.chimera.database.dao.DialogueTurnDao
@@ -24,6 +25,7 @@ import com.chimera.database.dao.SaveSlotDao
 import com.chimera.database.dao.SceneInstanceDao
 import com.chimera.database.dao.VowDao
 import com.chimera.database.entity.CharacterEntity
+import com.chimera.database.entity.CharacterEquipmentEntity
 import com.chimera.database.entity.CharacterStateEntity
 import com.chimera.database.entity.CraftingRecipeEntity
 import com.chimera.database.entity.DialogueTurnEntity
@@ -53,9 +55,10 @@ import com.chimera.database.entity.VowEntity
         QuestEntity::class,
         QuestObjectiveEntity::class,
         InventoryItemEntity::class,
-        CraftingRecipeEntity::class
+        CraftingRecipeEntity::class,
+        CharacterEquipmentEntity::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -75,6 +78,7 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
     abstract fun craftingRecipeDao(): CraftingRecipeDao
     abstract fun rumorPacketDao(): RumorPacketDao
     abstract fun factionStateDao(): FactionStateDao
+    abstract fun characterEquipmentDao(): CharacterEquipmentDao
 
     companion object {
         const val DATABASE_NAME = "chimera_game.db"
@@ -86,7 +90,7 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
                 DATABASE_NAME
             )
                 .addCallback(PrepopulateCallback())
-                .addMigrations(MIGRATION_7_8, MIGRATION_8_9)
+                .addMigrations(MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
             if (BuildConfig.DEBUG) builder.fallbackToDestructiveMigration()
             return builder.build()
         }
@@ -151,6 +155,29 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
                 db.execSQL("CREATE INDEX IF NOT EXISTS index_quest_objectives_target_map_node_id ON quest_objectives(target_map_node_id)")
                 db.execSQL("CREATE INDEX IF NOT EXISTS index_quest_objectives_target_npc_id ON quest_objectives(target_npc_id)")
                 db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_quest_objectives_quest_step ON quest_objectives(quest_id, step_index)")
+            }
+        }
+
+        /**
+         * 9 → 10: Add equip_slot to inventory_items and a character_equipment join table.
+         * Additive only — no existing tables/columns are modified.
+         */
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE inventory_items ADD COLUMN equip_slot TEXT DEFAULT NULL")
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS character_equipment (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        save_slot_id INTEGER NOT NULL,
+                        character_id TEXT NOT NULL,
+                        equip_slot TEXT NOT NULL,
+                        item_id TEXT NOT NULL,
+                        equipped_at INTEGER NOT NULL,
+                        FOREIGN KEY(character_id) REFERENCES characters(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_character_equipment_character_id ON character_equipment(character_id)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_character_equipment_character_id_equip_slot ON character_equipment(character_id, equip_slot)")
             }
         }
     }

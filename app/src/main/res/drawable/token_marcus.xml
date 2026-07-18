@@ -1,0 +1,32 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Shadow -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M24,26m-20,0a20,20 0,1 1,40 0a20,20 0,1 1,-40 0" />
+    <!-- Cloak body -->
+    <path
+        android:fillColor="#5C1A1A"
+        android:pathData="M24,8C16,8 10,16 12,24C14,34 20,40 24,40C28,40 34,34 36,24C38,16 32,8 24,8Z" />
+    <!-- Hood highlight -->
+    <path
+        android:fillColor="#8B2A2A"
+        android:pathData="M24,10C18,10 14,16 15,22C16,28 20,32 24,32C28,32 32,28 33,22C34,16 30,10 24,10Z" />
+    <!-- Staff -->
+    <path
+        android:strokeColor="#C89B3C"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M34,12L34,38" />
+    <path
+        android:fillColor="#D4A84E"
+        android:pathData="M32,10h4v4h-4z" />
+    <!-- Gold ring -->
+    <path
+        android:strokeColor="#9E7A1A"
+        android:strokeWidth="1.5"
+        android:pathData="M24,5C13.5,5 5,13.5 5,24s8.5,19 19,19 19,-8.5 19,-19S34.5,5 24,5Z" />
+</vector>

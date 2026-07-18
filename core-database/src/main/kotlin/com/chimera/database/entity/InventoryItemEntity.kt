@@ -42,5 +42,8 @@ data class InventoryItemEntity(
     val sourceSceneId: String? = null,
 
     @ColumnInfo(name = "acquired_at")
-    val acquiredAt: Long = System.currentTimeMillis()
+    val acquiredAt: Long = System.currentTimeMillis(),
+
+    @ColumnInfo(name = "equip_slot")
+    val equipSlot: String? = null // null = not equippable; e.g. "OUTFIT"
 )

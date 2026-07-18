@@ -3,6 +3,7 @@ package com.chimera.database.di
 import android.content.Context
 import com.chimera.database.ChimeraGameDatabase
 import com.chimera.database.dao.CharacterDao
+import com.chimera.database.dao.CharacterEquipmentDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.CraftingRecipeDao
 import com.chimera.database.dao.DialogueTurnDao
@@ -47,4 +48,5 @@ object DatabaseModule {
     @Provides fun provideQuestObjectiveDao(db: ChimeraGameDatabase): QuestObjectiveDao = db.questObjectiveDao()
     @Provides fun provideInventoryDao(db: ChimeraGameDatabase): InventoryDao = db.inventoryDao()
     @Provides fun provideCraftingRecipeDao(db: ChimeraGameDatabase): CraftingRecipeDao = db.craftingRecipeDao()
+    @Provides fun provideCharacterEquipmentDao(db: ChimeraGameDatabase): CharacterEquipmentDao = db.characterEquipmentDao()
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="token_marcus_description">Token for Marcus, a gothic mage with staff.</string>
+    <string name="token_aria_description">Token for Aria, an arcane scholar.</string>
+</resources>

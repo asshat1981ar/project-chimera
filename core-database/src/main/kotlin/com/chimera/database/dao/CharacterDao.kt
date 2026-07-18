@@ -28,6 +28,9 @@ interface CharacterDao {
     @Query("SELECT * FROM characters WHERE save_slot_id = :slotId AND is_player_character = 1 LIMIT 1")
     suspend fun getPlayerCharacter(slotId: Long): CharacterEntity?
 
+    @Query("SELECT * FROM characters WHERE save_slot_id = :slotId AND is_player_character = 1 LIMIT 1")
+    fun observePlayerCharacter(slotId: Long): Flow<CharacterEntity?>
+
     @Query("SELECT * FROM characters WHERE save_slot_id = :slotId AND role = 'COMPANION'")
     fun observeCompanions(slotId: Long): Flow<List<CharacterEntity>>
 
