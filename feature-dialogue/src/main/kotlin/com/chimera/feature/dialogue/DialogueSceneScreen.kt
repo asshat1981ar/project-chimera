@@ -66,18 +66,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chimera.core.model.sprites.EmptySpriteResolver
+import com.chimera.core.model.sprites.PortraitExpression
+import com.chimera.core.model.sprites.SpriteResolver
+import com.chimera.core.ui.sprites.NpcPortraitSprite
 import com.chimera.ui.theme.DimAsh
 import com.chimera.ui.theme.EmberGold
 import com.chimera.ui.theme.FadedBone
 import com.chimera.ui.theme.HollowCrimson
 import com.chimera.ui.theme.VoidGreen
 
+/**
+ * v2 (2026-07-14, Workstream H Phase 0.5 / WU-02): sprite-wired dialogue screen.
+ *
+ * The header portrait now prefers the ink-wash sprite system: the NPC's live
+ * disposition maps to a [PortraitExpression] (fromDisposition), and when
+ * [spriteResolver] has a portrait for (npcId, expression) it renders via
+ * [NpcPortraitSprite] — expression changes with the simulation. When no
+ * sprite asset exists, the original [com.chimera.ui.components.NpcPortrait]
+ * (with its disposition ring and drawn fallback) renders unchanged.
+ *
+ * Simulation contract unchanged: expression is a pure projection of
+ * ViewModel state; nothing here writes back into the sim.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DialogueSceneScreen(
     sceneId: String,
     onSceneComplete: (nextSceneId: String?) -> Unit,
     onTriggerDuel: (opponentId: String) -> Unit = {},
+    spriteResolver: SpriteResolver = EmptySpriteResolver,
     viewModel: DialogueSceneViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -155,16 +173,34 @@ fun DialogueSceneScreen(
                     ) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Leave scene", tint = FadedBone)
                     }
-                    // NPC portrait with live disposition ring
-                    com.chimera.ui.components.NpcPortrait(
-                        npcId = uiState.npcId.ifBlank { uiState.npcName },
-                        npcName = uiState.npcName,
-                        disposition = uiState.npcDisposition,
-                        archetype = uiState.npcArchetype,
-                        portraitResName = uiState.npcPortraitResName,
-                        size = 40.dp,
-                        contentDescription = "${uiState.npcName} portrait"
-                    )
+                    // NPC portrait: sprite system first (expression follows live
+                    // disposition), legacy NpcPortrait with disposition ring otherwise.
+                    val headerNpcId = uiState.npcId.ifBlank { uiState.npcName }
+                    val expression = remember(uiState.npcDisposition) {
+                        PortraitExpression.fromDisposition(uiState.npcDisposition)
+                    }
+                    val hasPortraitSprite = remember(headerNpcId, expression, spriteResolver) {
+                        spriteResolver.resolveNpcPortrait(headerNpcId, expression) != null
+                    }
+
+                    if (hasPortraitSprite) {
+                        NpcPortraitSprite(
+                            npcId = headerNpcId,
+                            resolver = spriteResolver,
+                            expression = expression,
+                            size = 40.dp
+                        )
+                    } else {
+                        com.chimera.ui.components.NpcPortrait(
+                            npcId = headerNpcId,
+                            npcName = uiState.npcName,
+                            disposition = uiState.npcDisposition,
+                            archetype = uiState.npcArchetype,
+                            portraitResName = uiState.npcPortraitResName,
+                            size = 40.dp,
+                            contentDescription = "${uiState.npcName} portrait"
+                        )
+                    }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(uiState.sceneTitle, style = MaterialTheme.typography.titleMedium)
