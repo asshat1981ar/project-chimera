@@ -1,8 +1,13 @@
 package com.chimera.feature.camp
 
+import android.content.Context
 import app.cash.turbine.test
+import com.chimera.ai.PortraitGenerationService
 import com.chimera.data.GameSessionManager
+import com.chimera.database.dao.CharacterDao
+import com.chimera.database.dao.CharacterEquipmentDao
 import com.chimera.database.dao.InventoryDao
+import com.chimera.database.entity.CharacterEntity
 import com.chimera.database.entity.InventoryItemEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,6 +24,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -28,9 +34,14 @@ class InventoryViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private val inventoryDao: InventoryDao = mock()
+    private val characterDao: CharacterDao = mock()
+    private val characterEquipmentDao: CharacterEquipmentDao = mock()
+    private val portraitService: PortraitGenerationService = mock()
     private val gameSessionManager: GameSessionManager = mock()
+    private val appContext: Context = mock()
 
     private val slotId = 1L
+    private val playerCharacterId = "player_1"
 
     // Reusable test items
     private val artifact = InventoryItemEntity(
@@ -69,6 +80,15 @@ class InventoryViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        val player = CharacterEntity(
+            id = playerCharacterId,
+            saveSlotId = slotId,
+            name = "Test Player",
+            role = "PROTAGONIST",
+            isPlayerCharacter = true
+        )
+        whenever(characterDao.observePlayerCharacter(slotId)).thenReturn(flowOf(player))
+        whenever(characterEquipmentDao.observeByCharacter(playerCharacterId)).thenReturn(flowOf(emptyList()))
     }
 
     @After
@@ -78,7 +98,11 @@ class InventoryViewModelTest {
 
     private fun buildViewModel(): InventoryViewModel = InventoryViewModel(
         inventoryDao = inventoryDao,
-        gameSessionManager = gameSessionManager
+        characterDao = characterDao,
+        characterEquipmentDao = characterEquipmentDao,
+        portraitService = portraitService,
+        gameSessionManager = gameSessionManager,
+        appContext = appContext
     )
 
     // ─── Slot null: no active game ───────────────────────────────────────────
