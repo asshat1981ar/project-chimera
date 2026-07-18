@@ -60,7 +60,8 @@
       "tide_amphitheater"
     ],
     "xFraction": 0.75,
-    "yFraction": 0.4
+    "yFraction": 0.4,
+    "nodeType": "shrine"
   },
   {
     "id": "tidal_lab",

@@ -48,7 +48,8 @@
       "reforged_camp"
     ],
     "xFraction": 0.15,
-    "yFraction": 0.45
+    "yFraction": 0.45,
+    "nodeType": "shrine"
   },
   {
     "id": "reforged_camp",
