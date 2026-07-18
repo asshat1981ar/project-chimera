@@ -65,7 +65,8 @@
     "sceneId": "vessa_shrine",
     "connectedTo": ["merchants_rest"],
     "xFraction": 0.15,
-    "yFraction": 0.3
+    "yFraction": 0.3,
+    "nodeType": "shrine"
   },
   {
     "id": "hollow_approach",

@@ -68,3 +68,36 @@ sprite system integration.
 **Next action:** batch 2 — read DialogueSceneScreen.kt + MapViewModel.kt from GitHub, produce
 sprite-wired versions of both screens (graceful fallback preserved), plus MapNode.nodeType model
 addition + loader change.
+
+## Session 2026-07-19 (WU-05 completion + ROADMAP C, Kimi)
+
+**Did:**
+- WU-05 asset completion: 31 vector drawables per style bible (3/4 overhead, upper-left key,
+  Abyss/Cold-stone base ramps, one restrained accent per state) —
+  map_shrine ×6 states, npc_*_token ×12 (portrait-ramp keyed), camp_item ×3,
+  ui_frame_gold + ui_seal ×3, combat_player stances ×3 + explicit _wounded ×3.
+  Rendered preview self-check against the ruins family before commit.
+- sprite_manifest.json v1.1.0: 109 entries, 100% drawable-backed (verified by script).
+  Fixed portrait drift (manifest said elara/thorne samples; roster is 12 NPCs — now
+  12×6 expression entries sharing base portrait art, expression via tint/ink-wash).
+  Fixed latent wounded-stance miss: resolveCombatStance(wounded=true) built IDs with
+  a _wounded suffix that no manifest entry registered; wounded variants are now explicit entries.
+- Content: nodeType "shrine" tagged on The Broken Shrine (act1), Ember Sanctum (act2),
+  Drowned Temple (act3); other nodes intentionally untagged (adapter default).
+- ROADMAP Workstream C: DialogueToneRing + MemoryRuneChip (core-ui) wired into
+  DialogueSceneScreen header (v3). Pure disposition projections with thresholds aligned to
+  PortraitExpression.fromDisposition; chips never expose raw scores; glyphs differ by shape
+  (not color-only); tone ring merges descendants for a single accessibility announcement.
+  JUnit tests: labels, pulse rule, color uniqueness, threshold bands, ≤2 chips,
+  rune/expression consistency sweep over -1.0..1.0.
+- Docs: QUEUE.md re-triaged (WU-05 done; combat/inventory wiring now the open sprite work).
+
+**Gate results:** not run locally — no Android SDK in sandbox; delegated to CI (android.yml)
+on the PR. All new Kotlin is detekt-conscious (LongMethod split, no magic-number reliance).
+All 31 XML drawables validated (well-formed) + raster-previewed.
+
+**Next action:** CI green → merge; then DuelScreen CombatStanceSprite wiring and
+InventoryItemSprite into Inventory/Crafting cells (QUEUE Ready).
+
+**Blockers:** none. (Historical 2026-07-14 push blocker resolved: GitHub integration now has
+Contents write; branch feat/wu05-sprite-asset-completion pushed via API.)

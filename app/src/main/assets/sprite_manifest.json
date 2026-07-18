@@ -1,112 +1,1265 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "style": "gothic_manuscript_inkwash",
-  "generated": "2026-07-13",
-  "total_assets": 194,
+  "generated": "2026-07-19",
   "categories": [
     {
       "category": "NPC_PORTRAIT",
-      "description": "NPC character portraits with expression variants",
+      "description": "NPC character portraits; expression variants share the base portrait art and differentiate via tint/ink-wash overlays (NpcPortraitSprite)",
       "entries": [
         {
-          "id": "npc_elara_neutral",
-          "baseName": "npc_elara_neutral",
-          "npcId": "elara",
-          "expression": "neutral",
+          "id": "npc_warden_neutral",
+          "baseName": "portrait_warden",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 128, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "warden",
+          "expression": "neutral"
         },
         {
-          "id": "npc_elara_hostile",
-          "baseName": "npc_elara_hostile",
-          "npcId": "elara",
-          "expression": "hostile",
+          "id": "npc_warden_tense",
+          "baseName": "portrait_warden",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 128, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "warden",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_warden_wounded",
+          "baseName": "portrait_warden",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "warden",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_warden_grateful",
+          "baseName": "portrait_warden",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "warden",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_warden_hostile",
+          "baseName": "portrait_warden",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "warden",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_warden_oathbound",
+          "baseName": "portrait_warden",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "warden",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_elena_neutral",
+          "baseName": "portrait_elena",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "elena",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_elena_tense",
+          "baseName": "portrait_elena",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "elena",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_elena_wounded",
+          "baseName": "portrait_elena",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "elena",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_elena_grateful",
+          "baseName": "portrait_elena",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "elena",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_elena_hostile",
+          "baseName": "portrait_elena",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "elena",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_elena_oathbound",
+          "baseName": "portrait_elena",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "elena",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_marcus_neutral",
+          "baseName": "portrait_marcus",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "marcus",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_marcus_tense",
+          "baseName": "portrait_marcus",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "marcus",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_marcus_wounded",
+          "baseName": "portrait_marcus",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "marcus",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_marcus_grateful",
+          "baseName": "portrait_marcus",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "marcus",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_marcus_hostile",
+          "baseName": "portrait_marcus",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "marcus",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_marcus_oathbound",
+          "baseName": "portrait_marcus",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "marcus",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_aria_neutral",
+          "baseName": "portrait_aria",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "aria",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_aria_tense",
+          "baseName": "portrait_aria",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "aria",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_aria_wounded",
+          "baseName": "portrait_aria",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "aria",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_aria_grateful",
+          "baseName": "portrait_aria",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "aria",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_aria_hostile",
+          "baseName": "portrait_aria",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "aria",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_aria_oathbound",
+          "baseName": "portrait_aria",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "aria",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_hollow_king_neutral",
+          "baseName": "portrait_hollow_king",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "hollow_king",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_hollow_king_tense",
+          "baseName": "portrait_hollow_king",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "hollow_king",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_hollow_king_wounded",
+          "baseName": "portrait_hollow_king",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "hollow_king",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_hollow_king_grateful",
+          "baseName": "portrait_hollow_king",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "hollow_king",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_hollow_king_hostile",
+          "baseName": "portrait_hollow_king",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "hollow_king",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_hollow_king_oathbound",
+          "baseName": "portrait_hollow_king",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "hollow_king",
+          "expression": "oathbound"
         },
         {
           "id": "npc_thorne_neutral",
-          "baseName": "npc_thorne_neutral",
-          "npcId": "thorne",
-          "expression": "neutral",
+          "baseName": "portrait_thorne",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 128, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "thorne",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_thorne_tense",
+          "baseName": "portrait_thorne",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "thorne",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_thorne_wounded",
+          "baseName": "portrait_thorne",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "thorne",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_thorne_grateful",
+          "baseName": "portrait_thorne",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "thorne",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_thorne_hostile",
+          "baseName": "portrait_thorne",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "thorne",
+          "expression": "hostile"
         },
         {
           "id": "npc_thorne_oathbound",
-          "baseName": "npc_thorne_oathbound",
-          "npcId": "thorne",
-          "expression": "oathbound",
+          "baseName": "portrait_thorne",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 128, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "thorne",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_vessa_neutral",
+          "baseName": "portrait_vessa",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "vessa",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_vessa_tense",
+          "baseName": "portrait_vessa",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "vessa",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_vessa_wounded",
+          "baseName": "portrait_vessa",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "vessa",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_vessa_grateful",
+          "baseName": "portrait_vessa",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "vessa",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_vessa_hostile",
+          "baseName": "portrait_vessa",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "vessa",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_vessa_oathbound",
+          "baseName": "portrait_vessa",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "vessa",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_kael_neutral",
+          "baseName": "portrait_kael",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "kael",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_kael_tense",
+          "baseName": "portrait_kael",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "kael",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_kael_wounded",
+          "baseName": "portrait_kael",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "kael",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_kael_grateful",
+          "baseName": "portrait_kael",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "kael",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_kael_hostile",
+          "baseName": "portrait_kael",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "kael",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_kael_oathbound",
+          "baseName": "portrait_kael",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "kael",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_seren_neutral",
+          "baseName": "portrait_seren",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "seren",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_seren_tense",
+          "baseName": "portrait_seren",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "seren",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_seren_wounded",
+          "baseName": "portrait_seren",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "seren",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_seren_grateful",
+          "baseName": "portrait_seren",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "seren",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_seren_hostile",
+          "baseName": "portrait_seren",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "seren",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_seren_oathbound",
+          "baseName": "portrait_seren",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "seren",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_dara_neutral",
+          "baseName": "portrait_dara",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "dara",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_dara_tense",
+          "baseName": "portrait_dara",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "dara",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_dara_wounded",
+          "baseName": "portrait_dara",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "dara",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_dara_grateful",
+          "baseName": "portrait_dara",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "dara",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_dara_hostile",
+          "baseName": "portrait_dara",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "dara",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_dara_oathbound",
+          "baseName": "portrait_dara",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "dara",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_rook_neutral",
+          "baseName": "portrait_rook",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "rook",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_rook_tense",
+          "baseName": "portrait_rook",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "rook",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_rook_wounded",
+          "baseName": "portrait_rook",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "rook",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_rook_grateful",
+          "baseName": "portrait_rook",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "rook",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_rook_hostile",
+          "baseName": "portrait_rook",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "rook",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_rook_oathbound",
+          "baseName": "portrait_rook",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "rook",
+          "expression": "oathbound"
+        },
+        {
+          "id": "npc_corruption_neutral",
+          "baseName": "portrait_corruption",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "corruption",
+          "expression": "neutral"
+        },
+        {
+          "id": "npc_corruption_tense",
+          "baseName": "portrait_corruption",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "corruption",
+          "expression": "tense"
+        },
+        {
+          "id": "npc_corruption_wounded",
+          "baseName": "portrait_corruption",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "corruption",
+          "expression": "wounded"
+        },
+        {
+          "id": "npc_corruption_grateful",
+          "baseName": "portrait_corruption",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "corruption",
+          "expression": "grateful"
+        },
+        {
+          "id": "npc_corruption_hostile",
+          "baseName": "portrait_corruption",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "corruption",
+          "expression": "hostile"
+        },
+        {
+          "id": "npc_corruption_oathbound",
+          "baseName": "portrait_corruption",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 192,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "corruption",
+          "expression": "oathbound"
         }
       ]
     },
     {
       "category": "NPC_TOKEN",
-      "description": "Overhead map tokens for NPCs",
+      "description": "Overhead map tokens for NPCs (vector drawables, portrait-ramp keyed)",
       "entries": [
         {
-          "id": "npc_elara_token",
-          "baseName": "npc_elara_token",
-          "npcId": "elara",
+          "id": "npc_warden_token",
+          "baseName": "npc_warden_token",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 64, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "warden"
+        },
+        {
+          "id": "npc_elena_token",
+          "baseName": "npc_elena_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "elena"
+        },
+        {
+          "id": "npc_marcus_token",
+          "baseName": "npc_marcus_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "marcus"
+        },
+        {
+          "id": "npc_aria_token",
+          "baseName": "npc_aria_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "aria"
+        },
+        {
+          "id": "npc_hollow_king_token",
+          "baseName": "npc_hollow_king_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "hollow_king"
         },
         {
           "id": "npc_thorne_token",
           "baseName": "npc_thorne_token",
-          "npcId": "thorne",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 64, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "thorne"
+        },
+        {
+          "id": "npc_vessa_token",
+          "baseName": "npc_vessa_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "vessa"
+        },
+        {
+          "id": "npc_kael_token",
+          "baseName": "npc_kael_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "kael"
+        },
+        {
+          "id": "npc_seren_token",
+          "baseName": "npc_seren_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "seren"
+        },
+        {
+          "id": "npc_dara_token",
+          "baseName": "npc_dara_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "dara"
+        },
+        {
+          "id": "npc_rook_token",
+          "baseName": "npc_rook_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "rook"
+        },
+        {
+          "id": "npc_corruption_token",
+          "baseName": "npc_corruption_token",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 64,
+              "density": "XHDPI"
+            }
+          ],
+          "npcId": "corruption"
         }
       ]
     },
     {
       "category": "COMBAT_PLAYER",
-      "description": "Player combat stance sprites",
+      "description": "Player combat stance sprites; wounded variants are explicit IDs so resolveCombatStance(wounded=true) resolves",
       "entries": [
         {
           "id": "combat_player_strike",
           "baseName": "combat_player_strike",
-          "stance": "strike",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 180, "density": "XHDPI"},
-            {"suffix": "_wounded", "resolution": 180, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 180,
+              "density": "XHDPI"
+            }
+          ],
+          "stance": "strike"
+        },
+        {
+          "id": "combat_player_strike_wounded",
+          "baseName": "combat_player_strike_wounded",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 180,
+              "density": "XHDPI"
+            }
+          ],
+          "stance": "strike"
         },
         {
           "id": "combat_player_ward",
           "baseName": "combat_player_ward",
-          "stance": "ward",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 180, "density": "XHDPI"},
-            {"suffix": "_wounded", "resolution": 180, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 180,
+              "density": "XHDPI"
+            }
+          ],
+          "stance": "ward"
+        },
+        {
+          "id": "combat_player_ward_wounded",
+          "baseName": "combat_player_ward_wounded",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 180,
+              "density": "XHDPI"
+            }
+          ],
+          "stance": "ward"
         },
         {
           "id": "combat_player_feint",
           "baseName": "combat_player_feint",
-          "stance": "feint",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 180, "density": "XHDPI"},
-            {"suffix": "_wounded", "resolution": 180, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 180,
+              "density": "XHDPI"
+            }
+          ],
+          "stance": "feint"
+        },
+        {
+          "id": "combat_player_feint_wounded",
+          "baseName": "combat_player_feint_wounded",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 180,
+              "density": "XHDPI"
+            }
+          ],
+          "stance": "feint"
         }
       ]
     },
@@ -115,74 +1268,172 @@
       "description": "Map node sprites by type and quest state",
       "entries": [
         {
-          "id": "map_ruins_active",
-          "baseName": "map_ruins_active",
-          "nodeType": "ruins",
-          "state": "active",
+          "id": "map_ruins_neutral",
+          "baseName": "map_ruins_neutral",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 96, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "ruins",
+          "state": "neutral"
+        },
+        {
+          "id": "map_ruins_active",
+          "baseName": "map_ruins_active",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "ruins",
+          "state": "active"
         },
         {
           "id": "map_ruins_hidden",
           "baseName": "map_ruins_hidden",
-          "nodeType": "ruins",
-          "state": "hidden",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 96, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "ruins",
+          "state": "hidden"
         },
         {
           "id": "map_ruins_completed",
           "baseName": "map_ruins_completed",
-          "nodeType": "ruins",
-          "state": "completed",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 96, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "ruins",
+          "state": "completed"
         },
         {
           "id": "map_ruins_failed",
           "baseName": "map_ruins_failed",
-          "nodeType": "ruins",
-          "state": "failed",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 96, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "ruins",
+          "state": "failed"
         },
         {
           "id": "map_ruins_blocked",
           "baseName": "map_ruins_blocked",
-          "nodeType": "ruins",
-          "state": "blocked",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 96, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "ruins",
+          "state": "blocked"
         },
         {
-          "id": "map_ruins_neutral",
-          "baseName": "map_ruins_neutral",
-          "nodeType": "ruins",
-          "state": "neutral",
+          "id": "map_shrine_neutral",
+          "baseName": "map_shrine_neutral",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 96, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "shrine",
+          "state": "neutral"
         },
         {
           "id": "map_shrine_active",
           "baseName": "map_shrine_active",
-          "nodeType": "shrine",
-          "state": "active",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 96, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "shrine",
+          "state": "active"
+        },
+        {
+          "id": "map_shrine_hidden",
+          "baseName": "map_shrine_hidden",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "shrine",
+          "state": "hidden"
+        },
+        {
+          "id": "map_shrine_completed",
+          "baseName": "map_shrine_completed",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "shrine",
+          "state": "completed"
+        },
+        {
+          "id": "map_shrine_failed",
+          "baseName": "map_shrine_failed",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "shrine",
+          "state": "failed"
+        },
+        {
+          "id": "map_shrine_blocked",
+          "baseName": "map_shrine_blocked",
+          "transparent": true,
+          "variants": [
+            {
+              "suffix": "",
+              "resolution": 96,
+              "density": "XHDPI"
+            }
+          ],
+          "nodeType": "shrine",
+          "state": "blocked"
         }
       ]
     },
@@ -193,29 +1444,41 @@
         {
           "id": "camp_item_herb_bundle",
           "baseName": "camp_item_herb_bundle",
-          "itemId": "herb_bundle",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 128, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 128,
+              "density": "XHDPI"
+            }
+          ],
+          "itemId": "herb_bundle"
         },
         {
           "id": "camp_item_iron_ingot",
           "baseName": "camp_item_iron_ingot",
-          "itemId": "iron_ingot",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 128, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 128,
+              "density": "XHDPI"
+            }
+          ],
+          "itemId": "iron_ingot"
         },
         {
           "id": "camp_item_omen_stone",
           "baseName": "camp_item_omen_stone",
-          "itemId": "omen_stone",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 128, "density": "XHDPI"}
-          ]
+            {
+              "suffix": "",
+              "resolution": 128,
+              "density": "XHDPI"
+            }
+          ],
+          "itemId": "omen_stone"
         }
       ]
     },
@@ -228,7 +1491,11 @@
           "baseName": "ui_frame_gold",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 512, "density": "XHDPI"}
+            {
+              "suffix": "",
+              "resolution": 512,
+              "density": "XHDPI"
+            }
           ]
         },
         {
@@ -236,7 +1503,11 @@
           "baseName": "ui_seal_common",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 32, "density": "XHDPI"}
+            {
+              "suffix": "",
+              "resolution": 32,
+              "density": "XHDPI"
+            }
           ]
         },
         {
@@ -244,7 +1515,11 @@
           "baseName": "ui_seal_rare",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 32, "density": "XHDPI"}
+            {
+              "suffix": "",
+              "resolution": 32,
+              "density": "XHDPI"
+            }
           ]
         },
         {
@@ -252,10 +1527,15 @@
           "baseName": "ui_seal_legendary",
           "transparent": true,
           "variants": [
-            {"suffix": "", "resolution": 32, "density": "XHDPI"}
+            {
+              "suffix": "",
+              "resolution": 32,
+              "density": "XHDPI"
+            }
           ]
         }
       ]
     }
-  ]
+  ],
+  "total_assets": 109
 }

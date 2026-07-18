@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera camp item: herb_bundle.
+     Tied medicinal sprigs; Sickly verdigris greens with a Tarnished gold binding cord. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="128dp"
+    android:height="128dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+    <path android:fillColor="#17151e" android:fillAlpha="0.65"
+        android:pathData="M24,100 A40,12 0 1 0 104,100 A40,12 0 1 0 24,100 Z" />
+    <path android:fillColor="#1c3327"
+        android:pathData="M40,96 L46,58 L50,58 L46,97 Z" />
+    <path android:fillColor="#1c3327"
+        android:pathData="M60,98 L62,54 L66,54 L66,98 Z" />
+    <path android:fillColor="#1c3327"
+        android:pathData="M80,96 L74,58 L78,58 L84,97 Z" />
+    <path android:fillColor="#2f5540"
+        android:pathData="M33,52 A9,14 0 1 0 51,52 A9,14 0 1 0 33,52 Z" />
+    <path android:fillColor="#4f7d5c" android:fillAlpha="0.9"
+        android:pathData="M32,44 A6,9 0 1 0 44,44 A6,9 0 1 0 32,44 Z" />
+    <path android:fillColor="#2f5540"
+        android:pathData="M53,46 A10,16 0 1 0 73,46 A10,16 0 1 0 53,46 Z" />
+    <path android:fillColor="#4f7d5c" android:fillAlpha="0.9"
+        android:pathData="M54,36 A6,9 0 1 0 66,36 A6,9 0 1 0 54,36 Z" />
+    <path android:fillColor="#2f5540"
+        android:pathData="M75,52 A9,14 0 1 0 93,52 A9,14 0 1 0 75,52 Z" />
+    <path android:fillColor="#82a883" android:fillAlpha="0.7"
+        android:pathData="M81,44 A5,8 0 1 0 91,44 A5,8 0 1 0 81,44 Z" />
+    <path android:fillColor="#8B7A3A"
+        android:pathData="M44,84 L80,84 L80,92 L44,92 Z" />
+    <path android:fillColor="#5C4A1A"
+        android:pathData="M44,92 L80,92 L78,96 L46,96 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.8"
+        android:pathData="M59,88 A3,3 0 1 0 65,88 A3,3 0 1 0 59,88 Z" />
+</vector>

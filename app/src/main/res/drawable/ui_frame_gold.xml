@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chimera UI chrome: ui_frame_gold.
+     Faded gold manuscript frame with corner flourishes; content area left empty for tinting over parchment. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="512dp"
+    android:height="512dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <path android:fillColor="#B8941F" android:fillAlpha="0.7"
+        android:pathData="M16,16 L496,16 L496,496 L16,496 Z M24,24 L24,488 L488,488 L488,24 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.35"
+        android:pathData="M40,40 L472,40 L472,472 L40,472 Z M43,43 L43,469 L469,469 L469,43 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.9"
+        android:pathData="M24,15 L33,24 L24,33 L15,24 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.5"
+        android:pathData="M42,24 A18,18 0 0 0 24,42 L24,38 A14,14 0 0 1 38,24 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.9"
+        android:pathData="M488,15 L479,24 L488,33 L497,24 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.5"
+        android:pathData="M470,24 A18,18 0 0 1 488,42 L488,38 A14,14 0 0 0 474,24 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.9"
+        android:pathData="M24,497 L33,488 L24,479 L15,488 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.5"
+        android:pathData="M42,488 A18,18 0 0 1 24,470 L24,474 A14,14 0 0 0 38,488 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.9"
+        android:pathData="M488,497 L479,488 L488,479 L497,488 Z" />
+    <path android:fillColor="#B8941F" android:fillAlpha="0.5"
+        android:pathData="M470,488 A18,18 0 0 0 488,470 L488,474 A14,14 0 0 1 474,488 Z" />
+</vector>

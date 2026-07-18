@@ -38,8 +38,12 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import com.chimera.ui.components.DialogueToneRing
 import com.chimera.ui.components.ManuscriptCard
+import com.chimera.ui.components.MemoryRuneChip
 import com.chimera.ui.components.ParchmentInputField
+import com.chimera.ui.components.memoryRunesForDisposition
+import com.chimera.ui.components.toneRingLabel
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -85,6 +89,12 @@ import com.chimera.ui.theme.VoidGreen
  * [NpcPortraitSprite] — expression changes with the simulation. When no
  * sprite asset exists, the original [com.chimera.ui.components.NpcPortrait]
  * (with its disposition ring and drawn fallback) renders unchanged.
+ *
+ * v3 (2026-07-19, ROADMAP Workstream C): the header portrait is wrapped in a
+ * [com.chimera.ui.components.DialogueToneRing] keyed to the live expression,
+ * and [com.chimera.ui.components.MemoryRuneChip]s under the mood line show
+ * what the NPC carries about the player — both pure projections of
+ * disposition, no raw numeric scores exposed.
  *
  * Simulation contract unchanged: expression is a pure projection of
  * ViewModel state; nothing here writes back into the sim.
@@ -184,22 +194,32 @@ fun DialogueSceneScreen(
                     }
 
                     if (hasPortraitSprite) {
-                        NpcPortraitSprite(
-                            npcId = headerNpcId,
-                            resolver = spriteResolver,
+                        DialogueToneRing(
                             expression = expression,
-                            size = 40.dp
-                        )
+                            contentDescription = "${uiState.npcName} portrait, tone ${toneRingLabel(expression)}"
+                        ) {
+                            NpcPortraitSprite(
+                                npcId = headerNpcId,
+                                resolver = spriteResolver,
+                                expression = expression,
+                                size = 40.dp
+                            )
+                        }
                     } else {
-                        com.chimera.ui.components.NpcPortrait(
-                            npcId = headerNpcId,
-                            npcName = uiState.npcName,
-                            disposition = uiState.npcDisposition,
-                            archetype = uiState.npcArchetype,
-                            portraitResName = uiState.npcPortraitResName,
-                            size = 40.dp,
-                            contentDescription = "${uiState.npcName} portrait"
-                        )
+                        DialogueToneRing(
+                            expression = expression,
+                            contentDescription = "${uiState.npcName} portrait, tone ${toneRingLabel(expression)}"
+                        ) {
+                            com.chimera.ui.components.NpcPortrait(
+                                npcId = headerNpcId,
+                                npcName = uiState.npcName,
+                                disposition = uiState.npcDisposition,
+                                archetype = uiState.npcArchetype,
+                                portraitResName = uiState.npcPortraitResName,
+                                size = 40.dp,
+                                contentDescription = null
+                            )
+                        }
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
@@ -209,6 +229,19 @@ fun DialogueSceneScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = FadedBone
                         )
+                        // ROADMAP C: memory runes — what the NPC carries about the
+                        // player, projected from disposition; no raw scores shown.
+                        val memoryRunes = remember(uiState.npcDisposition) {
+                            memoryRunesForDisposition(uiState.npcDisposition)
+                        }
+                        if (memoryRunes.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                memoryRunes.forEach { rune ->
+                                    MemoryRuneChip(rune = rune)
+                                }
+                            }
+                        }
                     }
                     if (uiState.isFallbackMode) {
                         Text(
