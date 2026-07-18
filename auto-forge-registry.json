@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "remedies": [
+    {
+      "name": "manual-base64-decode-fallback",
+      "type": "procedure",
+      "path": "(no script — procedure documented here)",
+      "supplements": "Google Drive connector (download_file_content) + workspace bash",
+      "trigger": "Workspace Linux VM unavailable AND a connector returns base64-encoded file content that must be written to disk",
+      "usage": "Download via download_file_content, decode the base64 payload in-model, Write the decoded text directly. Only for text/code files; refuse for binaries >~100KB and record manual download links instead. Always flag output as UNVERIFIED pending a compile/lint pass.",
+      "created": "2026-07-14",
+      "last_verified": "2026-07-14",
+      "status": "active"
+    },
+    {
+      "name": "missing-sprite-model-enums",
+      "type": "authored_files",
+      "path": "PortraitExpression.kt, MapNodeState.kt (this directory)",
+      "supplements": "Drive sprite asset drop (SPRITE-ASSETS-INDEX.md)",
+      "trigger": "Building the Chimera sprite system; core-model sprites package missing expression/state enums referenced by ChimeraSprite.kt and SpriteTestFixtures.kt",
+      "usage": "Copy both files to core-model/src/main/kotlin/com/chimera/core/model/sprites/. If originals surface in the Drive zip, diff before replacing.",
+      "created": "2026-07-14",
+      "last_verified": "2026-07-14",
+      "status": "active"
+    }
+  ]
+}
