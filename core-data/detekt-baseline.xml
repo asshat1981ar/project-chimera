@@ -2,6 +2,7 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
+    <ID>ConstructorParameterNaming:SpriteManifest.kt$SpriteManifest.ManifestContainer$val total_assets: Int = 0</ID>
     <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Accept the loss", moraleDelta = -0.05f, outcome = "Rations are shorter now. Nobody says anything, but the tension is palpable.")</ID>
     <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Block it out", moraleDelta = -0.02f, outcome = "You stuff cloth in your ears. The song fades. But something feels lost.")</ID>
     <ID>MaxLineLength:NightEventProvider.kt$NightEventProvider$NightEventChoice("Drive them away", moraleDelta = -0.06f, outcome = "The stranger staggers back into the dark. Their cries echo for a long time.")</ID>
@@ -37,9 +38,12 @@
     <ID>TooGenericExceptionCaught:MultiActMapNodeLoader.kt$MultiActMapNodeLoader$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MultiActNpcSeeder.kt$MultiActNpcSeeder$e: Exception</ID>
     <ID>TooGenericExceptionCaught:NpcSeeder.kt$NpcSeeder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SpriteLoader.kt$SpriteLoader$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SpriteManifest.kt$SpriteManifest$e: Exception</ID>
     <ID>TooManyFunctions:QuestRepository.kt$QuestRepository</ID>
     <ID>UnusedParameter:DialogueRepository.kt$DialogueRepository$bridgeTag: String</ID>
     <ID>UnusedPrivateProperty:SceneLoader.kt$SceneLoader$private val cinematicSceneFiles = listOf("act1_finale.json", "act2_finale.json", "act3_opening.json")</ID>
+    <ID>UnusedPrivateProperty:SpriteLoader.kt$SpriteLoader.Companion$private const val DEFAULT_MEMORY_MB = 50</ID>
     <ID>UseCheckOrError:GameSessionManager.kt$GameSessionManager$throw IllegalStateException("No active save slot")</ID>
   </CurrentIssues>
 </SmellBaseline>

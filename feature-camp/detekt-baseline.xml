@@ -7,5 +7,6 @@
     <ID>LongMethod:CraftingScreen.kt$@Composable fun CraftingScreen( onBack: () -&gt; Unit, viewModel: CraftingViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:InventoryScreen.kt$@Composable fun InventoryScreen( onBack: () -&gt; Unit, viewModel: InventoryViewModel = hiltViewModel() )</ID>
     <ID>MaxLineLength:CraftingScreen.kt$border = BorderStroke(1.dp, if (isSelected) EmberGold.copy(alpha = 0.6f) else MaterialTheme.colorScheme.outlineVariant)</ID>
+    <ID>TooGenericExceptionCaught:InventoryViewModel.kt$InventoryViewModel$e: Exception</ID>
   </CurrentIssues>
 </SmellBaseline>

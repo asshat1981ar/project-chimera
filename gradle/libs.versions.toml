@@ -24,6 +24,7 @@ hilt-work = "1.2.0"
 espresso = "3.5.1"
 androidx-test-ext = "1.1.5"
 detekt = "1.23.4"
+timber = "5.0.1"
 
 [libraries]
 # Gradle plugins (for build-logic convention plugins)
@@ -65,7 +66,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 # Serialization
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-kotlinx-json", version.ref = "kotlinx-serialization" }
 
 # Room
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
@@ -94,6 +95,9 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 
 # Coil image loading
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+
+# Logging
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 # WorkManager
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
