@@ -170,7 +170,6 @@ fun ChimeraNavHost(
                 ) { backStackEntry ->
                     val sceneId = backStackEntry.arguments?.getString("sceneId") ?: return@composable
                     DialogueSceneScreen(
-                        sceneId = sceneId,
                         onSceneComplete = { nextSceneId ->
                             if (nextSceneId != null) {
                                 navController.popBackStack()
