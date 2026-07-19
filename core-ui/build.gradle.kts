@@ -7,6 +7,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-model"))
+    implementation(project(":core-data"))
+
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
@@ -16,6 +19,8 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
 
     implementation(libs.coil.compose)
+
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
 }
