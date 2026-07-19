@@ -1,0 +1,7 @@
+{
+  "name": "chimera-dev-assistant",
+  "version": "1.0.0",
+  "displayName": "Chimera Dev Assistant",
+  "description": "Project-scoped helpers for Project Chimera Android development.",
+  "contextFileName": "QWEN.md"
+}
