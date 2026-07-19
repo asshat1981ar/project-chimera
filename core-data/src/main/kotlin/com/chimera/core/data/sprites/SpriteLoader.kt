@@ -9,6 +9,7 @@ import com.chimera.core.model.sprites.SpriteRef
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlin.math.max
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -157,11 +158,11 @@ class SpriteLoader @Inject constructor(
             val intrinsicW = drawable.intrinsicWidth
             val intrinsicH = drawable.intrinsicHeight
             val (w, h) = if (intrinsicW > 0 && intrinsicH > 0) {
-                if (maxOf(intrinsicW, intrinsicH) >= renderSizePx) {
+                if (max(intrinsicW, intrinsicH) >= renderSizePx) {
                     intrinsicW to intrinsicH
                 } else {
                     // Upscale render target for small vectors, keep aspect
-                    val scale = renderSizePx.toFloat() / maxOf(intrinsicW, intrinsicH)
+                    val scale = renderSizePx.toFloat() / max(intrinsicW, intrinsicH).toFloat()
                     (intrinsicW * scale).toInt() to (intrinsicH * scale).toInt()
                 }
             } else {
