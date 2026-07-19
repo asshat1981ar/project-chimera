@@ -17,11 +17,21 @@ subprojects {
         config.setFrom(rootProject.file("detekt.yml"))
         buildUponDefaultConfig = true
         parallel = true
-        baseline = file("detekt-baseline.xml")
+        // Note: the detekt 1.23.x plugin does NOT wire extension.baseline into the
+        // Detekt task's baseline input, so setting it here alone has no effect on
+        // `detekt` runs. We set the baseline on the task directly below instead.
+        // This is kept only so `detektBaseline` (the generator task) reads it.
+        baseline = project.file("detekt-baseline.xml")
     }
 
     tasks.withType<Detekt>().configureEach {
         jvmTarget = "1.8"
+        // Set the baseline directly on the task — per-subproject resolution so
+        // each module's own detekt-baseline.xml is applied (not a single root file).
+        val baselineFile = project.file("detekt-baseline.xml")
+        if (baselineFile.exists()) {
+            baseline.set(baselineFile)
+        }
         reports {
             html.required.set(true)
             txt.required.set(false)

@@ -92,7 +92,6 @@ import com.chimera.ui.theme.VoidGreen
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DialogueSceneScreen(
-    sceneId: String,
     onSceneComplete: (nextSceneId: String?) -> Unit,
     onTriggerDuel: (opponentId: String) -> Unit = {},
     spriteResolver: SpriteResolver = EmptySpriteResolver,
@@ -100,40 +99,7 @@ fun DialogueSceneScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Navigate to duel when triggered
-    LaunchedEffect(uiState.triggerDuelWith) {
-        uiState.triggerDuelWith?.let { opponentId ->
-            onTriggerDuel(opponentId)
-        }
-    }
-
-    // One-shot scene completion events: a non-null value means navigate to that scene
-    // (typically a cinematic), null means return to the previous screen.
-    LaunchedEffect(Unit) {
-        viewModel.sceneCompleteEvent.collect { nextSceneId ->
-            onSceneComplete(nextSceneId)
-        }
-    }
-
-    // Auto-advance timer for cinematic scenes
-    LaunchedEffect(uiState.cinematicIndex, uiState.autoAdvanceTimerMs) {
-        if (uiState.isCinematic && uiState.autoAdvanceTimerMs > 0) {
-            kotlinx.coroutines.delay(uiState.autoAdvanceTimerMs)
-            viewModel.advanceCinematic()
-        }
-    }
-
     val listState = rememberLazyListState()
-    var typedInput by remember { mutableStateOf("") }
-    val typedInputState = rememberUpdatedState(typedInput)
-    val sendMessage = remember {
-        {
-            if (typedInputState.value.isNotBlank()) {
-                viewModel.submitTypedInput(typedInputState.value)
-                typedInput = ""
-            }
-        }
-    }
 
     LaunchedEffect(uiState.transcript.size) {
         if (uiState.transcript.isNotEmpty()) {
@@ -141,334 +107,253 @@ fun DialogueSceneScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                if (uiState.isCinematic) Color(0xFF0D0B0B)
-                else MaterialTheme.colorScheme.background
-            )
-    ) {
-        // Cinematic mode: full-screen overlay with minimal chrome
-        if (uiState.isCinematic) {
-            CinematicHeader(
-                sceneTitle = uiState.sceneTitle,
-                onClose = { onSceneComplete(null) }
-            )
-        } else {
-            // Standard dialogue header
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 2.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        modifier = Modifier.testTag("btn_back_scene"),
-                        onClick = { onSceneComplete(null) }
-                    ) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Leave scene", tint = FadedBone)
-                    }
-                    // NPC portrait: sprite system first (expression follows live
-                    // disposition), legacy NpcPortrait with disposition ring otherwise.
-                    val headerNpcId = uiState.npcId.ifBlank { uiState.npcName }
-                    val expression = remember(uiState.npcDisposition) {
-                        PortraitExpression.fromDisposition(uiState.npcDisposition)
-                    }
-                    val hasPortraitSprite = remember(headerNpcId, expression, spriteResolver) {
-                        spriteResolver.resolveNpcPortrait(headerNpcId, expression) != null
-                    }
+    DialogueSceneEffects(uiState = uiState, viewModel = viewModel, onSceneComplete = onSceneComplete, onTriggerDuel = onTriggerDuel)
 
-                    if (hasPortraitSprite) {
-                        NpcPortraitSprite(
-                            npcId = headerNpcId,
-                            resolver = spriteResolver,
-                            expression = expression,
-                            size = 40.dp
-                        )
-                    } else {
-                        com.chimera.ui.components.NpcPortrait(
-                            npcId = headerNpcId,
-                            npcName = uiState.npcName,
-                            disposition = uiState.npcDisposition,
-                            archetype = uiState.npcArchetype,
-                            portraitResName = uiState.npcPortraitResName,
-                            size = 40.dp,
-                            contentDescription = "${uiState.npcName} portrait"
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(uiState.sceneTitle, style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            "${uiState.npcName} — ${uiState.npcMood}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = FadedBone
-                        )
-                    }
-                    if (uiState.isFallbackMode) {
-                        Text(
-                            "AUTHORED",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = EmberGold.copy(alpha = 0.6f),
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
-                    // Animated wave bars — visible while TTS is speaking an NPC line
-                    AnimatedVisibility(
-                        visible = uiState.isSpeaking,
-                        enter = fadeIn(tween(200)),
-                        exit = fadeOut(tween(300))
-                    ) {
-                        SpeakingWaveIcon(
-                            modifier = Modifier
-                                .padding(end = 6.dp)
-                                .size(width = 20.dp, height = 16.dp)
-                        )
-                    }
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
-                            color = EmberGold
-                        )
-                    }
-                }
-            }
-        }
-
-        // Relationship banner
-        AnimatedVisibility(
-            visible = uiState.relationshipBanner != null,
-            enter = slideInVertically() + fadeIn(),
-            exit = fadeOut()
-        ) {
-            uiState.relationshipBanner?.let { banner ->
-                Surface(
-                    color = if (banner.delta > 0) VoidGreen.copy(alpha = 0.2f) else HollowCrimson.copy(alpha = 0.2f),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "${banner.npcName}: ${if (banner.delta > 0) "+" else ""}${String.format("%.0f", banner.delta * 100)}%",
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                        color = if (banner.delta > 0) VoidGreen else HollowCrimson,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                LaunchedEffect(banner) {
-                    kotlinx.coroutines.delay(2500)
-                    viewModel.dismissRelationshipBanner()
-                }
-            }
-        }
-
-        // Transcript / Cinematic display
-        if (uiState.isCinematic) {
-            // Cinematic mode: center the current narration line
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp, vertical = 24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CinematicNarration(
-                    lines = uiState.transcript,
-                    currentIndex = uiState.cinematicIndex,
-                    totalLines = uiState.transcript.size,
-                    onTapNext = { viewModel.advanceCinematic() }
-                )
-            }
-        } else {
-            // Standard dialogue mode
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(uiState.transcript) { line ->
-                    DialogueBubble(line = line)
-                }
-            }
-        }
-
-        // Quick intents (hidden in cinematic mode)
-        if (uiState.quickIntents.isNotEmpty() && !uiState.isLoading && !uiState.isCinematic) {
-            Surface(color = MaterialTheme.colorScheme.surface) {
-                FlowRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    uiState.quickIntents.forEach { intent ->
-                        AssistChip(
-                            modifier = Modifier.testTag("btn_intent_${intent.take(20).lowercase().replace(" ", "_")}"),
-                            onClick = { viewModel.selectIntent(intent) },
-                            label = { Text(intent, style = MaterialTheme.typography.bodySmall) },
-                            colors = AssistChipDefaults.assistChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                labelColor = MaterialTheme.colorScheme.onSurface
-                            ),
-                            border = AssistChipDefaults.assistChipBorder(
-                                borderColor = EmberGold.copy(alpha = 0.3f)
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-        // Text input composer (hidden in cinematic mode)
-        if (!uiState.isSceneComplete && !uiState.isCinematic) {
-            Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 4.dp) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    ParchmentInputField(
-                        value = typedInput,
-                        onValueChange = { typedInput = it },
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("field_dialogue_input"),
-                        placeholder = "Speak your mind...",
-                        singleLine = true,
-                        enabled = !uiState.isLoading
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(
-                        modifier = Modifier.testTag("btn_send_dialogue"),
-                        onClick = { sendMessage() },
-                        enabled = typedInput.isNotBlank() && !uiState.isLoading
-                    ) {
-                        Icon(Icons.Default.Send, contentDescription = "Send dialogue", tint = EmberGold)
-                    }
-                }
-            }
-        }
-
-        // Cinematic tap-to-advance hint
-        if (uiState.isCinematic && !uiState.isSceneComplete && uiState.autoAdvanceTimerMs > 0) {
-            Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)) {
-                Text(
-                    text = "Tap to advance",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = FadedBone,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
+    DialogueSceneContent(
+        uiState = uiState,
+        listState = listState,
+        onSceneComplete = onSceneComplete,
+        viewModel = viewModel,
+        spriteResolver = spriteResolver
+    )
 }
 
+/**
+ * Standard (non-cinematic) dialogue header: back button, NPC portrait (sprite
+ * system first, legacy [com.chimera.ui.components.NpcPortrait] fallback),
+ * scene title / NPC name+mood, AUTHORED badge, speaking-wave indicator, and
+ * loading spinner.
+ */
 @Composable
-private fun DialogueBubble(line: DialogueLine) {
-    val alignment = if (line.isPlayer) Alignment.End else Alignment.Start
-    val borderColor = remember(line.isPlayer) {
-        if (line.isPlayer) EmberGold.copy(alpha = 0.4f) else VoidGreen.copy(alpha = 0.4f)
-    }
-    val nameColor = if (line.isPlayer) EmberGold else HollowCrimson
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = alignment
+internal fun DialogueHeader(
+    uiState: DialogueUiState,
+    spriteResolver: SpriteResolver,
+    onClose: () -> Unit
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = line.speakerName,
-                style = MaterialTheme.typography.labelMedium,
-                color = nameColor
-            )
-            if (!line.isPlayer && line.emotion != "neutral") {
-                Spacer(modifier = Modifier.width(6.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                modifier = Modifier.testTag("btn_back_scene"),
+                onClick = onClose
+            ) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Leave scene", tint = FadedBone)
+            }
+            // NPC portrait: sprite system first (expression follows live
+            // disposition), legacy NpcPortrait with disposition ring otherwise.
+            DialogueHeaderPortrait(uiState = uiState, spriteResolver = spriteResolver)
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(uiState.sceneTitle, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    text = line.emotion,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = FadedBone.copy(alpha = 0.6f)
+                    "${uiState.npcName} — ${uiState.npcMood}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = FadedBone
                 )
             }
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        ManuscriptCard(
-            fillColor = MaterialTheme.colorScheme.surfaceVariant,
-            borderColor = borderColor,
-            borderWidth = 1.dp,
-            modifier = Modifier.fillMaxWidth(0.85f)
-        ) {
-            Text(
-                text = line.text,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            if (uiState.isFallbackMode) {
+                Text(
+                    "AUTHORED",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = EmberGold.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
+            // Animated wave bars — visible while TTS is speaking an NPC line
+            AnimatedVisibility(
+                visible = uiState.isSpeaking,
+                enter = fadeIn(tween(200)),
+                exit = fadeOut(tween(300))
+            ) {
+                SpeakingWaveIcon(
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .size(width = 20.dp, height = 16.dp)
+                )
+            }
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = EmberGold
+                )
+            }
         }
     }
 }
 
 /**
- * Three animated vertical bars that pulse out of phase — a minimal "speaking" indicator.
- * Renders in EmberGold so it matches the rest of the dialogue chrome.
+ * NPC portrait for the dialogue header. Prefers the sprite system (expression
+ * follows live disposition); falls back to the legacy [NpcPortrait] with its
+ * disposition ring when no sprite asset is available.
  */
 @Composable
-private fun SpeakingWaveIcon(modifier: Modifier = Modifier) {
-    val transition = rememberInfiniteTransition(label = "wave")
-    val barColor = EmberGold
+internal fun DialogueHeaderPortrait(
+    uiState: DialogueUiState,
+    spriteResolver: SpriteResolver
+) {
+    val headerNpcId = uiState.npcId.ifBlank { uiState.npcName }
+    val expression = remember(uiState.npcDisposition) {
+        PortraitExpression.fromDisposition(uiState.npcDisposition)
+    }
+    val hasPortraitSprite = remember(headerNpcId, expression, spriteResolver) {
+        spriteResolver.resolveNpcPortrait(headerNpcId, expression) != null
+    }
 
-    // Each bar gets a staggered delay so they ripple left-to-right
-    val h1 by transition.animateFloat(
-        initialValue = 0.3f, targetValue = 1.0f,
-        animationSpec = infiniteRepeatable(
-            tween(420, easing = FastOutSlowInEasing), RepeatMode.Reverse
-        ), label = "bar1"
-    )
-    val h2 by transition.animateFloat(
-        initialValue = 0.3f, targetValue = 1.0f,
-        animationSpec = infiniteRepeatable(
-            tween(420, 140, easing = FastOutSlowInEasing), RepeatMode.Reverse
-        ), label = "bar2"
-    )
-    val h3 by transition.animateFloat(
-        initialValue = 0.3f, targetValue = 1.0f,
-        animationSpec = infiniteRepeatable(
-            tween(420, 280, easing = FastOutSlowInEasing), RepeatMode.Reverse
-        ), label = "bar3"
-    )
+    if (hasPortraitSprite) {
+        NpcPortraitSprite(
+            npcId = headerNpcId,
+            resolver = spriteResolver,
+            expression = expression,
+            size = 40.dp
+        )
+    } else {
+        com.chimera.ui.components.NpcPortrait(
+            npcId = headerNpcId,
+            npcName = uiState.npcName,
+            disposition = uiState.npcDisposition,
+            archetype = uiState.npcArchetype,
+            portraitResName = uiState.npcPortraitResName,
+            size = 40.dp,
+            contentDescription = "${uiState.npcName} portrait"
+        )
+    }
+}
 
-    Canvas(
-        modifier = modifier.semantics(mergeDescendants = true) {
-            contentDescription = "Speaking indicator"
-        }
+/**
+ * Animated relationship-delta banner. Shows the NPC name and signed percentage
+ * change, auto-dismisses after 2.5s via [onDismiss].
+ */
+@Composable
+internal fun RelationshipBanner(
+    banner: RelationshipBanner?,
+    onDismiss: () -> Unit
+) {
+    AnimatedVisibility(
+        visible = banner != null,
+        enter = slideInVertically() + fadeIn(),
+        exit = fadeOut()
     ) {
-        val barW = size.width / 5f          // 3 bars + 2 gaps in 5 equal parts
-        val gap  = barW                     // gap == bar width
-        val maxH = size.height
-        val barHeights = listOf(h1, h2, h3)
+        banner?.let {
+            Surface(
+                color = if (it.delta > 0) VoidGreen.copy(alpha = 0.2f) else HollowCrimson.copy(alpha = 0.2f),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "${it.npcName}: ${if (it.delta > 0) "+" else ""}${String.format(java.util.Locale.US, "%.0f", it.delta * 100)}%",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                    color = if (it.delta > 0) VoidGreen else HollowCrimson,
+                    textAlign = TextAlign.Center
+                )
+            }
 
-        barHeights.forEachIndexed { i, fraction ->
-            val barH  = maxH * fraction
-            val left  = i * (barW + gap)
-            val top   = (maxH - barH) / 2f
-            drawRoundRect(
-                color        = barColor,
-                topLeft      = androidx.compose.ui.geometry.Offset(left, top),
-                size         = androidx.compose.ui.geometry.Size(barW, barH),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(barW / 2f)
-            )
+            LaunchedEffect(it) {
+                kotlinx.coroutines.delay(2500)
+                onDismiss()
+            }
         }
+    }
+}
+
+/**
+ * Row of quick-intent assist chips. Each chip is test-tagged with
+ * `btn_intent_<sanitized-intent>` for UI automation.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun QuickIntentsRow(
+    intents: List<String>,
+    onSelectIntent: (String) -> Unit
+) {
+    Surface(color = MaterialTheme.colorScheme.surface) {
+        FlowRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            intents.forEach { intent ->
+                AssistChip(
+                    modifier = Modifier.testTag("btn_intent_${intent.take(20).lowercase().replace(" ", "_")}"),
+                    onClick = { onSelectIntent(intent) },
+                    label = { Text(intent, style = MaterialTheme.typography.bodySmall) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    border = AssistChipDefaults.assistChipBorder(
+                        borderColor = EmberGold.copy(alpha = 0.3f)
+                    )
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Text input composer: parchment input field + send button. The send button is
+ * enabled only when [typedInput] is non-blank and [isEnabled] is true.
+ */
+@Composable
+internal fun DialogueComposer(
+    typedInput: String,
+    onTypedInput: (String) -> Unit,
+    onSend: () -> Unit,
+    isEnabled: Boolean
+) {
+    Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 4.dp) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ParchmentInputField(
+                value = typedInput,
+                onValueChange = onTypedInput,
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag("field_dialogue_input"),
+                placeholder = "Speak your mind...",
+                singleLine = true,
+                enabled = isEnabled
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButton(
+                modifier = Modifier.testTag("btn_send_dialogue"),
+                onClick = onSend,
+                enabled = typedInput.isNotBlank() && isEnabled
+            ) {
+                Icon(Icons.Default.Send, contentDescription = "Send dialogue", tint = EmberGold)
+            }
+        }
+    }
+}
+
+/**
+ * Tap-to-advance hint shown at the bottom of cinematic scenes when auto-advance is active.
+ */
+@Composable
+internal fun CinematicAdvanceHint() {
+    Surface(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)) {
+        Text(
+            text = "Tap to advance",
+            style = MaterialTheme.typography.labelSmall,
+            color = FadedBone,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -476,7 +361,7 @@ private fun SpeakingWaveIcon(modifier: Modifier = Modifier) {
  * Minimal header for cinematic scenes - just the scene title and close button.
  */
 @Composable
-private fun CinematicHeader(
+internal fun CinematicHeader(
     sceneTitle: String,
     onClose: () -> Unit
 ) {
@@ -507,7 +392,7 @@ private fun CinematicHeader(
  * Full-screen cinematic narration display with fade-in animation and tap-to-advance.
  */
 @Composable
-private fun CinematicNarration(
+internal fun CinematicNarration(
     lines: List<DialogueLine>,
     currentIndex: Int,
     totalLines: Int,
