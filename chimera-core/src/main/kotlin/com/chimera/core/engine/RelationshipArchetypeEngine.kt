@@ -318,6 +318,101 @@ class RelationshipArchetypeEngine {
             relationshipDamage.value > 0.95f || (tensionLevel.value < 0.1f && escalationRound > 5)
     }
 
+    class GrowthAndUnderinvestmentArchetype(
+        npcId: String,
+        playerId: String
+    ) : SystemArchetype(npcId, playerId, ArchetypeType.GROWTH_AND_UNDERINVESTMENT) {
+
+        private val growthPotential = Variable("growth_potential", 0.6f)
+        private val investment = Variable("investment", 0.2f)
+        private val opportunityCost = Variable("opportunity_cost", 0.0f)
+        private val stagnation = Variable("stagnation", 0.0f)
+
+        init {
+            systemVariables["growth_potential"] = growthPotential
+            systemVariables["investment"] = investment
+            systemVariables["opportunity_cost"] = opportunityCost
+            systemVariables["stagnation"] = stagnation
+            createFeedbackLoops()
+        }
+
+        private fun createFeedbackLoops() {
+            // Reinforcing loop: investment grows capability, which unlocks more growth potential.
+            feedbackLoops.add(FeedbackLoop("capability_growth", investment, growthPotential, 0.5f))
+            // Balancing loop: sustained investment gradually erodes accumulated opportunity cost;
+            // absent investment, cost only moves via direct neglect/threaten interactions below.
+            feedbackLoops.add(FeedbackLoop("neglect_cost", investment, opportunityCost, -0.25f))
+            // Delayed consequence: sustained under-investment eventually manifests as stagnation.
+            feedbackLoops.add(
+                DelayedFeedbackLoop("underinvestment_stagnation", opportunityCost, stagnation, 0.5f, 4.0f)
+            )
+        }
+
+        override suspend fun processInteraction(interaction: NPCInteraction): EmotionalImpact {
+            when (interaction.type) {
+                InteractionType.TEACH, InteractionType.HELP -> {
+                    investment.addValue(0.3f * interaction.intensity)
+                    opportunityCost.subtractValue(0.15f * interaction.intensity)
+                }
+                InteractionType.GIFT -> {
+                    // Gifts feel generous but don't build lasting capability.
+                    growthPotential.addValue(0.1f * interaction.intensity)
+                    opportunityCost.addValue(0.1f * interaction.intensity)
+                }
+                InteractionType.PERSUADE -> {
+                    investment.addValue(0.15f * interaction.intensity)
+                }
+                InteractionType.IGNORE, InteractionType.REFUSE -> {
+                    investment.subtractValue(0.2f * interaction.intensity)
+                    opportunityCost.addValue(0.2f * interaction.intensity)
+                }
+                InteractionType.THREATEN -> {
+                    investment.subtractValue(0.3f * interaction.intensity)
+                    stagnation.addValue(0.1f * interaction.intensity)
+                }
+                InteractionType.BARGAIN -> {
+                    investment.addValue(0.1f * interaction.intensity)
+                    opportunityCost.subtractValue(0.05f * interaction.intensity)
+                }
+                else -> {}
+            }
+            updateSystemState(interaction.deltaTime)
+            return calculateEmotionalImpact()
+        }
+
+        private fun calculateEmotionalImpact(): EmotionalImpact {
+            return when {
+                stagnation.value > 0.6f && investment.value < 0.3f -> EmotionalImpact(
+                    emotions = mapOf("resignation" to 0.7f, "regret" to 0.5f),
+                    dialogueHint = "I could have been so much more, if only someone had believed in it.",
+                    dispositionDelta = -0.1f
+                )
+                opportunityCost.value > 0.6f -> EmotionalImpact(
+                    emotions = mapOf("frustration" to 0.5f, "longing" to 0.4f),
+                    dialogueHint = "There's so much potential here going to waste.",
+                    dispositionDelta = -0.05f
+                )
+                investment.value > 0.6f && growthPotential.value > 0.6f -> EmotionalImpact(
+                    emotions = mapOf("pride" to 0.7f, "gratitude" to 0.6f),
+                    dialogueHint = "I'm finally becoming who I could be. Thank you for investing in me.",
+                    dispositionDelta = 0.15f
+                )
+                investment.value > 0.4f -> EmotionalImpact(
+                    emotions = mapOf("hope" to 0.4f),
+                    dialogueHint = "I can feel myself growing.",
+                    dispositionDelta = 0.05f
+                )
+                else -> EmotionalImpact.NEUTRAL
+            }
+        }
+
+        override fun calculateStabilityIndex(): Float =
+            1.0f - (opportunityCost.value + stagnation.value) / 2.0f
+
+        override fun shouldTerminate(): Boolean =
+            (investment.value > 0.8f && growthPotential.value > 0.8f) || stagnation.value > 0.95f
+    }
+
     // Supporting types
 
     data class Variable(
@@ -422,7 +517,7 @@ class RelationshipArchetypeEngine {
             ArchetypeType.SHIFTING_THE_BURDEN -> ShiftingTheBurdenArchetype(npcId, playerId)
             ArchetypeType.FIXES_THAT_FAIL -> FixesThatFailArchetype(npcId, playerId)
             ArchetypeType.ESCALATION -> EscalationArchetype(npcId, playerId)
-            ArchetypeType.GROWTH_AND_UNDERINVESTMENT -> throw IllegalArgumentException("Archetype $type not yet implemented")
+            ArchetypeType.GROWTH_AND_UNDERINVESTMENT -> GrowthAndUnderinvestmentArchetype(npcId, playerId)
         }
         val key = "${npcId}_${playerId}_${type.name}"
         activeArchetypes[key] = archetype

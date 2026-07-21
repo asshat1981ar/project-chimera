@@ -12,6 +12,7 @@ android {
 dependencies {
     implementation(project(":core-model"))
     implementation(project(":core-database"))
+    implementation(project(":chimera-core"))
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

@@ -2,6 +2,7 @@ package com.chimera.data
 
 import android.content.Context
 import android.content.res.AssetManager
+import com.chimera.core.engine.RelationshipArchetypeEngine
 import com.chimera.database.dao.CharacterDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.entity.CharacterEntity
@@ -9,6 +10,7 @@ import com.chimera.database.entity.CharacterStateEntity
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +50,7 @@ class MultiActNpcSeederTest {
     private lateinit var statesCaptor: ArgumentCaptor<CharacterStateEntity>
 
     private lateinit var seeder: MultiActNpcSeeder
+    private lateinit var archetypeEngine: RelationshipArchetypeEngine
 
     private val act1Json = """
         [
@@ -78,7 +81,8 @@ class MultiActNpcSeederTest {
                 "id": "kael",
                 "name": "Kael",
                 "role": "rival",
-                "initialDisposition": -0.3
+                "initialDisposition": -0.3,
+                "archetype": "ESCALATION"
             }
         ]
     """.trimIndent()
@@ -110,7 +114,8 @@ class MultiActNpcSeederTest {
         stubAsset("act2_npcs.json", act2Json)
         stubAsset("act3_npcs.json", act3Json)
         stubAsset("portrait_manifest.json", manifestJson)
-        seeder = MultiActNpcSeeder(context, characterDao, characterStateDao)
+        archetypeEngine = RelationshipArchetypeEngine()
+        seeder = MultiActNpcSeeder(context, characterDao, characterStateDao, archetypeEngine)
     }
 
     private fun stubAsset(name: String, content: String) {
@@ -181,6 +186,25 @@ class MultiActNpcSeederTest {
         assertEquals(0.5f, states.getValue("thorne").dispositionToPlayer)
         assertEquals("protector", states.getValue("thorne").activeArchetype)
         assertEquals(-0.3f, states.getValue("kael").dispositionToPlayer)
+    }
+
+    @Test
+    fun `seedNpcsForSlot initializes the relationship archetype engine for valid archetype labels`() = runBlocking {
+        seeder.seedNpcsForSlot(1L)
+
+        val activeArchetypes = archetypeEngine.getActiveArchetypes()
+        val kaelKey = activeArchetypes.keys.single { it.startsWith("kael_") }
+        assertEquals(RelationshipArchetypeEngine.ArchetypeType.ESCALATION, activeArchetypes[kaelKey])
+    }
+
+    @Test
+    fun `seedNpcsForSlot skips NPCs with an unrecognized archetype label without throwing`() = runBlocking {
+        // thorne's fixture archetype is "protector", which is not a real ArchetypeType --
+        // seeding must not throw, and no archetype should be registered for it.
+        seeder.seedNpcsForSlot(1L)
+
+        val activeArchetypes = archetypeEngine.getActiveArchetypes()
+        assertTrue(activeArchetypes.keys.none { it.startsWith("thorne_") })
     }
 
     @Test
