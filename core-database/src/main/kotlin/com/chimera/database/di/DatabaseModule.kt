@@ -7,6 +7,7 @@ import com.chimera.database.dao.CharacterEquipmentDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.CraftingRecipeDao
 import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.EventLogDao
 import com.chimera.database.dao.InventoryDao
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.JournalEntryDao
@@ -49,4 +50,5 @@ object DatabaseModule {
     @Provides fun provideInventoryDao(db: ChimeraGameDatabase): InventoryDao = db.inventoryDao()
     @Provides fun provideCraftingRecipeDao(db: ChimeraGameDatabase): CraftingRecipeDao = db.craftingRecipeDao()
     @Provides fun provideCharacterEquipmentDao(db: ChimeraGameDatabase): CharacterEquipmentDao = db.characterEquipmentDao()
+    @Provides fun provideEventLogDao(db: ChimeraGameDatabase): EventLogDao = db.eventLogDao()
 }

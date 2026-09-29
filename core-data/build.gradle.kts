@@ -12,6 +12,10 @@ android {
 dependencies {
     implementation(project(":core-model"))
     implementation(project(":core-database"))
+    // Deterministic simulation (SaveStateReducer) - pure JVM, no Android deps.
+    implementation(project(":chimera-core"))
+    // Cloud save-sync transport (CloudSaveRepository -> Cloudflare Worker).
+    implementation(project(":core-network"))
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

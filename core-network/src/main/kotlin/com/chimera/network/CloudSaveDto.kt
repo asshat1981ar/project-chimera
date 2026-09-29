@@ -32,3 +32,32 @@ data class CloudSaveAck(
     @SerialName("deleted")     val deleted: Long? = null,
     @SerialName("updated_at")  val updatedAt: Long? = null
 )
+
+/**
+ * Sent to POST /save/:slotId/events - an incremental batch of event-log records
+ * (ADR-002). Records are immutable, so the server can treat this as an idempotent
+ * upsert keyed on `(slot_id, sequence)`.
+ */
+@Serializable
+data class EventLogPushRequest(
+    @SerialName("slot_id")        val slotId: Long,
+    @SerialName("from_sequence")  val fromSequence: Long,
+    @SerialName("records")        val records: List<String>
+)
+
+/** Returned by GET /save/:slotId/events?from_sequence=N */
+@Serializable
+data class EventLogPullResponse(
+    @SerialName("slot_id")       val slotId: Long,
+    @SerialName("records")       val records: List<String> = emptyList(),
+    @SerialName("max_sequence")  val maxSequence: Long = -1L
+)
+
+/** Returned by POST /save/:slotId/events */
+@Serializable
+data class EventLogPushAck(
+    @SerialName("ok")            val ok: Boolean,
+    @SerialName("slot_id")       val slotId: Long? = null,
+    @SerialName("accepted")      val accepted: Int = 0,
+    @SerialName("max_sequence")  val maxSequence: Long = -1L
+)

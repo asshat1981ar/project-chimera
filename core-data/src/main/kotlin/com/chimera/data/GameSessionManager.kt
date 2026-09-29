@@ -1,13 +1,23 @@
 package com.chimera.data
 
+import com.chimera.data.events.GameEventRecorder
+import com.chimera.model.GameEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GameSessionManager @Inject constructor() {
+class GameSessionManager @Inject constructor(
+    private val eventRecorder: GameEventRecorder
+) {
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _activeSlotId = MutableStateFlow<Long?>(null)
     val activeSlotId: StateFlow<Long?> = _activeSlotId.asStateFlow()
@@ -17,11 +27,15 @@ class GameSessionManager @Inject constructor() {
     fun setActiveSlot(slotId: Long) {
         _activeSlotId.value = slotId
         sessionStartTime = System.currentTimeMillis()
+        // ADR-002: the active slot's event log is the authority - start recording it.
+        eventRecorder.start(slotId)
+        scope.launch { eventRecorder.record(slotId, GameEvent.SaveSlotSelected(slotId)) }
     }
 
     fun clearActiveSlot() {
         _activeSlotId.value = null
         sessionStartTime = 0L
+        eventRecorder.stop()
     }
 
     fun requireActiveSlotId(): Long =

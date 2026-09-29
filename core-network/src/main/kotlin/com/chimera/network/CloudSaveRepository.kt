@@ -15,7 +15,7 @@ import io.ktor.http.isSuccess
 /**
  * REST client for the Chimera cloud-save Cloudflare Worker.
  *
- * All methods return [CloudSaveResult] — they never throw. A failure is
+ * All methods return [CloudSaveResult] - they never throw. A failure is
  * returned as [CloudSaveResult.Failure] so that callers (ViewModels) can
  * apply graceful-degradation: local Room DB is always the source of truth;
  * the cloud sync is best-effort.
@@ -62,6 +62,40 @@ class CloudSaveRepository(
         }
         CloudSaveResult.Success(response.body<CloudSaveAck>())
     }.getOrElse { CloudSaveResult.Failure("Delete error: ${it.message}") }
+
+    /**
+     * Pushes an incremental batch of event-log records (ADR-002).
+     *
+     * Records are immutable and keyed on `(slot_id, sequence)`, so the server applies them
+     * as an idempotent upsert - a retried push can never duplicate or corrupt the log.
+     */
+    suspend fun pushEventLog(request: EventLogPushRequest): CloudSaveResult<EventLogPushAck> = runCatching {
+        val response = client.post("$baseUrl/save/${request.slotId}/events") {
+            headers { append("Authorization", authHeader()) }
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+        if (!response.status.isSuccess()) {
+            return@runCatching CloudSaveResult.Failure("Event push failed: HTTP ${response.status.value}")
+        }
+        CloudSaveResult.Success(response.body<EventLogPushAck>())
+    }.getOrElse { CloudSaveResult.Failure("Event push error: ${it.message}") }
+
+    /**
+     * Pulls event-log records for a slot from [fromSequence] (inclusive).
+     * A 404 means the slot has no remote log yet - returned as `Success(null)`.
+     */
+    suspend fun pullEventLog(slotId: Long, fromSequence: Long = 0L): CloudSaveResult<EventLogPullResponse?> =
+        runCatching {
+            val response = client.get("$baseUrl/save/$slotId/events?from_sequence=$fromSequence") {
+                headers { append("Authorization", authHeader()) }
+            }
+            when (response.status) {
+                HttpStatusCode.OK       -> CloudSaveResult.Success(response.body<EventLogPullResponse>())
+                HttpStatusCode.NotFound -> CloudSaveResult.Success(null)
+                else -> CloudSaveResult.Failure("Event pull failed: HTTP ${response.status.value}")
+            }
+        }.getOrElse { CloudSaveResult.Failure("Event pull error: ${it.message}") }
 
     fun close() = client.close()
 }

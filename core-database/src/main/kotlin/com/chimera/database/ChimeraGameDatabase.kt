@@ -14,6 +14,7 @@ import com.chimera.database.dao.CharacterEquipmentDao
 import com.chimera.database.dao.CharacterStateDao
 import com.chimera.database.dao.CraftingRecipeDao
 import com.chimera.database.dao.DialogueTurnDao
+import com.chimera.database.dao.EventLogDao
 import com.chimera.database.dao.FactionStateDao
 import com.chimera.database.dao.InventoryDao
 import com.chimera.database.dao.JournalEntryDao
@@ -29,6 +30,7 @@ import com.chimera.database.entity.CharacterEquipmentEntity
 import com.chimera.database.entity.CharacterStateEntity
 import com.chimera.database.entity.CraftingRecipeEntity
 import com.chimera.database.entity.DialogueTurnEntity
+import com.chimera.database.entity.EventLogEntity
 import com.chimera.database.entity.FactionStateEntity
 import com.chimera.database.entity.InventoryItemEntity
 import com.chimera.database.entity.JournalEntryEntity
@@ -56,9 +58,10 @@ import com.chimera.database.entity.VowEntity
         QuestObjectiveEntity::class,
         InventoryItemEntity::class,
         CraftingRecipeEntity::class,
-        CharacterEquipmentEntity::class
+        CharacterEquipmentEntity::class,
+        EventLogEntity::class
     ],
-    version = 10,
+    version = 11,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -79,6 +82,7 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
     abstract fun rumorPacketDao(): RumorPacketDao
     abstract fun factionStateDao(): FactionStateDao
     abstract fun characterEquipmentDao(): CharacterEquipmentDao
+    abstract fun eventLogDao(): EventLogDao
 
     companion object {
         const val DATABASE_NAME = "chimera_game.db"
@@ -90,14 +94,14 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
                 DATABASE_NAME
             )
                 .addCallback(PrepopulateCallback())
-                .addMigrations(MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+                .addMigrations(MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
             if (BuildConfig.DEBUG) builder.fallbackToDestructiveMigration()
             return builder.build()
         }
 
         /**
-         * 7 → 8: Add FTS5 virtual table for journal full-text search.
-         * Additive only — journal_entries table is not modified.
+         * 7 -> 8: Add FTS5 virtual table for journal full-text search.
+         * Additive only - journal_entries table is not modified.
          * content= keeps FTS in sync with the main table automatically.
          */
         val MIGRATION_7_8 = object : Migration(7, 8) {
@@ -120,7 +124,7 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
         }
 
         /**
-         * 8 → 9: Add quest_objectives table.
+         * 8 -> 9: Add quest_objectives table.
          */
         val MIGRATION_8_9 = object : Migration(8, 9) {
             override fun migrate(db: SupportSQLiteDatabase) {
@@ -159,8 +163,8 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
         }
 
         /**
-         * 9 → 10: Add equip_slot to inventory_items and a character_equipment join table.
-         * Additive only — no existing tables/columns are modified.
+         * 9 -> 10: Add equip_slot to inventory_items and a character_equipment join table.
+         * Additive only - no existing tables/columns are modified.
          */
         val MIGRATION_9_10 = object : Migration(9, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
@@ -178,6 +182,30 @@ abstract class ChimeraGameDatabase : RoomDatabase() {
                 """.trimIndent())
                 db.execSQL("CREATE INDEX IF NOT EXISTS index_character_equipment_character_id ON character_equipment(character_id)")
                 db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_character_equipment_character_id_equip_slot ON character_equipment(character_id, equip_slot)")
+            }
+        }
+
+        /**
+         * 10 -> 11: Add the append-only game_events log (ADR-002).
+         * Additive only - no existing tables/columns are modified.
+         */
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS game_events (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        event_id TEXT NOT NULL,
+                        slot_id INTEGER NOT NULL,
+                        sequence INTEGER NOT NULL,
+                        occurred_at INTEGER NOT NULL,
+                        schema_version INTEGER NOT NULL,
+                        event_type TEXT NOT NULL,
+                        payload_json TEXT NOT NULL
+                    )
+                """.trimIndent())
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_game_events_slot_id_sequence ON game_events(slot_id, sequence)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_game_events_event_id ON game_events(event_id)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_game_events_slot_id ON game_events(slot_id)")
             }
         }
     }
