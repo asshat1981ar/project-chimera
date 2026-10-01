@@ -1,6 +1,6 @@
 # ADR-003: Android 3D Renderer for Chimera
 
-Status: PROPOSED
+Status: SPIKE IN PROGRESS
 Date: 2026-10-01
 
 ## Decision target
@@ -14,7 +14,7 @@ Select the smallest sustainable renderer integration capable of the first playab
 - Google documents native Android 3D/AR rendering paths including OpenGL and Vulkan, but those lower-level paths increase integration surface for this product goal.
 
 ## Candidate
-SceneView + Filament is the leading candidate for the initial spike because it minimizes custom renderer code while fitting the existing Compose stack.
+SceneView 4.51.0 + Filament is the leading candidate for the initial spike because it minimizes custom renderer code while fitting the existing Compose stack.
 
 ## Constraints
 1. Do not add the dependency until the minimal architecture spike validates build compatibility.
