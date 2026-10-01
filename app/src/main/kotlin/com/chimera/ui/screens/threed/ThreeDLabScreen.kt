@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.sceneview.SceneView
 import io.github.sceneview.math.Position
+import io.github.sceneview.math.colorOf
 import io.github.sceneview.math.Size
 import io.github.sceneview.node.CubeNode
 import io.github.sceneview.rememberCameraManipulator
@@ -32,7 +33,7 @@ fun ThreeDLabScreen(onBack: () -> Unit) {
     val materialLoader = rememberMaterialLoader(engine)
     val material = remember(materialLoader) {
         materialLoader.createColorInstance(
-            color = io.github.sceneview.math.Color(0.25f, 0.55f, 0.85f, 1.0f)
+            colorOf(r = 0.25f, g = 0.55f, b = 0.85f, a = 1.0f)
         )
     }
 
