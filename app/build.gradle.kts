@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.chimera"
-    compileSdk = 34
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.chimera.ashes"
@@ -166,6 +166,9 @@ dependencies {
     implementation(project(":feature-journal"))
     implementation(project(":feature-party"))
     implementation(project(":feature-settings"))
+
+    // 3D rendering spike
+    implementation(libs.sceneview)
 
     // Core Android
     implementation(libs.androidx.core.ktx)

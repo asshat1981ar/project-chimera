@@ -27,6 +27,7 @@ import com.chimera.feature.settings.FactionStandingScreen
 import com.chimera.feature.settings.SettingsScreen
 import com.chimera.ui.screens.acttransition.ActTransitionScreen
 import com.chimera.ui.screens.splash.SplashScreen
+import com.chimera.ui.screens.threed.ThreeDLabScreen
 
 /**
  * v2 (2026-07-14, WU-04): sprite runtime wiring.
@@ -103,6 +104,9 @@ fun ChimeraNavHost(
                         },
                         onActTransition = { actTag ->
                             navController.navigate(ChimeraRoutes.actTransition(actTag))
+                        },
+                        onOpen3dLab = {
+                            navController.navigate(ChimeraRoutes.THREE_D_LAB)
                         }
                     )
                 }
@@ -145,6 +149,10 @@ fun ChimeraNavHost(
 
                 composable(ChimeraRoutes.PARTY) {
                     PartyScreen()
+                }
+
+                composable(ChimeraRoutes.THREE_D_LAB) {
+                    ThreeDLabScreen(onBack = { navController.popBackStack() })
                 }
 
                 composable(ChimeraRoutes.SETTINGS) {

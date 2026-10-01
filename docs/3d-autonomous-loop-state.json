@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "mission": "project-chimera-android-3d",
+  "branch": "agent/3d-autonomous-loop",
+  "pull_request": 200,
+  "gate": "G2",
+  "status": "BLOCKED_PENDING_CI",
+  "last_verified": {
+    "repository_reconnaissance": true,
+    "architecture_boundary": true,
+    "renderer_research": true,
+    "sceneview_dependency_spike": true,
+    "runtime_3d": false,
+    "apk_build": false
+  },
+  "renderer_candidate": {
+    "library": "io.github.sceneview:sceneview",
+    "version": "4.51.0",
+    "status": "experimental",
+    "reason": "Compose-native Filament integration with procedural geometry and glTF support"
+  },
+  "recovery": {
+    "attempt": 1,
+    "blocker": "GitHub Actions Android SDK setup requested obsolete package 'tools'",
+    "action": "removed tools from android-actions/setup-android package list",
+    "verification": "fresh workflow pending"
+  },
+  "next_cycle": [
+    "verify fresh GitHub Actions run reaches Gradle",
+    "if Gradle reaches dependency resolution, verify SceneView artifact/toolchain compatibility",
+    "if dependency/toolchain incompatibility occurs, evaluate bounded alternative rather than upgrading Kotlin/AGP silently",
+    "verify 3D prototype compiles",
+    "obtain APK build evidence",
+    "obtain Android runtime evidence"
+  ],
+  "exit_policy": {
+    "max_recovery_attempts": 3,
+    "stagnation_cycles": 2,
+    "never_claim_runtime_success_without_evidence": true
+  }
+}

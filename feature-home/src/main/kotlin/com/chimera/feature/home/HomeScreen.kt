@@ -52,6 +52,7 @@ fun HomeScreen(
     onEnterScene: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
     onActTransition: (String) -> Unit = DefaultOnActTransition,
+    onOpen3dLab: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -243,6 +244,13 @@ fun HomeScreen(
                     )
                 }
             }
+        }
+
+        item {
+            GothicButton(
+                onClick = onOpen3dLab,
+                modifier = Modifier.fillMaxWidth().testTag("btn_3d_lab")
+            ) { Text("Enter 3D Prototype") }
         }
 
         item { Spacer(modifier = Modifier.height(ChimeraSpacing.regular)) }

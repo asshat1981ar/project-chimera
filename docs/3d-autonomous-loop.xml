@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chimera_autonomous_development version="1.0">
+  <mission>Develop asshat1981ar/project-chimera into a stable Android-first 3D game through evidence-gated autonomous iteration.</mission>
+  <authority>
+    <simulation>chimera-core plus durable GameEvent/save replay model</simulation>
+    <rendering>projection_only</rendering>
+    <ai>optional_adapter_only</ai>
+  </authority>
+  <loop>
+    <states>DISCOVER,RESEARCH,PLAN,IMPLEMENT,VERIFY,PLAYTEST,REVIEW,REPLAN</states>
+    <policy>One measurable hypothesis per cycle; smallest safe implementation batch; verify before advancing.</policy>
+    <evidence>commit, tests, build, runtime/playtest, artifact provenance, failures, next hypothesis</evidence>
+  </loop>
+  <vertical_slice>
+    <criterion>fresh_install_3d_scene</criterion>
+    <criterion>mobile_movement</criterion>
+    <criterion>camera_follow</criterion>
+    <criterion>rendered_npc_or_object</criterion>
+    <criterion>interaction</criterion>
+    <criterion>deterministic_event_changes_world</criterion>
+    <criterion>meaningful_playable_loop</criterion>
+    <criterion>save_restore</criterion>
+    <criterion>apk_build_install</criterion>
+    <criterion>core_tests_pass</criterion>
+    <criterion>no_critical_smoke_crash</criterion>
+  </vertical_slice>
+  <gates>
+    <gate id="G0">repository and build reconnaissance</gate>
+    <gate id="G1">3D architecture decision</gate>
+    <gate id="G2">minimal renderer proof</gate>
+    <gate id="G3">playable vertical slice</gate>
+    <gate id="G4">integration and regression</gate>
+    <gate id="G5">performance</gate>
+    <gate id="G6">release artifact</gate>
+    <gate id="G7">final audit</gate>
+  </gates>
+  <recovery max_distinct_attempts="3">classify blocker, attempt materially different strategies, persist unblock task, continue independent work</recovery>
+  <stagnation consecutive_cycles="2">replan instead of repeating unchanged approach</stagnation>
+  <complete_when>all vertical slice criteria and gates are evidenced; no critical/high blocker; stable repeated verification; remaining backlog explicitly deferred</complete_when>
+  <never>claim runtime success without runtime evidence; move simulation authority into rendering; invent measurements; silently rewrite architecture</never>
+</chimera_autonomous_development>
