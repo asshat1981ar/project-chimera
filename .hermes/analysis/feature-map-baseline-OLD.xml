@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongMethod:MapScreen.kt$@Composable private fun MapNodeMarker( node: MapNode, isSelected: Boolean, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:MapScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun MapScreen( onEnterScene: (String) -&gt; Unit = {}, viewModel: MapViewModel = hiltViewModel() )</ID>
+    <ID>UnusedParameter:MapScreen.kt$onDismiss: () -&gt; Unit</ID>
+    <ID>UnusedPrivateProperty:MapViewModel.kt$MapViewModel$val charStates = characterStateDao.observeBySlot(slotId)</ID>
+    <ID>UnusedPrivateProperty:MapViewModel.kt$MapViewModel$val dispositions = mutableMapOf&lt;String, Float&gt;()</ID>
+  </CurrentIssues>
+</SmellBaseline>

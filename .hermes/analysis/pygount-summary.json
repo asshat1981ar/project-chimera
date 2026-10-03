@@ -1,0 +1,34 @@
+{
+  "total_files": 278,
+  "total_code_lines": 20338,
+  "total_doc_lines": 1927,
+  "total_empty_lines": 7576,
+  "by_language": {
+    "Kotlin": {
+      "files": 278,
+      "code": 20338,
+      "doc": 1927,
+      "empty": 7576
+    }
+  },
+  "by_module_code": {
+    "app": 2886,
+    "build.gradle.kts": 22,
+    "chimera-core": 1093,
+    "core-ai": 1386,
+    "core-data": 1680,
+    "core-database": 1385,
+    "core-model": 650,
+    "core-network": 484,
+    "core-ui": 3503,
+    "domain": 1604,
+    "feature-camp": 1744,
+    "feature-dialogue": 945,
+    "feature-home": 392,
+    "feature-journal": 551,
+    "feature-map": 514,
+    "feature-party": 845,
+    "feature-settings": 626,
+    "settings.gradle.kts": 28
+  }
+}

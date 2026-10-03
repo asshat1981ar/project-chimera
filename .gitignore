@@ -40,3 +40,4 @@ tasks/
 .claude/
 .serena/
 sqlite_mcp_server.db
+.toolchains/
