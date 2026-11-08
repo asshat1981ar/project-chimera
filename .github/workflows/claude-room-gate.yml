@@ -1,7 +1,8 @@
 name: claude-room-gate
 
-# Room migration contract. Job "check" is deterministic (no Claude, no paths filter: it filters inside
-# the job and succeeds when nothing relevant changed), so it is safe to make a required check.
+# Room migration contract. Job "check" is deterministic (no Claude, no secrets, no job-level if:: it runs on
+# forks and drafts too, filters inside the job and succeeds when nothing relevant changed), so it is safe
+# to make a required check. A version bump missing while entity files changed is only a warning (advisory).
 # Job "claude" adds a typed structured_output verdict; it is advisory and never the only gate.
 # Empty Claude output means "no verdict" (warning), never a pass.
 
@@ -14,9 +15,6 @@ permissions: {}
 
 jobs:
   check:
-    if: |
-      github.event.pull_request.draft == false &&
-      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 10
     concurrency:
@@ -81,9 +79,11 @@ jobs:
 
   claude:
     needs: check
-    if: ${{ !cancelled() && needs.check.outputs.relevant == 'true' && vars.CLAUDE_PAUSE != 'true' && github.actor != 'dependabot[bot]' }}
+    if: ${{ !cancelled() && needs.check.outputs.relevant == 'true' && vars.CLAUDE_PAUSE != 'true' && github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ${{ vars.CLAUDE_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
+    env:
+      CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: '1'
     concurrency:
       group: claude-room-gate-${{ github.event.pull_request.number }}
       cancel-in-progress: true
