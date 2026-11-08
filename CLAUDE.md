@@ -101,3 +101,10 @@ A cleanup task is complete only when:
 - Stale side surfaces are removed or clearly marked legacy.
 - Docs match the actual repo.
 - A new contributor can build the app without guessing.
+
+<!-- BEGIN claude-code-action (generated) -->
+## Claude in GitHub Actions
+- `@claude` runs `.github/workflows/claude.yml`; branches `claude/**` also run Android CI (`android.yml`) and, on success, `sdlc-gate.yml` posts to the SDLC webhook.
+- Room changes: bump `version`, add `MIGRATION_x_y`, commit `core-database/schemas/.../<n>.json`; `claude-room-gate.yml` checks all three.
+- `chimera-core` stays pure Kotlin and deterministic (seeded RNG, no wall clock, no Android imports).
+<!-- END claude-code-action -->

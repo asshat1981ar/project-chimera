@@ -1,0 +1,138 @@
+name: claude-room-gate
+
+# Room migration contract. Job "check" is deterministic (no Claude, no paths filter: it filters inside
+# the job and succeeds when nothing relevant changed), so it is safe to make a required check.
+# Job "claude" adds a typed structured_output verdict; it is advisory and never the only gate.
+# Empty Claude output means "no verdict" (warning), never a pass.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  check:
+    if: |
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: claude-room-gate-check-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    outputs:
+      relevant: ${{ steps.contract.outputs.relevant }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check Room migration contract
+        id: contract
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          schema_dir="core-database/schemas/com.chimera.database.ChimeraGameDatabase"
+          db="core-database/src/main/kotlin/com/chimera/database/ChimeraGameDatabase.kt"
+          changed=$(git diff --name-only "$BASE_SHA"...HEAD -- core-database core-model || true)
+          if [ -z "$changed" ]; then
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+            echo "No core-database/core-model changes: nothing to check." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "relevant=true" >> "$GITHUB_OUTPUT"
+          entity_changed=$(printf '%s\n' "$changed" | grep -E 'Entity\.kt$|Converters\.kt$|ChimeraGameDatabase\.kt$' || true)
+          if [ -z "$entity_changed" ]; then
+            echo "No entity/converter/database changes: contract not applicable." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          old=$(git show "$BASE_SHA:$db" 2>/dev/null | sed -n 's/^ *version = \([0-9][0-9]*\).*/\1/p' | head -n 1 || true)
+          new=$(sed -n 's/^ *version = \([0-9][0-9]*\).*/\1/p' "$db" | head -n 1)
+          {
+            echo "### Room migration contract"
+            echo "- version: base=${old:-unknown}, head=${new:-unknown}"
+            echo "- changed: $(printf '%s' "$entity_changed" | tr '\n' ' ')"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$old" ] || [ -z "$new" ]; then
+            echo "::warning::Could not read the Room version; no verdict."
+            exit 0
+          fi
+          if [ "$old" = "$new" ]; then
+            echo "::warning::Entity/converter files changed but Room version is still $new. If the schema changed, bump version, add MIGRATION_${old}_$((old + 1)) and commit the schema JSON."
+            exit 0
+          fi
+          fail=0
+          if ! grep -q "MIGRATION_${old}_${new}" "$db"; then
+            echo "::error::MIGRATION_${old}_${new} is not defined or registered in ChimeraGameDatabase.kt"
+            fail=1
+          fi
+          if [ ! -f "$schema_dir/${new}.json" ]; then
+            echo "::error::Missing $schema_dir/${new}.json (run the Room schema export and commit it)"
+            fail=1
+          fi
+          exit "$fail"
+
+  claude:
+    needs: check
+    if: ${{ !cancelled() && needs.check.outputs.relevant == 'true' && vars.CLAUDE_PAUSE != 'true' && github.actor != 'dependabot[bot]' }}
+    runs-on: ${{ vars.CLAUDE_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    concurrency:
+      group: claude-room-gate-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Typed Room review
+        id: room
+        continue-on-error: true
+        uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1.0.269
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: "/room-gate PR_NUMBER: ${{ github.event.pull_request.number }} BASE_SHA: ${{ github.event.pull_request.base.sha }}"
+          claude_args: |
+            --permission-mode auto
+            --model ${{ vars.CLAUDE_MODEL || 'claude-sonnet-5-5' }}
+            --max-turns 15
+            --allowedTools "Read,Glob,Grep,Bash(git diff:*),Bash(git show:*),Bash(gh pr comment:*)"
+            --disallowedTools "Edit,MultiEdit,Write,WebFetch,WebSearch"
+            --json-schema '{"type":"object","required":["version_before","version_after","entities_changed","migration_registered","schema_json_committed","verdict"],"properties":{"version_before":{"type":"integer"},"version_after":{"type":"integer"},"entities_changed":{"type":"array","items":{"type":"string"}},"migration_registered":{"type":"boolean"},"schema_json_committed":{"type":"boolean"},"destructive_risk":{"enum":["none","debug_only","release"]},"missing_tests":{"type":"array","items":{"type":"string"}},"verdict":{"enum":["pass","fail","not_applicable"]},"reason":{"type":"string"}}}'
+
+      - name: Report verdict
+        if: ${{ !cancelled() }}
+        env:
+          OUT: ${{ steps.room.outputs.structured_output }}
+        run: |
+          set -euo pipefail
+          if [ -z "${OUT:-}" ]; then
+            echo "::warning::Claude returned no structured verdict (rate limit or error). No verdict is not a pass; see the deterministic check job."
+            echo "### Room verdict: none (WARN)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          {
+            echo "### Room verdict"
+            echo
+            echo '```json'
+            printf '%s\n' "$OUT" | jq .
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          verdict=$(printf '%s' "$OUT" | jq -r '.verdict // "none"')
+          if [ "$verdict" = "fail" ]; then
+            echo "::error::Room migration verdict: fail"
+            exit 1
+          fi

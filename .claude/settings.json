@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew testMockDebugUnitTest:*)",
+      "Bash(./gradlew :chimera-core:test:*)",
+      "Bash(./gradlew :core-model:test:*)",
+      "Bash(./gradlew :core-model:check:*)",
+      "Bash(./gradlew :core-database:lint:*)",
+      "Bash(./gradlew :app:lintMockDebug:*)",
+      "Bash(./gradlew :app:testMockDebugUnitTest:*)",
+      "Bash(./gradlew detekt:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Read(./.env*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.jks)",
+      "Read(**/*.keystore)",
+      "Read(**/secrets/**)",
+      "Read(./local.properties)",
+      "Read(**/google-services.json)",
+      "Bash(bash scripts/deploy-*:*)"
+    ]
+  }
+}

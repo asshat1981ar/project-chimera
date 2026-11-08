@@ -1,0 +1,44 @@
+name: claude-maintenance
+
+# Weekly doc-truth audit (CLAUDE.md: "docs match the actual repo"). Read-only; keeps one open issue.
+# The mcp__github_ci__ tools do not exist on schedule events, so logs come from gh via allowlisted Bash.
+
+on:
+  schedule:
+    - cron: "17 9 * * 1"
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  doc-truth:
+    if: ${{ vars.CLAUDE_PAUSE != 'true' }}
+    runs-on: ${{ vars.CLAUDE_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    concurrency:
+      group: claude-maintenance
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Audit docs against code
+        uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1.0.269
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: "/doc-truth REPO: ${{ github.repository }}"
+          claude_args: |
+            --permission-mode auto
+            --model ${{ vars.CLAUDE_MODEL || 'claude-sonnet-5-5' }}
+            --max-turns 20
+            --allowedTools "Read,Glob,Grep,Bash(git log:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(gh issue comment:*)"
+            --disallowedTools "Edit,MultiEdit,Write,WebFetch,WebSearch"

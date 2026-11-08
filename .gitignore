@@ -37,6 +37,9 @@ tasks/
 .env*.local
 .superpowers/
 .worktrees/
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/commands/
+!.claude/agents/
 .serena/
 sqlite_mcp_server.db
