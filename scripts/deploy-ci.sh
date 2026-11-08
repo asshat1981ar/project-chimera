@@ -196,5 +196,5 @@ else
 fi
 
 echo -e "${CYAN}====================================================${NC}"
-echo -e "${GREEN}${NC_BOLD}               Deployment Complete!                 ${NC_RESET}"
+echo -e "${GREEN}${NC_BOLD}               Deployment Complete!                 ${NC}"
 echo -e "${CYAN}====================================================${NC}"
