@@ -4,8 +4,9 @@ name: claude
 # Needs secret CLAUDE_CODE_OAUTH_TOKEN and the Claude GitHub App (see docs/claude-automation.md).
 # Tag mode checks out the PR head, so this job never runs PR code: cross-repo (fork) PRs are refused
 # by the "fork" step, and no build, test or package-manager command is allowlisted. Claude edits and
-# commits through the action's own tools; the CI that runs on its pushed branch (without secrets)
-# reports build and test results.
+# commits through the action's own tools; the CI that runs on its pushed branch reports build and test
+# results. gh pr view / gh issue view are denied: they return unfiltered comments, bypassing the
+# include/exclude_comments_by_actor filters, which only apply to the action's own pre-fetched context.
 
 on:
   # zizmor: ignore[dangerous-triggers] -- owner-gated trigger; cross-repo PRs refused by the fork step; no PR code executed (no build/test tools allowlisted); env scrub on
@@ -88,6 +89,6 @@ jobs:
             --permission-mode auto
             --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5-5' }}
             --max-turns 50
-            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git status:*),Bash(git show:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh issue view:*)"
-            --disallowedTools "WebFetch,WebSearch,Bash(curl:*),Bash(gh api:*)"
+            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git status:*),Bash(git show:*),Bash(gh pr diff:*)"
+            --disallowedTools "WebFetch,WebSearch,Bash(curl:*),Bash(gh api:*),Bash(gh search:*),Bash(gh pr view:*),Bash(gh issue view:*),Bash(./gradlew:*),Bash(gradle:*),Bash(bash:*),Bash(sh:*),Bash(python3:*),Bash(python:*),Bash(make:*)"
             --append-system-prompt "CI context. Follow CLAUDE.md cleanup rules: smallest safe batch, update docs when commands or structure change. Build, test and package-manager commands are not available to you here: do not try to run gradle. Make the change with your file and commit tools; CI runs on the pushed claude/ branch and reports the build and test results."

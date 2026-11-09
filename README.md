@@ -115,6 +115,10 @@ This logs into your Debian PRoot container, builds the APK locally (takes ~10 mi
 If you want to pull a pre-built APK compiled in the cloud:
 ```bash
 # Exit the PRoot container to your Termux host, then run:
+# First time, and after every pull that changes scripts/deploy-ci.sh, refresh the home copy.
+# A stale copy can install an unverified agent-branch build.
+cp scripts/deploy-ci.sh ~/deploy-ci.sh
+grep -q 'INSTALL UNVERIFIED' ~/deploy-ci.sh && echo "deploy-ci.sh is current"
 bash ~/deploy-ci.sh
 ```
 This fetches the recent CI/CD workflow runs from your GitHub repository using the `gh` CLI, downloads the selected artifact (debug, beta, demo, release), and instantly installs/launches it via Shizuku.

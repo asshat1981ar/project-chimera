@@ -11,7 +11,9 @@
       "Read(./local.properties)",
       "Read(./.git/config)",
       "Read(**/google-services.json)",
-      "Bash(bash scripts/deploy-*:*)"
+      "Bash(bash scripts/deploy-*:*)",
+      "Edit(./scripts/deploy*)",
+      "Write(./scripts/deploy*)"
     ]
   }
 }

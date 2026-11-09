@@ -80,7 +80,8 @@ Run all commands from the repository root (or Termux home for deployment):
 ./gradlew detekt                 # Static analysis
 ./gradlew clean build            # Full clean build
 bash ~/deploy.sh                 # (Termux Host) Build locally inside PRoot and deploy via Shizuku/rish
-bash ~/deploy-ci.sh              # (Termux Host) Download latest APK from GitHub Actions and deploy via Shizuku/rish
+cp scripts/deploy-ci.sh ~/deploy-ci.sh   # (Termux Host) REQUIRED after every pull that changes it: ~/deploy-ci.sh is a copy, a stale one can install an unverified build
+bash ~/deploy-ci.sh              # (Termux Host) Download latest APK from GitHub Actions and deploy via Shizuku/rish (installs verified main builds only)
 ```
 
 Only document commands that are verified in the current repo.

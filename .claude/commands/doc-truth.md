@@ -1,9 +1,9 @@
 ---
-allowed-tools: Read,Glob,Grep,Bash(git log:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(gh issue comment:*)
+allowed-tools: Read,Glob,Grep,Bash(git log:*)
 description: Weekly audit that documentation matches the repository
 ---
 
-Argument: `REPO`. Read-only: never edit files.
+Argument: `REPO`. Read-only: never edit files. You have no GitHub issue tools; do not try to find or create issues. The workflow publishes your result.
 
 Verify:
 1. Every command in `CLAUDE.md`, `README.md` and `.github/copilot-instructions.md` resolves to a real Gradle task or an existing file.
@@ -12,4 +12,4 @@ Verify:
 
 Known findings to confirm first: `.github/copilot-instructions.md` lists `./scripts/android-static-check.sh`, which does not exist; README says "DB v7" while the code says `version = 11`.
 
-Report: keep exactly one open issue titled `Doc truth audit` (use `gh issue list` to find it; create it if missing; otherwise add a comment). List each finding as file, claim, reality.
+Report: return only the JSON required by the supplied schema, one entry per finding with file, claim and reality. An empty `findings` array means the docs match.

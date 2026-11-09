@@ -1,7 +1,9 @@
 name: claude-maintenance
 
-# Weekly doc-truth audit (CLAUDE.md: "docs match the actual repo"). Read-only; keeps one open issue.
-# The mcp__github_ci__ tools do not exist on schedule events, so logs come from gh via allowlisted Bash.
+# Weekly doc-truth audit (CLAUDE.md: "docs match the actual repo"). Claude is read-only and holds no issue
+# tools: it returns findings as structured_output, and a separate deterministic job (no Claude, no secrets)
+# upserts the single fixed-title issue "Doc truth audit". Claude never sees public issue text.
+# The mcp__github_ci__ tools do not exist on schedule events, so none are used.
 
 on:
   schedule:
@@ -22,7 +24,8 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
-      issues: write
+    outputs:
+      report: ${{ steps.audit.outputs.structured_output }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -31,9 +34,9 @@ jobs:
           persist-credentials: false
 
       - name: Audit docs against code
+        id: audit
+        continue-on-error: true
         uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1.0.269
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -42,5 +45,49 @@ jobs:
             --permission-mode auto
             --model ${{ vars.CLAUDE_MODEL || 'claude-sonnet-5-5' }}
             --max-turns 20
-            --allowedTools "Read,Glob,Grep,Bash(git log:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(gh issue comment:*)"
-            --disallowedTools "Edit,MultiEdit,Write,WebFetch,WebSearch"
+            --allowedTools "Read,Glob,Grep,Bash(git log:*)"
+            --disallowedTools "Edit,MultiEdit,Write,WebFetch,WebSearch,Bash(gh:*),Bash(curl:*)"
+            --json-schema '{"type":"object","required":["findings"],"properties":{"findings":{"type":"array","items":{"type":"object","required":["file","claim","reality"],"properties":{"file":{"type":"string"},"claim":{"type":"string"},"reality":{"type":"string"}}}}}}'
+
+  report:
+    needs: doc-truth
+    if: ${{ !cancelled() && needs.doc-truth.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: claude-maintenance-report
+      cancel-in-progress: false
+    permissions:
+      issues: write
+    steps:
+      - name: Upsert the Doc truth audit issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          OUT: ${{ needs.doc-truth.outputs.report }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          title="Doc truth audit"
+          if [ -z "${OUT:-}" ]; then
+            echo "::warning::Claude returned no report (rate limit or error); no issue written. No report is not a clean audit."
+            echo "### Doc truth audit: no verdict (WARN)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          {
+            echo "Weekly doc-truth audit (report only). Run: $RUN_URL"
+            echo
+            echo "| File | Claim | Reality |"
+            echo "|---|---|---|"
+            printf '%s\n' "$OUT" | jq -r '.findings[:50][] | "| `\(.file[0:200] | gsub("[`|\n]";" "))` | \(.claim[0:400] | gsub("[|\n]";" ") | gsub("@";"@​")) | \(.reality[0:400] | gsub("[|\n]";" ") | gsub("@";"@​")) |"'
+            if [ "$(printf '%s' "$OUT" | jq '.findings | length')" = "0" ]; then
+              echo "| - | No findings | - |"
+            fi
+          } > "$RUNNER_TEMP/body.md"
+          existing=$(gh issue list --repo "$REPO" --state open --author app/github-actions --search "\"$title\" in:title" --json number,title \
+            | jq -r --arg t "$title" '[.[] | select(.title == $t)][0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh issue create --repo "$REPO" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          fi

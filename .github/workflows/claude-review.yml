@@ -2,7 +2,9 @@ name: claude-review
 
 # Agent mode: automatic PR review through the /review-pr command (.claude/commands/review-pr.md).
 # Read-only: the review never edits files. Same-repo PRs only; the PR head is read, never built or run.
-# Comment filters are tag-mode-only, so this agent-mode job is told not to read PR comments.
+# Comment filters are tag-mode-only, so this agent-mode job is told not to read PR comments, and the
+# gh commands that return them are denied. Findings are posted as inline comments. The paths: filter
+# makes this advisory only; never make it a required check.
 
 on:
   pull_request:
@@ -48,11 +50,10 @@ jobs:
         uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1.0.269
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          use_sticky_comment: "true"
           prompt: "/review-pr REPO: ${{ github.repository }} PR_NUMBER: ${{ github.event.pull_request.number }}"
           claude_args: |
             --permission-mode auto
             --model ${{ vars.CLAUDE_MODEL || 'claude-sonnet-5-5' }}
             --max-turns 30
             --allowedTools "Read,Glob,Grep,Task,mcp__github_inline_comment__create_inline_comment,Bash(gh pr diff:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
-            --disallowedTools "Edit,MultiEdit,Write,WebFetch,WebSearch"
+            --disallowedTools "Edit,MultiEdit,Write,WebFetch,WebSearch,Bash(gh pr view:*),Bash(gh issue view:*),Bash(gh api:*),Bash(gh search:*)"

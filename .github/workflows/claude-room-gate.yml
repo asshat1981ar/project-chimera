@@ -1,9 +1,9 @@
 name: claude-room-gate
 
-# Room migration contract. Job "check" is deterministic (no Claude, no secrets, no job-level if:: it runs on
-# forks and drafts too, filters inside the job and succeeds when nothing relevant changed), so it is safe
-# to make a required check. A version bump missing while entity files changed is only a warning (advisory).
-# Job "claude" adds a typed structured_output verdict; it is advisory and never the only gate.
+# Room migration contract. Job "room-gate" is deterministic (no Claude, no secrets, no job-level if:: it runs
+# on forks and drafts too, filters inside the job and succeeds when nothing relevant changed), so it is safe
+# to make a required check (context name: room-gate). It fails closed: entity or converter files changed
+# without a Room version bump, or an unreadable version, both FAIL. Job "claude" adds a typed structured_output verdict; it is advisory and never the only gate.
 # Empty Claude output means "no verdict" (warning), never a pass.
 
 on:
@@ -14,11 +14,12 @@ on:
 permissions: {}
 
 jobs:
-  check:
+  room-gate:
+    name: room-gate
     runs-on: ubuntu-latest
     timeout-minutes: 10
     concurrency:
-      group: claude-room-gate-check-${{ github.event.pull_request.number }}
+      group: claude-room-gate-det-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     permissions:
       contents: read
@@ -51,6 +52,7 @@ jobs:
             echo "No entity/converter/database changes: contract not applicable." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          schema_entity_changed=$(printf '%s\n' "$entity_changed" | grep -E 'Entity\.kt$|Converters\.kt$' || true)
           old=$(git show "$BASE_SHA:$db" 2>/dev/null | sed -n 's/^ *version = \([0-9][0-9]*\).*/\1/p' | head -n 1 || true)
           new=$(sed -n 's/^ *version = \([0-9][0-9]*\).*/\1/p' "$db" | head -n 1)
           {
@@ -59,11 +61,15 @@ jobs:
             echo "- changed: $(printf '%s' "$entity_changed" | tr '\n' ' ')"
           } >> "$GITHUB_STEP_SUMMARY"
           if [ -z "$old" ] || [ -z "$new" ]; then
-            echo "::warning::Could not read the Room version; no verdict."
-            exit 0
+            echo "::error::Could not read the Room version (base=${old:-unknown}, head=${new:-unknown}); failing closed."
+            exit 1
           fi
           if [ "$old" = "$new" ]; then
-            echo "::warning::Entity/converter files changed but Room version is still $new. If the schema changed, bump version, add MIGRATION_${old}_$((old + 1)) and commit the schema JSON."
+            if [ -n "$schema_entity_changed" ]; then
+              echo "::error::Entity/converter files changed but Room version is still $new. Bump version, add MIGRATION_${old}_$((old + 1)) and commit the schema JSON."
+              exit 1
+            fi
+            echo "::warning::Only ChimeraGameDatabase.kt changed and the version is unchanged ($new). Fine unless the schema changed."
             exit 0
           fi
           fail=0
@@ -78,8 +84,8 @@ jobs:
           exit "$fail"
 
   claude:
-    needs: check
-    if: ${{ !cancelled() && needs.check.outputs.relevant == 'true' && vars.CLAUDE_PAUSE != 'true' && github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository }}
+    needs: room-gate
+    if: ${{ !cancelled() && needs.room-gate.outputs.relevant == 'true' && vars.CLAUDE_PAUSE != 'true' && github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ${{ vars.CLAUDE_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     env:
@@ -89,7 +95,7 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -109,8 +115,8 @@ jobs:
             --permission-mode auto
             --model ${{ vars.CLAUDE_MODEL || 'claude-sonnet-5-5' }}
             --max-turns 15
-            --allowedTools "Read,Glob,Grep,Bash(git diff:*),Bash(git show:*),Bash(gh pr comment:*)"
-            --disallowedTools "Edit,MultiEdit,Write,WebFetch,WebSearch"
+            --allowedTools "Read,Glob,Grep,Bash(git diff:*),Bash(git show:*)"
+            --disallowedTools "Edit,MultiEdit,Write,WebFetch,WebSearch,Bash(gh:*),Bash(curl:*)"
             --json-schema '{"type":"object","required":["version_before","version_after","entities_changed","migration_registered","schema_json_committed","verdict"],"properties":{"version_before":{"type":"integer"},"version_after":{"type":"integer"},"entities_changed":{"type":"array","items":{"type":"string"}},"migration_registered":{"type":"boolean"},"schema_json_committed":{"type":"boolean"},"destructive_risk":{"enum":["none","debug_only","release"]},"missing_tests":{"type":"array","items":{"type":"string"}},"verdict":{"enum":["pass","fail","not_applicable"]},"reason":{"type":"string"}}}'
 
       - name: Report verdict
@@ -120,7 +126,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${OUT:-}" ]; then
-            echo "::warning::Claude returned no structured verdict (rate limit or error). No verdict is not a pass; see the deterministic check job."
+            echo "::warning::Claude returned no structured verdict (rate limit or error). No verdict is not a pass; see the deterministic room-gate job."
             echo "### Room verdict: none (WARN)" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi

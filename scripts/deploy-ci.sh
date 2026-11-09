@@ -132,7 +132,7 @@ fi
 
 # Verify exactly what is about to be installed (also covers a manually typed run ID):
 # it must be a successful push run of this repository whose head is the current tip of $BRANCH.
-run_info=$(gh api "repos/$REPO/actions/runs/$run_id" --jq '[.head_repository.full_name, .event, .conclusion, .head_branch, .head_sha] | @tsv' 2>/dev/null || true)
+run_info=$(gh api "repos/$REPO/actions/runs/$run_id" --jq '[(.head_repository.full_name // "none"), (.event // "none"), (.conclusion // "none"), (.head_branch // "none"), (.head_sha // "none")] | @tsv' 2>/dev/null || true)
 IFS=$'\t' read -r run_repo run_event run_conclusion run_branch run_sha <<< "$run_info"
 tip_sha=$(gh api "repos/$REPO/commits/$BRANCH" --jq '.sha' 2>/dev/null || true)
 echo -e "${BLUE}[*] Run ${run_id}: repo=${run_repo:-unknown} event=${run_event:-unknown} result=${run_conclusion:-unknown}${NC}"

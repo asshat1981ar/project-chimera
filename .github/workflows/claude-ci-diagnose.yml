@@ -69,7 +69,7 @@ jobs:
             --max-turns 15
             --add-dir ${{ runner.temp }}/ci-log
             --allowedTools "Read,Glob,Grep"
-            --disallowedTools "Edit,MultiEdit,Write,Bash,WebFetch,WebSearch"
+            --disallowedTools "Edit,MultiEdit,Write,Bash,WebFetch,WebSearch,Bash(gh pr view:*),Bash(gh issue view:*),Bash(gh api:*)"
             --json-schema '{"type":"object","required":["diagnosis","confidence"],"properties":{"diagnosis":{"type":"string"},"suggested_patch":{"type":"string"},"confidence":{"enum":["low","medium","high"]}}}'
 
   post:
@@ -99,11 +99,11 @@ jobs:
           {
             echo "### Claude CI diagnosis (report only)"
             echo
-            printf '%s\n' "$OUT" | jq -r '.diagnosis // "(none)" | .[0:6000]'
+            printf '%s\n' "$OUT" | jq -r '.diagnosis // "(none)" | .[0:6000] | gsub("@";"@\u200b")'
             echo
             echo "Suggested patch (not applied; review before use):"
             echo '```diff'
-            printf '%s\n' "$OUT" | jq -r '.suggested_patch // "(none)" | .[0:6000]'
+            printf '%s\n' "$OUT" | jq -r '.suggested_patch // "(none)" | .[0:6000] | gsub("@";"@\u200b")'
             echo '```'
             echo "Confidence: $(printf '%s' "$OUT" | jq -r '.confidence // "unknown"'). Failed run: $RUN_URL"
           } > "$RUNNER_TEMP/comment.md"

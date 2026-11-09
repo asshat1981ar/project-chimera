@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read,Glob,Grep,Bash(git diff:*),Bash(git show:*),Bash(gh pr comment:*)
+allowed-tools: Read,Glob,Grep,Bash(git diff:*),Bash(git show:*)
 description: Typed Room migration contract check for a pull request
 ---
 
@@ -15,4 +15,4 @@ Steps:
 2. List changed entity files with `git diff --name-only BASE_SHA...HEAD`.
 3. Verify items 2 and 3 above from the tree. Check whether `fallbackToDestructiveMigration()` is reachable outside DEBUG builds and whether tests (`MigrationTestHelper`) cover the new migration.
 4. Known baseline: version 11 already lacks `11.json` (pre-existing). Mention it once in the comment, and do not fail the verdict for it.
-5. Post one short PR comment with `gh pr comment`, then return only the JSON required by the supplied schema. Use `not_applicable` when no schema change is present.
+5. Do not post comments (the workflow publishes your JSON to the job summary). Return only the JSON required by the supplied schema, with the `reason` field holding a short explanation. Use `not_applicable` when no schema change is present.
