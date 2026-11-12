@@ -1,0 +1,94 @@
+name: claude
+
+# Tag mode: answers @claude on issues, PR comments and PR reviews (owner only).
+# Needs secret CLAUDE_CODE_OAUTH_TOKEN and the Claude GitHub App (see docs/claude-automation.md).
+# Tag mode checks out the PR head, so this job never runs PR code: cross-repo (fork) PRs are refused
+# by the "fork" step, and no build, test or package-manager command is allowlisted. Claude edits and
+# commits through the action's own tools; the CI that runs on its pushed branch reports build and test
+# results. gh pr view / gh issue view are denied: they return unfiltered comments, bypassing the
+# include/exclude_comments_by_actor filters, which only apply to the action's own pre-fetched context.
+
+on:
+  # zizmor: ignore[dangerous-triggers] -- owner-gated trigger; cross-repo PRs refused by the fork step; no PR code executed (no build/test tools allowlisted); env scrub on
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [opened, assigned]
+
+permissions: {}
+
+jobs:
+  claude:
+    # Owner-only defence in depth on a public repo; the action re-checks write access.
+    if: |
+      vars.CLAUDE_PAUSE != 'true' &&
+      github.actor != 'dependabot[bot]' &&
+      github.actor == github.repository_owner && (
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.review.body, '@claude')) ||
+        (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      )
+    runs-on: ${{ vars.CLAUDE_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 60
+    env:
+      CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: '1'
+    concurrency:
+      group: claude-${{ github.event.issue.number || github.event.pull_request.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+      id-token: write
+    steps:
+      - name: Refuse cross-repo PRs
+        id: fork
+        env:
+          EVENT: ${{ github.event_name }}
+          IS_PR: ${{ github.event.issue.pull_request && 'true' || 'false' }}
+          PR: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          cross=true
+          if [ "$EVENT" != "issue_comment" ] || [ "$IS_PR" != "true" ]; then
+            cross=false
+          elif out=$(gh pr view "$PR" --repo "$REPO" --json isCrossRepository -q .isCrossRepository) && [ "$out" = "false" ]; then
+            cross=false
+          fi
+          echo "cross=$cross" >> "$GITHUB_OUTPUT"
+          if [ "$cross" = "true" ]; then
+            echo "Cross-repo or unverifiable PR: Claude not run." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Run Claude
+        if: steps.fork.outputs.cross != 'true'
+        uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1.0.269
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          # Deliberate: android.yml builds claude/** pushes, so every Claude branch gets CI.
+          branch_prefix: "claude/"
+          include_comments_by_actor: "asshat1981ar,coderabbitai[bot]"
+          exclude_comments_by_actor: "dependabot[bot],renovate[bot]"
+          claude_args: |
+            --permission-mode auto
+            --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5-5' }}
+            --max-turns 50
+            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git status:*),Bash(git show:*),Bash(gh pr diff:*)"
+            --disallowedTools "WebFetch,WebSearch,Bash(curl:*),Bash(gh api:*),Bash(gh search:*),Bash(gh pr view:*),Bash(gh issue view:*),Bash(./gradlew:*),Bash(gradle:*),Bash(bash:*),Bash(sh:*),Bash(python3:*),Bash(python:*),Bash(make:*)"
+            --append-system-prompt "CI context. Follow CLAUDE.md cleanup rules: smallest safe batch, update docs when commands or structure change. Build, test and package-manager commands are not available to you here: do not try to run gradle. Make the change with your file and commit tools; CI runs on the pushed claude/ branch and reports the build and test results."

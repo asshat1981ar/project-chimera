@@ -1,0 +1,25 @@
+# Hosts that jobs on GitHub's egress-firewall runner (runs-on: ubuntu-24.04-firewall) may reach.
+# Opt in by setting the repo variable CLAUDE_RUNNER=ubuntu-24.04-firewall (technical preview).
+# Add a host only when a workflow step needs it, name it in full (no '*'), and say what uses it.
+mode: enforce
+allow:
+  # Claude API: model requests and trading the workflow's GitHub identity token for an API token
+  - api.anthropic.com
+  # GitHub API: the Claude Code action and gh
+  - api.github.com
+  # Claude Code install script
+  - claude.ai
+  # Claude Code binary
+  - downloads.claude.ai
+  # Release asset downloads
+  - release-assets.githubusercontent.com
+  # npm packages used by the action
+  - registry.npmjs.org
+  # Gradle distribution and plugin portal (hosts unverified until the first firewall run)
+  - services.gradle.org
+  - plugins.gradle.org
+  # Maven dependencies
+  - repo.maven.apache.org
+  # Android Gradle plugin and AndroidX artifacts
+  - dl.google.com
+  - maven.google.com

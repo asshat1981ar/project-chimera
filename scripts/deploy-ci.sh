@@ -19,6 +19,27 @@ REPO="asshat1981ar/project-chimera"
 WORKFLOW="android.yml"
 TMP_DOWNLOAD_DIR="/data/data/com.termux/files/home/.chimera_ci_tmp"
 
+# Safety: only runs from this branch are offered by default. android.yml also builds
+# claude/** pushes, so "newest run of any branch" could install unreviewed code.
+# Override with: deploy-ci.sh --branch <name>   or   CHIMERA_DEPLOY_BRANCH=<name>
+BRANCH="${CHIMERA_DEPLOY_BRANCH:-main}"
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --branch|-b)
+            if [ "$#" -lt 2 ] || [ -z "$2" ]; then
+                echo -e "${RED}[ERROR] $1 needs a branch name.${NC}"
+                exit 1
+            fi
+            BRANCH="$2"
+            shift 2
+            ;;
+        *)
+            echo -e "${RED}[ERROR] Unknown argument: $1 (usage: deploy-ci.sh [--branch <name>])${NC}"
+            exit 1
+            ;;
+    esac
+done
+
 # Header
 echo -e "${CYAN}====================================================${NC}"
 echo -e "${NC_BOLD}  Project Chimera - GitHub Actions & Shizuku Deploy ${NC}"
@@ -91,22 +112,48 @@ case "$choice" in
 esac
 
 # 3. Retrieve Latest Runs
-echo -e "\n${BLUE}[*] Fetching recent CI/CD runs for workflow: $WORKFLOW...${NC}"
+echo -e "\n${BLUE}[*] Fetching recent CI/CD runs for workflow: $WORKFLOW (branch: $BRANCH)...${NC}"
 # Get runs and print them cleanly to the user
-gh run list --repo "$REPO" --workflow "$WORKFLOW" --limit 5
+gh run list --repo "$REPO" --workflow "$WORKFLOW" --branch "$BRANCH" --limit 5
 
 echo -e "\n${NC_BOLD}Select GitHub Actions Run ID to download:${NC}"
 echo -e "Press ${GREEN}[Enter]${NC} to download from the latest run listed above."
 read -rp "Run ID (or empty for latest): " run_id
 
 if [ -z "$run_id" ]; then
-    # Grab the database ID of the first (latest) run
-    run_id=$(gh run list --repo "$REPO" --workflow "$WORKFLOW" --limit 1 --json databaseId --jq '.[0].databaseId')
+    # Latest SUCCESSFUL PUSH run on the branch (PR and fork runs are never auto-selected)
+    run_id=$(gh run list --repo "$REPO" --workflow "$WORKFLOW" --branch "$BRANCH" --event push --status success --limit 1 --json databaseId --jq '.[0].databaseId')
     if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
-        echo -e "${RED}[ERROR] No runs found for workflow $WORKFLOW.${NC}"
+        echo -e "${RED}[ERROR] No successful push runs found for workflow $WORKFLOW on branch $BRANCH.${NC}"
         exit 1
     fi
-    echo -e "${BLUE}[*] Selecting latest run ID: ${GREEN}${run_id}${NC}"
+    echo -e "${BLUE}[*] Selecting latest successful push run ID: ${GREEN}${run_id}${NC}"
+fi
+
+# Verify exactly what is about to be installed (also covers a manually typed run ID):
+# it must be a successful push run of this repository whose head is the current tip of $BRANCH.
+run_info=$(gh api "repos/$REPO/actions/runs/$run_id" --jq '[(.head_repository.full_name // "none"), (.event // "none"), (.conclusion // "none"), (.head_branch // "none"), (.head_sha // "none")] | @tsv' 2>/dev/null || true)
+IFS=$'\t' read -r run_repo run_event run_conclusion run_branch run_sha <<< "$run_info"
+tip_sha=$(gh api "repos/$REPO/commits/$BRANCH" --jq '.sha' 2>/dev/null || true)
+echo -e "${BLUE}[*] Run ${run_id}: repo=${run_repo:-unknown} event=${run_event:-unknown} result=${run_conclusion:-unknown}${NC}"
+echo -e "${BLUE}    branch=${NC_BOLD}${run_branch:-unknown}${NC} head SHA=${NC_BOLD}${run_sha:-unknown}${NC} (tip of ${BRANCH}: ${tip_sha:-unknown})"
+problems=()
+[ "$run_repo" = "$REPO" ] || problems+=("built from another repository (fork)")
+[ "$run_event" = "push" ] || problems+=("not a push run (event=${run_event:-unknown})")
+[ "$run_conclusion" = "success" ] || problems+=("run did not succeed")
+[ "$run_branch" = "$BRANCH" ] || problems+=("branch is ${run_branch:-unknown}, not $BRANCH")
+[ -n "$tip_sha" ] && [ "$run_sha" = "$tip_sha" ] || problems+=("not the current tip of $BRANCH")
+if [ "$BRANCH" != "main" ]; then
+    problems+=("branch $BRANCH is not main (unmerged code)")
+fi
+if [ "${#problems[@]}" -gt 0 ]; then
+    echo -e "${YELLOW}[WARNING] This build is not a verified main build:${NC}"
+    for p in "${problems[@]}"; do echo -e "${YELLOW}   - ${p}${NC}"; done
+    read -rp "Type INSTALL UNVERIFIED to continue, anything else to abort: " confirm
+    if [ "$confirm" != "INSTALL UNVERIFIED" ]; then
+        echo -e "${RED}[ABORT] Nothing installed.${NC}"
+        exit 1
+    fi
 fi
 
 # 4. Download the Artifact
@@ -167,5 +214,5 @@ else
 fi
 
 echo -e "${CYAN}====================================================${NC}"
-echo -e "${GREEN}${NC_BOLD}               Deployment Complete!                 ${NC_RESET}"
+echo -e "${GREEN}${NC_BOLD}               Deployment Complete!                 ${NC}"
 echo -e "${CYAN}====================================================${NC}"

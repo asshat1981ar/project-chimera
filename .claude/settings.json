@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [],
+    "deny": [
+      "Read(./.env*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.jks)",
+      "Read(**/*.keystore)",
+      "Read(**/secrets/**)",
+      "Read(./local.properties)",
+      "Read(./.git/config)",
+      "Read(**/google-services.json)",
+      "Bash(bash scripts/deploy-*:*)",
+      "Edit(./scripts/deploy*)",
+      "Write(./scripts/deploy*)"
+    ]
+  }
+}
